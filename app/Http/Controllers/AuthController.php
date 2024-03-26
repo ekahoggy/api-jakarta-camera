@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Ramsey\Uuid\Uuid as Generator;
 
 class AuthController extends Controller
 {
@@ -15,7 +18,7 @@ class AuthController extends Controller
     public function __construct()
     {
         # By default we are using here auth:api middleware
-        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
     /**
@@ -23,15 +26,79 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
-    {
-        $credentials = request(['email', 'password']);
+    // public function login()
+    // {
+    //     $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+    //     if (! $token = auth()->attempt($credentials)) {
+    //         return response()->json(['error' => 'Unauthorized'], 401);
+    //     }
+
+    //     return $this->respondWithToken($token); # If all credentials are correct - we are going to generate a new access token and send it back on response
+    // }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+        $credentials = $request->only('email', 'password');
+
+        $token = Auth::attempt($credentials);
+        if (!$token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ], 401);
         }
 
-        return $this->respondWithToken($token); # If all credentials are correct - we are going to generate a new access token and send it back on response
+        $user = Auth::user();
+        return response()->json([
+                'status' => 'success',
+                'user' => $user,
+                'authorisation' => $this->respondWithToken($token)
+            ]);
+
+    }
+
+    public function register(Request $request){
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:5',
+            'phone_code' => 'required|string|max:3',
+            'phone_number' => 'required|string|max:15|unique:users'
+        ]);
+
+        $id = Generator::uuid4()->toString();
+
+        $request->phone_number = ltrim($request->phone_number, '0');
+        $request->phone_number = ltrim($request->phone_number, '+62');
+        $request->phone_number = ltrim($request->phone_number, '62');
+
+        $user = User::create([
+            'id' => $id,
+            'type' => 'customer',
+            'username' => $request->username,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone_code' => $request->phone_code,
+            'phone_number' => $request->phone_number,
+            'phone_number' => $request->phone_number,
+            'is_active' => 'verifikasi',
+        ]);
+
+        $user->id = $id;
+        $token = Auth::login($user);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User created successfully',
+            'user' => $user,
+            'authorisation' => $this->respondWithToken($token)
+        ]);
     }
 
     /**
@@ -52,9 +119,11 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth()->logout(); # This is just logout function that will destroy access token of current user
-
-        return response()->json(['message' => 'Successfully logged out']);
+        Auth::logout();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Successfully logged out',
+        ]);
     }
 
     /**
@@ -64,9 +133,14 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        # When access token will be expired, we are going to generate a new one wit this function
-        # and return it here in response
-        return $this->respondWithToken(auth()->refresh());
+        return response()->json([
+            'status' => 'success',
+            'user' => Auth::user(),
+            'authorisation' => [
+                'token' => Auth::refresh(),
+                'type' => 'bearer',
+            ]
+        ]);
     }
 
     /**

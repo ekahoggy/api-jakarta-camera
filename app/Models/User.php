@@ -21,6 +21,8 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
+        'type',
         'username',
         'name',
         'email',
@@ -32,8 +34,13 @@ class User extends Authenticatable implements JWTSubject
         'roles_id',
         'kode',
         'email_expired',
+        'is_active',
         'created_at',
         'updated_at',
+    ];
+
+    protected $casts = [
+        'id' => 'string'
     ];
 
     public function getJWTIdentifier()
@@ -60,12 +67,37 @@ class User extends Authenticatable implements JWTSubject
         'password', 'remember_token',
     ];
 
+    public function getUser($req){
+        $query = DB::table($this->table);
+
+        if($req->type !== null){
+            $query->where("type", $req->type);
+        }
+        if($req->is_active !== null){
+            $query->where("is_active", $req->is_active);
+        }
+
+        $data = $query->limit(20)
+                    ->orderBy('name', 'ASC')
+                    ->get();
+
+        return $data;
+    }
+
+    public function changeStatus($id, $status = 'aktif'){
+        $query = DB::table($this->table)
+                    ->where('id', $id)
+                    ->update(['is_active' => $status]);
+
+        return $query;
+    }
+
     public function roles(){
         return $this->belongsTo(Role::class, 'roles_id')->select('name', 'id');
     }
 
     public function checkEmail($email){
-        $query = DB::table('users')
+        $query = DB::table($this->table)
                     ->where('email', $email)
                     ->orWhere('name', 'like', '%' . $email . '%')->get();
         return $query;
