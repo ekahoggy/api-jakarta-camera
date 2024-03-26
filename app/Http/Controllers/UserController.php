@@ -35,6 +35,22 @@ class UserController extends Controller
         }
     }
 
+    public function getDetailUser(Request $request, $id){
+        try {
+            $data = $this->user->getDetailUser($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
     public function create(Request $request){
         $request->validate([
             'username' => 'required|string|max:255',
@@ -67,13 +83,55 @@ class UserController extends Controller
                 'password' => Hash::make($request->password),
                 'phone_code' => $request->phone_code,
                 'phone_number' => $request->phone_number,
-                'phone_number' => $request->phone_number,
                 'address' => $request->address,
                 'photo' => $photo,
                 'roles_id' => $request->roles_id,
                 'is_active' => $request->is_active ? $request->is_active : 'aktif',
             ]);
             $user->id = $id;
+
+            return response()->json([
+                'data' => $user,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function update(Request $request, $id){
+        try {
+            $getDataUser = $this->user->getDetailUser($id);
+
+            $data = [
+                'type' => $request->type ? $request->type : $getDataUser->type,
+                'username' => $request->username ? $request->username : $getDataUser->username,
+                'name' => $request->name ? $request->name : $getDataUser->name,
+                'email' => $request->email ? $request->email : $getDataUser->email,
+                'password' => $request->password ? Hash::make($request->password) : false,
+                'phone_code' => $request->phone_code ? $request->phone_code : $getDataUser->phone_code,
+                'phone_number' => $request->phone_number ? $request->package_number : $getDataUser->phone_number,
+                'address' => $request->address ? $request->address : $getDataUser->address,
+                'roles_id' => $request->roles_id ? $request->roles_id : $getDataUser->roles_id,
+                'is_active' => $request->is_active ? $request->is_active : $getDataUser->is_active
+            ];
+
+            $data['phone_number'] = ltrim($data['phone_number'], '0');
+            $data['phone_number'] = ltrim($data['phone_number'], '+62');
+            $data['phone_number'] = ltrim($data['phone_number'], '62');
+            if($data['password'] === false){
+                unset($data['password']);
+            }
+
+            //upload image
+            if (!empty($request->photo)) {
+                $data['photo'] = ImageServiceProvider::uploadImage($request->photo, 'images/users/photo');
+            }
+
+            $user = $this->user->updateData($id, $data);
 
             return response()->json([
                 'data' => $user,

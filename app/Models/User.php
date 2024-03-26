@@ -84,10 +84,26 @@ class User extends Authenticatable implements JWTSubject
         return $data;
     }
 
+    public function getDetailUser($id){
+        $data = DB::table($this->table)
+                    ->where("id", $id)
+                    ->first();
+
+        return $data;
+    }
+
     public function changeStatus($id, $status = 'aktif'){
         $query = DB::table($this->table)
                     ->where('id', $id)
                     ->update(['is_active' => $status]);
+
+        return $query;
+    }
+
+    public function updateData($id, $data = []){
+        $query = DB::table($this->table)
+                    ->where('id', $id)
+                    ->update($data);
 
         return $query;
     }
