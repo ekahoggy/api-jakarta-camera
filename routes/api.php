@@ -45,7 +45,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/status', [RoleController::class, 'changeStatus']);
         });
 
-        Route::group(['prefix' => 'role'], function (){
+        Route::group(['prefix' => 'kategori'], function (){
             Route::get('/', [KategoriController::class, 'getData']);
             Route::get('/{id}', [KategoriController::class, 'getDetailKategori']);
             Route::post('/', [KategoriController::class, 'create']);

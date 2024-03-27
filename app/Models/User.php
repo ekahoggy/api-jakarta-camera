@@ -73,6 +73,9 @@ class User extends Authenticatable implements JWTSubject
         if($req->type !== null){
             $query->where("type", $req->type);
         }
+        if($req->name !== null){
+            $query->where('name', 'like', '%' . $req->name . '%');
+        }
         if($req->is_active !== null){
             $query->where("is_active", $req->is_active);
         }

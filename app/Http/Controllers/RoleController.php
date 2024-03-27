@@ -17,7 +17,7 @@ class RoleController extends Controller
 
     public function getData(Request $request){
         try {
-            $data = $this->role->getUser($request);
+            $data = $this->role->getRole($request);
 
             return response()->json([
                 'data' => $data,
