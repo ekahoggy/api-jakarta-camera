@@ -18,7 +18,7 @@ class AuthController extends Controller
     public function __construct()
     {
         # By default we are using here auth:api middleware
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'me']]);
     }
 
     /**
@@ -26,17 +26,6 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    // public function login()
-    // {
-    //     $credentials = request(['email', 'password']);
-
-    //     if (! $token = auth()->attempt($credentials)) {
-    //         return response()->json(['error' => 'Unauthorized'], 401);
-    //     }
-
-    //     return $this->respondWithToken($token); # If all credentials are correct - we are going to generate a new access token and send it back on response
-    // }
-
     public function login(Request $request)
     {
         $request->validate([
@@ -54,12 +43,14 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+        $data = [
+            'user' => $user,
+            'auth' => $this->respondWithToken($token)
+        ];
         return response()->json([
-                'status' => 'success',
-                'user' => $user,
-                'authorisation' => $this->respondWithToken($token)
-            ]);
-
+                'status_code' => 200,
+                'data'  => $data,
+            ], 200);
     }
 
     public function register(Request $request){
@@ -108,8 +99,18 @@ class AuthController extends Controller
      */
     public function me()
     {
-        # Here we just get information about current user
-        return response()->json(auth()->user());
+        if(auth()->user()){
+            return response()->json([
+                'status_code' => 200,
+                'data' => auth()->user()
+            ], 200);
+        }
+        else{
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Unauthorized',
+            ], 401);
+        }
     }
 
     /**
