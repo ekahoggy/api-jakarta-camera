@@ -122,9 +122,9 @@ class AuthController extends Controller
     {
         Auth::logout();
         return response()->json([
-            'status' => 'success',
+            'status_code' => 200,
             'message' => 'Successfully logged out',
-        ]);
+        ], 200);
     }
 
     /**
