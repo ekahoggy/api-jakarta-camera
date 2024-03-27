@@ -26,14 +26,15 @@ use App\Http\Controllers\UserController;
 */
 
 Route::group(['middleware' => 'api'], function (){
-    Route::group(['prefix' => 'auth'], function (){
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::post('/refresh', [AuthController::class, 'refresh']);
-        Route::post('/me', [AuthController::class, 'me']);
-    });
     Route::group(['prefix' => 'v1'], function (){
+        Route::group(['prefix' => 'auth'], function (){
+            Route::post('/login', [AuthController::class, 'login']);
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::post('/logout', [AuthController::class, 'logout']);
+            Route::post('/refresh', [AuthController::class, 'refresh']);
+            Route::post('/me', [AuthController::class, 'me']);
+        });
+
         Route::group(['prefix' => 'user'], function (){
             Route::get('/', [UserController::class, 'getData']);
             Route::get('/{id}', [UserController::class, 'getDetailUser']);
