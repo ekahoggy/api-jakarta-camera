@@ -29,7 +29,7 @@ class Kategori extends Model
         return $this->hasMany('App\Models\Kategori','induk_id','id') ;
     }
 
-    public function getKategori($req){
+    public function getKategori($req = []){
         $data = DB::table($this->table)->whereNull('induk_id')->orderBy('created_at', 'DESC')->get();
 
         foreach ($data as $key => $value) {
