@@ -11,7 +11,7 @@ class KategoriController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['kategori']]);
         $this->kategori = new Kategori();
     }
 
@@ -62,6 +62,18 @@ class KategoriController extends Controller
                 'message' => $th,
                 'status_code' => 500
             ], 500);
+        }
+    }
+
+    public function kategori() {
+        $kategoriModel = new kategori();
+        $categories = $kategoriModel->getKategori();
+
+        if($categories){
+            return response()->json(['status_code' => 200, 'data' => $categories], 200);
+        }
+        else{
+            return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
         }
     }
 }

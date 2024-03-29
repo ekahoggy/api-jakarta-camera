@@ -25,6 +25,7 @@ class UserController extends Controller
 
             return response()->json([
                 'data' => $data,
+                'totalItems' => count($data),
                 'status_code' => 200
             ], 200);
         } catch (\Throwable $th) {
