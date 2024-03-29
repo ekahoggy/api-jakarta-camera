@@ -17,7 +17,8 @@ class KategoriController extends Controller
 
     public function getData(Request $request){
         try {
-            $data = $this->kategori->getKategori($request);
+            $params = (array) $request->all();
+            $data = $this->kategori->getAll($params);
 
             return response()->json([
                 'data' => $data,
@@ -31,9 +32,26 @@ class KategoriController extends Controller
         }
     }
 
-    public function getDetailUser(Request $request, $id){
+    public function simpan(Request $request){
         try {
-            $data = $this->kategori->getDetailUser($id);
+            $params = $request->all();
+            $data = $this->kategori->simpan((array) $params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getDetail($id){
+        try {
+            $data = $this->kategori->getDetail($id);
 
             return response()->json([
                 'data' => $data,

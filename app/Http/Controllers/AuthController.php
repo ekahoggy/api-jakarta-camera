@@ -145,6 +145,19 @@ class AuthController extends Controller
     }
 
     /**
+     * Check token is expired.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function checkToken()
+    {
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Token not expired yet'
+        ], 200);
+    }
+
+    /**
      * Get the token array structure.
      *
      * @param  string $token

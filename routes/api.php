@@ -33,6 +33,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
+            Route::get('/checkAuthorization',  [AuthController::class, 'checkToken']);
         });
 
         Route::group(['prefix' => 'user'], function (){
@@ -53,9 +54,8 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::group(['prefix' => 'kategori'], function (){
             Route::get('/', [KategoriController::class, 'getData']);
-            Route::get('/{id}', [KategoriController::class, 'getDetailKategori']);
-            Route::post('/', [KategoriController::class, 'create']);
-            Route::post('/{id}', [KategoriController::class, 'update']);
+            Route::get('/{id}', [KategoriController::class, 'getDetail']);
+            Route::post('/save', [KategoriController::class, 'simpan']);
             Route::post('/status', [KategoriController::class, 'changeStatus']);
         });
     });
