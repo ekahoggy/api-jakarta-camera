@@ -58,6 +58,15 @@ class Kategori extends Model
         ];
     }
 
+    public function getById($id){
+        $data = DB::table($this->table)
+            ->select('id, induk_id, kategori, slug, icon, keterangan')
+            ->where('id', $id)
+            ->get();
+
+        return $data;
+    }
+
     public function simpan($params) { 
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateCategory($params);

@@ -54,7 +54,8 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::group(['prefix' => 'kategori'], function (){
             Route::get('/', [KategoriController::class, 'getData']);
-            Route::get('/{id}', [KategoriController::class, 'getDetail']);
+            Route::get('/{id}', [KategoriController::class, 'getDataById']);
+            Route::get('/detail/{id}', [KategoriController::class, 'getDetail']);
             Route::post('/save', [KategoriController::class, 'simpan']);
             Route::post('/status', [KategoriController::class, 'changeStatus']);
         });

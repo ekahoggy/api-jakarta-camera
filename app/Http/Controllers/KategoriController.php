@@ -32,10 +32,27 @@ class KategoriController extends Controller
         }
     }
 
+    public function getDataById(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->kategori->getById($params['id']);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
     public function simpan(Request $request){
         try {
-            $params = $request->all();
-            $data = $this->kategori->simpan((array) $params);
+            $params = (array) $request->all();
+            $data = $this->kategori->simpan($params);
 
             return response()->json([
                 'data' => $data,
