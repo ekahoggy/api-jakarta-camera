@@ -32,10 +32,10 @@ class KategoriController extends Controller
         }
     }
 
-    public function getDataById(Request $request){
+    public function getDataById($id){
         try {
-            $params = (array) $request->all();
-            $data = $this->kategori->getById($params['id']);
+            // $params = (array) $request->all();
+            $data = $this->kategori->getById($id);
 
             return response()->json([
                 'data' => $data,
