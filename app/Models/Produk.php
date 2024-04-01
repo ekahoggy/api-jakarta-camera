@@ -43,23 +43,37 @@ class Produk extends Model
         'id' => 'string'
     ];
 
-    public function getAll($param = []){
+    public function getAll($params = []){
         $query = DB::table('m_produk')
-                ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_produk_media.media_link')
-                ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
-                ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
-                ->where('m_produk_media.is_main', 1);
-        if(!empty($param)){
-            if($param['kategori']){
-                $query->where('m_kategori.slug', $param['kategori']);
-            }
-            // if($param['price_start']){
-            //     $query->where('m_kategori.slug', $param['kategori']);
-            // }
-        }
-        $data = $query->get();
+            ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_produk_media.media_link')
+            ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+            ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
+            ->where('m_produk_media.is_main', 1);
 
-        return $data;
+        $totalItems = $query->count();
+
+        if (isset($params['kategori']) && !empty($params['kategori'])) {
+            $query->where("m_kategori.slug", "!=", $params['kategori']);
+        }
+
+        // if (isset($params['price_start']) && !empty($params['price_start'])) {
+        //     $query->where("m_kategori.slug", "!=", $params['kategori']);
+        // }
+
+        if (isset($params['offset']) && !empty($params['offset'])) {
+            $query->offset($params['offset']);
+        }
+
+        if (isset($params['limit']) && !empty($params['limit'])) {
+            $query->limit($params['limit']);
+        }
+
+        $data = $query->orderBy('m_produk.created_at', 'DESC')->get();
+
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
     }
 
     public function getBySlug($slug){

@@ -17,9 +17,12 @@ class ProdukController extends Controller
 
     //public function
     public function getProduk(Request $request){
-        $model = Produk::where('is_active', 1)->get();
+        $produkModel = new Produk();
+        $params = (array) $request->all();
+        
+        $produk = $produkModel->getAll($params);
 
-        return response()->json(['success' => true, "data" => $model]);
+        return response()->json(['success' => true, "data" => $produk]);
     }
 
     public function getProdukById(Request $request, $id){
@@ -30,15 +33,13 @@ class ProdukController extends Controller
 
     public function katalog(Request $request) {
         $produkModel = new Produk();
-        $param = [
-            'kategori'  => $request->kategori
-        ];
-        $produk = $produkModel->getAll($param);
-        if($produk){
+        $params = (array) $request->all();
+        
+        $produk = $produkModel->getAll($params);
 
+        if ($produk){
             return response()->json(['status_code' => 200, 'data' => $produk], 200);
-        }
-        else{
+        } else{
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
         }
     }

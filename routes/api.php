@@ -60,6 +60,14 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/status', [KategoriController::class, 'changeStatus']);
         });
 
+        Route::group(['prefix' => 'produk'], function (){
+            Route::get('/', [ProdukController::class, 'getProduk']);
+            Route::get('/{id}', [ProdukController::class, 'getDataById']);
+            Route::get('/detail/{id}', [ProdukController::class, 'getDetail']);
+            Route::post('/save', [ProdukController::class, 'simpan']);
+            Route::post('/status', [ProdukController::class, 'changeStatus']);
+        });
+
         Route::prefix('public')->group(function (){
             // user post
             Route::post('/checkEmail', [UserController::class, 'checkEmail']);
