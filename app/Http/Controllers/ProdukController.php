@@ -15,7 +15,6 @@ class ProdukController extends Controller
         $this->produk = new Produk();
     }
 
-    //public function
     public function getProduk(Request $request){
         $produkModel = new Produk();
         $params = (array) $request->all();
@@ -63,6 +62,23 @@ class ProdukController extends Controller
         }
         else{
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
+        }
+    }
+
+    public function simpan(Request $request){
+        try {
+            $params = (array) $request->only('id', 'm_kategori_id', 'sku', 'nama', 'type', 'harga', 'link_tokped', 'link_shopee', 'link_bukalapak', 'link_lazada', 'link_blibli', 'detail_produk', 'deskripsi', 'in_box', 'photo');
+            $data = $this->produk->simpan($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
         }
     }
 }
