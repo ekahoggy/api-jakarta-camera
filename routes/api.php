@@ -64,8 +64,9 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/', [ProdukController::class, 'getProduk']);
             Route::get('/{id}', [ProdukController::class, 'getDataById']);
             Route::get('/detail/{id}', [ProdukController::class, 'getDetail']);
+            Route::get('/photo/{id}', [ProdukController::class, 'getPhoto']);
+            Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
             Route::post('/save', [ProdukController::class, 'simpan']);
-            Route::post('/status', [ProdukController::class, 'changeStatus']);
         });
 
         Route::prefix('public')->group(function (){

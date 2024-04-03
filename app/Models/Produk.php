@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Ramsey\Uuid\Exception\UnsatisfiedDependencyException;
+use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -96,14 +96,22 @@ class Produk extends Model
     }
 
     public function updateProduct($params) {
+
+        $id = $params['id']; unset($params['id']);
         $params['slug'] = Str::slug($params['nama'], '-');
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($params['id'], $params['photo']);
+            $this->savePhoto($id, $params['photo']); 
+            unset($params['photo']);
         }
 
-        return DB::table('m_produk')->where('id', $params['id'])->update($params);
+        if (isset($params['variant']) && !empty(isset($params['variant']))) {
+            $this->saveVariant($id, $params['variant']); 
+            unset($params['variant']);
+        }
+
+        return DB::table('m_produk')->where('id', $id)->update($params);
     }
 
     public function insertProduct($params) {
@@ -112,7 +120,13 @@ class Produk extends Model
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($params['id'], $params['photo']);
+            $this->savePhoto($params['id'], $params['photo']); 
+            unset($params['photo']);
+        }
+
+        if (isset($params['variant']) && !empty(isset($params['variant']))) {
+            $this->saveVariant($params['id'], $params['variant']); 
+            unset($params['variant']);
         }
 
         return DB::table('m_produk')->insert($params);
@@ -123,11 +137,59 @@ class Produk extends Model
 
         DB::table('m_produk_foto')->where('m_produk_id', $produkId)->delete();
         foreach($photo as $i => $image) {
+            $image['id'] = Generator::uuid4()->toString();
             $image['foto'] = $service->saveImage("produk/", $image['foto']);
             $image['m_produk_id'] = $produkId;
             $image['urutan'] = $i + 1;
 
             DB::table('m_produk_foto')->insert($image);
         }
+    }
+
+    public function saveVariant($produkId, $listVariant = []) {
+        $service = new Service();
+
+        foreach($listVariant as $variant) {
+            $variant['m_produk_id'] = $produkId;
+            $variant['photo'] = $service->saveImage("produk/", $variant['photo']);
+
+            if (isset($variant['id']) && !empty(isset($variant['id']))) {
+                $id = $variant['id']; unset($variant['id']);
+                DB::table('m_produk_varian')->where('id', $id)->update($variant);
+            } else {
+                $variant['id'] = Generator::uuid4()->toString();
+                DB::table('m_produk_varian')->insert($variant);
+            }
+
+            return true;
+        }
+    }
+
+    public function getPhoto($produkId) {
+        $photo = DB::table('m_produk_foto')->where('m_produk_id', $produkId)->get();
+
+        if (!empty($photo)) {
+            foreach($photo as $i => $image) {
+                $photo[$i]->foto = Storage::url('images/produk/' . $image->foto);
+            }
+        }
+
+        return $photo;
+    }
+
+    public function getVariant($produkId) {
+        $listVariant = DB::table('m_produk_varian')->where('m_produk_id', $produkId)->get();
+
+        if (!empty($listVariant)) {
+            foreach($listVariant as $i => $variant) {
+                if ($variant->photo)  {
+                    $variant[$i]->photo = Storage::url('images/produk/' . $variant->photo);
+                }
+            }
+
+            return $listVariant;
+        }
+
+        return [];
     }
 }
