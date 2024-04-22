@@ -61,7 +61,7 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::group(['prefix' => 'produk'], function (){
-            Route::get('/', [ProdukController::class, 'getProduk']);
+            Route::get('/', [ProdukController::class, 'getData']);
             Route::get('/{id}', [ProdukController::class, 'getDataById']);
             Route::get('/detail/{id}', [ProdukController::class, 'getDetail']);
             Route::get('/photo/{id}', [ProdukController::class, 'getPhoto']);

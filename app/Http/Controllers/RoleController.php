@@ -31,9 +31,9 @@ class RoleController extends Controller
         }
     }
 
-    public function getDetailUser(Request $request, $id){
+    public function getDetailRole(Request $request, $id){
         try {
-            $data = $this->role->getDetailUser($id);
+            $data = $this->role->getDetailRole($id);
 
             return response()->json([
                 'data' => $data,

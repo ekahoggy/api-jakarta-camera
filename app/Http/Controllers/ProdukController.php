@@ -15,10 +15,10 @@ class ProdukController extends Controller
         $this->produk = new Produk();
     }
 
-    public function getProduk(Request $request){
+    public function getData(Request $request){
         $produkModel = new Produk();
         $params = (array) $request->all();
-        
+
         $produk = $produkModel->getAll($params);
 
         return response()->json(['success' => true, "data" => $produk]);
@@ -33,7 +33,7 @@ class ProdukController extends Controller
     public function katalog(Request $request) {
         $produkModel = new Produk();
         $params = (array) $request->all();
-        
+
         $produk = $produkModel->getAll($params);
 
         if ($produk){
