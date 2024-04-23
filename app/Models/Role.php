@@ -31,6 +31,7 @@ class Role extends Model
 
     public function getRole($req){
         $query = DB::table($this->table);
+        $totalItems = $query->count();
 
         if($req->is_deleted !== null){
             $query->where("is_deleted", $req->is_deleted);
@@ -39,6 +40,17 @@ class Role extends Model
         $data = $query->limit(20)
                     ->orderBy('name', 'ASC')
                     ->get();
+
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
+    }
+
+    public function getDetailRole($id){
+        $data = DB::table($this->table)
+                    ->where("id", $id)
+                    ->first();
 
         return $data;
     }
