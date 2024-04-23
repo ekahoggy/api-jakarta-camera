@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\RegionController;
@@ -58,6 +59,14 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/detail/{id}', [KategoriController::class, 'getDetail']);
             Route::post('/save', [KategoriController::class, 'simpan']);
             Route::post('/status', [KategoriController::class, 'changeStatus']);
+        });
+
+        Route::group(['prefix' => 'voucher'], function (){
+            Route::get('/', [VoucherController::class, 'getData']);
+            Route::get('/{id}', [VoucherController::class, 'getDataById']);
+            Route::get('/detail/{id}', [VoucherController::class, 'getDetail']);
+            Route::post('/save', [VoucherController::class, 'simpan']);
+            Route::post('/status', [VoucherController::class, 'changeStatus']);
         });
 
         Route::group(['prefix' => 'produk'], function (){
