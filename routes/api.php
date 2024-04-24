@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
@@ -45,6 +46,13 @@ Route::group(['middleware' => 'api'], function (){
             Route::put('/status', [UserController::class, 'changeStatus']);
         });
 
+        Route::group(['prefix' => 'customer'], function (){
+            Route::get('/', [CustomerController::class, 'getData']);
+            Route::get('/{id}', [CustomerController::class, 'getDataById']);
+            Route::post('/save', [CustomerController::class, 'simpan']);
+            Route::post('/status', [CustomerController::class, 'changeStatus']);
+        });
+
         Route::group(['prefix' => 'role'], function (){
             Route::get('/', [RoleController::class, 'getData']);
             Route::get('/{id}', [RoleController::class, 'getDetailRole']);
@@ -64,7 +72,6 @@ Route::group(['middleware' => 'api'], function (){
         Route::group(['prefix' => 'voucher'], function (){
             Route::get('/', [VoucherController::class, 'getData']);
             Route::get('/{id}', [VoucherController::class, 'getDataById']);
-            Route::get('/detail/{id}', [VoucherController::class, 'getDetail']);
             Route::post('/save', [VoucherController::class, 'simpan']);
             Route::post('/status', [VoucherController::class, 'changeStatus']);
         });
