@@ -11,6 +11,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\PromoController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiteController;
@@ -67,6 +68,13 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/detail/{id}', [KategoriController::class, 'getDetail']);
             Route::post('/save', [KategoriController::class, 'simpan']);
             Route::post('/status', [KategoriController::class, 'changeStatus']);
+        });
+
+        Route::group(['prefix' => 'promo'], function (){
+            Route::get('/', [PromoController::class, 'getData']);
+            Route::get('/{id}', [PromoController::class, 'getDataById']);
+            Route::post('/save', [PromoController::class, 'simpan']);
+            Route::post('/status', [PromoController::class, 'changeStatus']);
         });
 
         Route::group(['prefix' => 'voucher'], function (){
