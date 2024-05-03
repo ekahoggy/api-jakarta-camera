@@ -83,8 +83,7 @@ class KategoriController extends Controller
     }
 
     public function kategori() {
-        $kategoriModel = new kategori();
-        $categories = $kategoriModel->getKategori();
+        $categories = $this->kategori->getKategori();
 
         if($categories){
             return response()->json(['status_code' => 200, 'data' => $categories], 200);
