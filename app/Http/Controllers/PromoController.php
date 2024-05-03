@@ -50,7 +50,7 @@ class PromoController extends Controller
 
     public function simpan(Request $request){
         try {
-            $params = (array) $request->only('id', 'kode', 'promo', 'tanggal_mulai', 'tanggal_selesai', 'jam_mulai', 'jam_selesai', 'is_status');
+            $params = (array) $request->only('id', 'kode', 'promo', 'tanggal_mulai', 'tanggal_selesai', 'jam_mulai', 'jam_selesai');
             $data = $this->promo->simpan($params);
 
             return response()->json([
