@@ -54,6 +54,14 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/status', [CustomerController::class, 'changeStatus']);
         });
 
+        Route::group(['prefix' => 'address'], function (){
+            Route::get('/', [AddressController::class, 'getData'])->name('getData');
+            Route::get('/edit', [AddressController::class, 'getAddressById'])->name('getDataById');
+            Route::post('/save', [AddressController::class, 'saveAddress'])->name('simpan');
+            Route::post('/update', [AddressController::class, 'updateAddress'])->name('simpan');
+            Route::post('/delete', [AddressController::class, 'deleteAddress'])->name('deleteAddress');
+        });
+
         Route::group(['prefix' => 'role'], function (){
             Route::get('/', [RoleController::class, 'getData']);
             Route::get('/{id}', [RoleController::class, 'getDetailRole']);

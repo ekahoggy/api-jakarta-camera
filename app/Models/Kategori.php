@@ -104,4 +104,15 @@ class Kategori extends Model
 
         return DB::table('m_kategori')->insert($params);
     }
+
+    public function getKategori(){
+        $data = DB::table('m_kategori')->whereNull('induk_id')->orderBy('created_at', 'DESC')->get();
+
+        foreach ($data as $key => $value) {
+            $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
+            $data[$key]->child = DB::table('m_kategori')->where('induk_id', $value->id)->get();
+        }
+
+        return $data;
+    }
 }

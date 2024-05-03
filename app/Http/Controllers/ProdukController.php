@@ -11,7 +11,7 @@ class ProdukController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['produk']]);
+        // $this->middleware('auth:api', ['except' => ['produk']]);
         $this->produk = new Produk();
     }
 
