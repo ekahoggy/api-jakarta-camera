@@ -130,6 +130,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/save', [AddressController::class, 'saveAddress'])->name('saveAddress');
             Route::post('/update', [AddressController::class, 'updateAddress'])->name('updateAddress');
             Route::post('/delete', [AddressController::class, 'deleteAddress'])->name('deleteAddress');
+            Route::get('/main', [AddressController::class, 'getMainAddress'])->name('mainAddress');
         });
 
         // Region

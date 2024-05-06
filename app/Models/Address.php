@@ -92,6 +92,10 @@ class Address extends Model
                 $query->where('users_address.user_id', '=', $params['user_id']);
             }
 
+            if (isset($params['active']) && !empty($params['active'])) {
+                $query->where('users_address.active', '=', $params['active']);
+            }
+
         return $query->get();
     }
 

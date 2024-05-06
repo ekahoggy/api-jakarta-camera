@@ -107,4 +107,14 @@ class AddressController extends Controller
 
         return response()->json(['status_code' => 422, 'message' => 'An error occurred on the server'], 422);
     }
+
+    public function getMainAddress(Request $request) {
+        $params = $request->all();
+        $data = $this->address->getAddress($params);
+
+        return response()->json([
+            'data' => $data,
+            'status_code' => 200, 
+        ], 200);
+    }
 }
