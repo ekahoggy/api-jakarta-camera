@@ -10,6 +10,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\RegionController;
@@ -141,11 +142,15 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/province', [RegionController::class, 'province'])->name('province');
         });
 
+        Route::prefix('order')->group(function (){
+            Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
+        });
+
         Route::get('/make-password', function() {
             $password = bcrypt('123456');
 
             return response([
-                'message' => 'Berhasil melakukan manipulasi storage',
+                'message' => 'Berhasil membuat password',
                 'password' => $password
             ]);
         });
