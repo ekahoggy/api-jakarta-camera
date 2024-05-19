@@ -71,7 +71,7 @@ class Kategori extends Model
         return $data;
     }
 
-    public function simpan($params) { 
+    public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateCategory($params);
         } else {

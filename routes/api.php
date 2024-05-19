@@ -16,7 +16,11 @@ use App\Http\Controllers\PromoController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiteController;
+use App\Http\Controllers\StokKategoriController;
+use App\Http\Controllers\StokKeluarController;
+use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\UserController;
+use App\Models\StokUpdate;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +104,36 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/photo/{id}', [ProdukController::class, 'getPhoto']);
             Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
             Route::post('/save', [ProdukController::class, 'simpan']);
+        });
+
+        Route::group(['prefix' => 'stok'], function (){
+            Route::get('/available', [StokMasukController::class, 'getAvailable']);
+
+            Route::group(['prefix' => 'kategori'], function (){
+                Route::get('/', [StokKategoriController::class, 'getData']);
+                Route::get('/{id}', [StokKategoriController::class, 'getDataById']);
+                Route::get('/type/{type}', [StokKategoriController::class, 'getDataByType']);
+                Route::post('/save', [StokKategoriController::class, 'simpan']);
+                Route::post('/status', [StokKategoriController::class, 'changeStatus']);
+            });
+            Route::group(['prefix' => 'masuk'], function (){
+                Route::get('/', [StokMasukController::class, 'getData']);
+                Route::get('/{id}', [StokMasukController::class, 'getDataById']);
+                Route::post('/save', [StokMasukController::class, 'simpan']);
+                Route::post('/status', [StokMasukController::class, 'changeStatus']);
+            });
+            Route::group(['prefix' => 'keluar'], function (){
+                Route::get('/', [StokKeluarController::class, 'getData']);
+                Route::get('/{id}', [StokKeluarController::class, 'getDataById']);
+                Route::post('/save', [StokKeluarController::class, 'simpan']);
+                Route::post('/status', [StokKeluarController::class, 'changeStatus']);
+            });
+            Route::group(['prefix' => 'opname'], function (){
+                Route::get('/', [StokUpdate::class, 'getData']);
+                Route::get('/{id}', [StokUpdate::class, 'getDataById']);
+                Route::post('/save', [StokUpdate::class, 'simpan']);
+                Route::post('/status', [StokUpdate::class, 'changeStatus']);
+            });
         });
 
         Route::prefix('public')->group(function (){
