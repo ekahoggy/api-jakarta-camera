@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Promo;
+use App\Models\PromoDet;
 use Illuminate\Http\Request;
 
 class PromoController extends Controller
 {
     protected $promo;
+    protected $promoDet;
 
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['promo']]);
         $this->promo = new Promo();
+        $this->promoDet = new PromoDet();
     }
 
     public function getData(Request $request){
@@ -35,6 +38,7 @@ class PromoController extends Controller
     public function getDataById($id){
         try {
             $data = $this->promo->getById($id);
+            $data->detail = $this->promoDet->getDetailByPromo($id);
 
             return response()->json([
                 'data' => $data,
@@ -50,8 +54,22 @@ class PromoController extends Controller
 
     public function simpan(Request $request){
         try {
-            $params = (array) $request->only('id', 'kode', 'promo', 'tanggal_mulai', 'tanggal_selesai', 'jam_mulai', 'jam_selesai');
-            $data = $this->promo->simpan($params);
+            $params = (array) $request->all();
+            $data = $this->promo->simpan($params['main']);
+            $detail = [];
+            foreach ($params['detail'] as $key => $value) {
+                $detail[$key]['m_promo_id'] = $data['id'];
+                $detail[$key]['m_produk_id'] = $value['produk'];
+                $detail[$key]['persen'] = $value['diskon'];
+                $detail[$key]['nominal'] = ((double)$value['diskon'] / 100) * (int)$value['harga'];
+                $detail[$key]['promo_used'] = 0;
+                $detail[$key]['qty'] = $value['jumlah'];
+            }
+
+            // simpan detail promo
+            foreach ($detail as $key => $value) {
+                $this->promoDet->simpan($value);
+            }
 
             return response()->json([
                 'data' => $data,

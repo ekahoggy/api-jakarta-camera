@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Ramsey\Uuid\Uuid as Generator;
+use Illuminate\Support\Facades\Auth;
 
 class PromoDet extends Model
 {
@@ -27,9 +29,19 @@ class PromoDet extends Model
     ];
 
     public function getDetailByPromo($id_promo = null){
-        $query = DB::table($this->table);
-        $totalItems = $query->count();
+        $query = DB::table($this->table)
+        ->select(
+            'm_promo_det.*',
+            'm_produk.id as m_produk_id',
+            'm_produk.nama',
+            'm_produk.sku',
+            'm_produk.harga'
+        )
+        ->leftJoin('m_produk', 'm_produk.id', '=', 'm_promo_det.m_produk_id');
 
+        if ($id_promo !== null) {
+            $query->where("m_promo_id", "=", $id_promo);
+        }
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
             $query->where("id", "!=", $params['notEqual']);
         }
@@ -42,11 +54,26 @@ class PromoDet extends Model
             $query->limit($params['limit']);
         }
 
-        $data = $query->orderBy('created_at', 'DESC')->get();
+        $data = $query->get();
 
-        return [
-            'list' => $data,
-            'totalItems' => $totalItems
-        ];
+        return $data;
+    }
+
+    public function simpan($params) {
+        if (isset($params['id']) && !empty($params['id'])) {
+            return $this->updatePromoDet($params);
+        } else {
+            return $this->insertPromoDet($params);
+        }
+    }
+
+    public function updatePromoDet($params) {
+        $id = $params['id']; unset($params['id']);
+        return DB::table($this->table)->where('id', $id)->update($params);
+    }
+
+    public function insertPromoDet($params) {
+        $params['id'] = Generator::uuid4()->toString();
+        return DB::table($this->table)->insert($params);
     }
 }
