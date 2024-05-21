@@ -102,6 +102,13 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/save', [ProdukController::class, 'simpan']);
         });
 
+        Route::group(['prefix' => 'order'], function (){
+            Route::get('/', [OrderController::class, 'getData']);
+            Route::get('/{id}', [OrderController::class, 'getDataById']);
+            Route::post('/save', [OrderController::class, 'simpan']);
+            Route::post('/status', [OrderController::class, 'changeStatus']);
+        });
+
         Route::prefix('public')->group(function (){
             // user post
             Route::post('/checkEmail', [UserController::class, 'checkEmail']);
