@@ -67,7 +67,7 @@ class ProdukController extends Controller
 
     public function simpan(Request $request){
         try {
-            $params = (array) $request->only('id', 'm_kategori_id', 'sku', 'nama', 'type', 'harga', 'link_tokped', 'link_shopee', 'link_bukalapak', 'link_lazada', 'link_blibli', 'detail_produk', 'deskripsi', 'in_box', 'photo', 'variant');
+            $params = (array) $request->all();
             $data = $this->produk->simpan($params);
 
             return response()->json([
