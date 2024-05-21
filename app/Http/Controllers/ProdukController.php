@@ -105,4 +105,16 @@ class ProdukController extends Controller
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
         }
     }
+
+    public function varian($type){
+        $produkModel = new Produk();
+        $variant = $produkModel->varian($type);
+
+        if($variant){
+            return response()->json(['status_code' => 200, 'data' => $variant], 200);
+        }
+        else{
+            return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
+        }
+    }
 }

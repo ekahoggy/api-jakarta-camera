@@ -87,7 +87,7 @@ class Produk extends Model
         return $query;
     }
 
-    public function simpan($params) { 
+    public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateProduct($params);
         } else {
@@ -102,12 +102,12 @@ class Produk extends Model
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($id, $params['photo']); 
+            $this->savePhoto($id, $params['photo']);
             unset($params['photo']);
         }
 
         if (isset($params['variant']) && !empty(isset($params['variant']))) {
-            $this->saveVariant($id, $params['variant']); 
+            $this->saveVariant($id, $params['variant']);
             unset($params['variant']);
         }
 
@@ -120,12 +120,12 @@ class Produk extends Model
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($params['id'], $params['photo']); 
+            $this->savePhoto($params['id'], $params['photo']);
             unset($params['photo']);
         }
 
         if (isset($params['variant']) && !empty(isset($params['variant']))) {
-            $this->saveVariant($params['id'], $params['variant']); 
+            $this->saveVariant($params['id'], $params['variant']);
             unset($params['variant']);
         }
 
@@ -191,5 +191,15 @@ class Produk extends Model
         }
 
         return [];
+    }
+
+    public function varian($type) {
+        if($type === 'ukuran'){
+            $data = DB::table('m_varian_ukuran')->get();
+        }else if($type === 'warna'){
+            $data = DB::table('m_varian_warna')->get();
+        }
+
+        return $data;
     }
 }

@@ -103,6 +103,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/detail/{id}', [ProdukController::class, 'getDetail']);
             Route::get('/photo/{id}', [ProdukController::class, 'getPhoto']);
             Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
+            Route::get('/variant/type/{type}', [ProdukController::class, 'varian']);
             Route::post('/save', [ProdukController::class, 'simpan']);
         });
 
