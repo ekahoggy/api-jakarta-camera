@@ -87,7 +87,7 @@ class Produk extends Model
         return $query;
     }
 
-    public function simpan($params) { 
+    public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateProduct($params);
         } else {
@@ -102,12 +102,12 @@ class Produk extends Model
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($id, $params['photo']); 
+            $this->savePhoto($id, $params['photo']);
             unset($params['photo']);
         }
 
         if (isset($params['variant']) && !empty(isset($params['variant']))) {
-            $this->saveVariant($id, $params['variant']); 
+            $this->saveVariant($id, $params['variant']);
             unset($params['variant']);
         }
 
@@ -120,12 +120,12 @@ class Produk extends Model
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($params['id'], $params['photo']); 
+            $this->savePhoto($params['id'], $params['photo']);
             unset($params['photo']);
         }
 
         if (isset($params['variant']) && !empty(isset($params['variant']))) {
-            $this->saveVariant($params['id'], $params['variant']); 
+            $this->saveVariant($params['id'], $params['variant']);
             unset($params['variant']);
         }
 
@@ -135,23 +135,26 @@ class Produk extends Model
     public function savePhoto($produkId, $photo) {
         $service = new Service();
 
-        DB::table('m_produk_foto')->where('m_produk_id', $produkId)->delete();
+        DB::table('m_produk_media')->where('m_produk_id', $produkId)->delete();
         foreach($photo as $i => $image) {
             $image['id'] = Generator::uuid4()->toString();
-            $image['foto'] = $service->saveImage("produk/", $image['foto']);
+            $image['media_link'] = $service->saveImage("produk/", $image['foto']);
             $image['m_produk_id'] = $produkId;
+            $image['is_main'] = $i == 0 ? 1 : 0;
             $image['urutan'] = $i + 1;
 
-            DB::table('m_produk_foto')->insert($image);
+            DB::table('m_produk_media')->insert($image);
         }
     }
 
-    public function saveVariant($produkId, $listVariant = []) {
+    public function saveVariant($produkId, $listVariant) {
         $service = new Service();
 
         foreach($listVariant as $variant) {
             $variant['m_produk_id'] = $produkId;
-            $variant['photo'] = $service->saveImage("produk/", $variant['photo']);
+            if (isset($variant['image']) && !empty(isset($variant['image']))) {
+                $variant['image'] = $service->saveImage("produk/", $variant['image']);
+            }
 
             if (isset($variant['id']) && !empty(isset($variant['id']))) {
                 $id = $variant['id']; unset($variant['id']);
@@ -160,8 +163,6 @@ class Produk extends Model
                 $variant['id'] = Generator::uuid4()->toString();
                 DB::table('m_produk_varian')->insert($variant);
             }
-
-            return true;
         }
     }
 
@@ -191,5 +192,15 @@ class Produk extends Model
         }
 
         return [];
+    }
+
+    public function varian($type) {
+        if($type === 'ukuran'){
+            $data = DB::table('m_varian_ukuran')->get();
+        }else if($type === 'warna'){
+            $data = DB::table('m_varian_warna')->get();
+        }
+
+        return $data;
     }
 }

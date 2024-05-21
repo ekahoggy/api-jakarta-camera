@@ -17,7 +17,8 @@ class StokKategori extends Model
         'id',
         'nama',
         'type',
-        'deskripsi'
+        'deskripsi',
+        'status'
     ];
 
     protected $casts = [
@@ -40,6 +41,7 @@ class StokKategori extends Model
             $query->limit($params['limit']);
         }
 
+        $query->where("status", "=", 1);
         $data = $query->orderBy('created_at', 'DESC')->get();
 
         return [
@@ -52,6 +54,14 @@ class StokKategori extends Model
         $data = DB::table($this->table)
             ->where('id', $id)
             ->first();
+
+        return $data;
+    }
+
+    public function getDataByType($type){
+        $data = DB::table($this->table)
+            ->where('type', $type)
+            ->get();
 
         return $data;
     }
@@ -69,6 +79,22 @@ class StokKategori extends Model
 
         $id = $params['id']; unset($params['id']);
         $params['updated_at'] = date('Y-m-d H:i:s');
+
+        return DB::table($this->table)->where('id', $id)->update($params);
+    }
+
+    public function updateStatus($params) {
+        $id = $params['id']; unset($params['id']);
+        $params['updated_at'] = date('Y-m-d H:i:s');
+
+        return DB::table($this->table)->where('id', $id)->update($params);
+    }
+
+    public function changeStatus($params) {
+        $id = $params['id'];
+
+        $params['updated_at'] = date('Y-m-d H:i:s');
+        $params['status'] = 0;
 
         return DB::table($this->table)->where('id', $id)->update($params);
     }

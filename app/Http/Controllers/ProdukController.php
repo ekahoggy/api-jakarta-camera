@@ -67,7 +67,7 @@ class ProdukController extends Controller
 
     public function simpan(Request $request){
         try {
-            $params = (array) $request->only('id', 'm_kategori_id', 'sku', 'nama', 'type', 'harga', 'link_tokped', 'link_shopee', 'link_bukalapak', 'link_lazada', 'link_blibli', 'detail_produk', 'deskripsi', 'in_box', 'photo', 'variant');
+            $params = (array) $request->all();
             $data = $this->produk->simpan($params);
 
             return response()->json([
@@ -97,6 +97,18 @@ class ProdukController extends Controller
     public function getVariant($id) {
         $produkModel = new Produk();
         $variant = $produkModel->getVariant($id);
+
+        if($variant){
+            return response()->json(['status_code' => 200, 'data' => $variant], 200);
+        }
+        else{
+            return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
+        }
+    }
+
+    public function varian($type){
+        $produkModel = new Produk();
+        $variant = $produkModel->varian($type);
 
         if($variant){
             return response()->json(['status_code' => 200, 'data' => $variant], 200);

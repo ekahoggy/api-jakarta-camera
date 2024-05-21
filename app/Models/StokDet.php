@@ -50,10 +50,32 @@ class StokDet extends Model
 
     public function getById($id){
         $data = DB::table($this->table)
-            ->where('id', $id)
-            ->first();
+            ->where('t_stok_id', $id)
+            ->get();
 
         return $data;
+    }
+
+    public function getAvailable($params){
+        $data = DB::table($this->table)
+            ->select('t_stok.*', 't_stok_det.m_produk_id', 't_stok_det.qty')
+            ->leftJoin('t_stok', 't_stok.id', '=' , 't_stok_det.t_stok_id')
+            // ->where('t_stok.type', $params['type'])
+            ->where('t_stok.status', 'a')
+            ->where('t_stok_det.m_produk_id', $params['m_produk_id'])
+            ->get();
+
+        $stok = 0;
+        foreach ($data as $key => $value) {
+            if($value->type === 'i'){
+                $stok += $value->qty;
+            }
+            else{
+                $stok -= $value->qty;
+            }
+        }
+
+        return $stok;
     }
 
     public function simpan($params) {
@@ -65,20 +87,12 @@ class StokDet extends Model
     }
 
     public function updateStokDet($params) {
-        $service = new Service();
-
         $id = $params['id']; unset($params['id']);
-        $params['updated_at'] = date('Y-m-d H:i:s');
-
         return DB::table($this->table)->where('id', $id)->update($params);
     }
 
     public function insertStokDet($params) {
-        $service = new Service();
-
         $params['id'] = Generator::uuid4()->toString();
-        $params['created_at'] = date('Y-m-d H:i:s');
-
         return DB::table($this->table)->insert($params);
     }
 }
