@@ -46,8 +46,16 @@ class Produk extends Model
 
     public function getAll($params = []){
         $query = DB::table('m_produk')
-            ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_produk_media.media_link')
+            ->selectRaw(
+                'm_produk.*,
+                m_kategori.kategori,
+                m_kategori.slug as slug_kategori,
+                m_brand.brand,
+                m_brand.slug as slug_brand,
+                m_produk_media.media_link'
+            )
             ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+            ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
             ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
             ->where('m_produk_media.is_main', 1);
 
@@ -137,13 +145,16 @@ class Produk extends Model
 
         DB::table('m_produk_media')->where('m_produk_id', $produkId)->delete();
         foreach($photo as $i => $image) {
-            $image['id'] = Generator::uuid4()->toString();
-            $image['media_link'] = $service->saveImage("produk/", $image['foto']);
-            $image['m_produk_id'] = $produkId;
-            $image['is_main'] = $i == 0 ? 1 : 0;
-            $image['urutan'] = $i + 1;
+            $data = [];
+            if($image['isFoto']){
+                $data['id'] = Generator::uuid4()->toString();
+                $data['media_link'] = $service->saveImage("produk/", $image['foto']);
+                $data['m_produk_id'] = $produkId;
+                $data['is_main'] = $i == 0 ? 1 : 0;
+                $data['urutan'] = $i + 1;
 
-            DB::table('m_produk_media')->insert($image);
+                DB::table('m_produk_media')->insert($data);
+            }
         }
     }
 
@@ -153,7 +164,7 @@ class Produk extends Model
         foreach($listVariant as $variant) {
             $variant['m_produk_id'] = $produkId;
             if (isset($variant['image']) && !empty(isset($variant['image']))) {
-                $variant['image'] = $service->saveImage("produk/", $variant['image']);
+                $variant['image'] = $service->saveImage("produk-variant/", $variant['image']);
             }
 
             if (isset($variant['id']) && !empty(isset($variant['id']))) {
@@ -167,11 +178,11 @@ class Produk extends Model
     }
 
     public function getPhoto($produkId) {
-        $photo = DB::table('m_produk_foto')->where('m_produk_id', $produkId)->get();
+        $photo = DB::table('m_produk_media')->where('m_produk_id', $produkId)->get();
 
         if (!empty($photo)) {
             foreach($photo as $i => $image) {
-                $photo[$i]->foto = Storage::url('images/produk/' . $image->foto);
+                $photo[$i]->foto = Storage::url('images/produk/' . $image->media_link);
             }
         }
 
@@ -183,8 +194,8 @@ class Produk extends Model
 
         if (!empty($listVariant)) {
             foreach($listVariant as $i => $variant) {
-                if ($variant->photo)  {
-                    $variant[$i]->photo = Storage::url('images/produk/' . $variant->photo);
+                if ($variant->image)  {
+                    $listVariant[$i]->image = Storage::url('images/produk-variant/' . $variant->image);
                 }
             }
 

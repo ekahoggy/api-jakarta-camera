@@ -110,6 +110,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
             Route::get('/variant/type/{type}', [ProdukController::class, 'varian']);
             Route::post('/save', [ProdukController::class, 'simpan']);
+            Route::post('/prosesVariant', [ProdukController::class, 'prosesVariant']);
         });
 
         Route::group(['prefix' => 'stok'], function (){
