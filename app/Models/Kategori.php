@@ -37,6 +37,15 @@ class Kategori extends Model
         $query = DB::table($this->table);
         $totalItems = $query->count();
 
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if($key === 'kategori'){
+                    $query->where('kategori', 'like', '%' . $value . '%');
+                }
+            }
+        }
+
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
             $query->where("id", "!=", $params['notEqual']);
         }
@@ -53,7 +62,7 @@ class Kategori extends Model
 
         foreach ($data as $key => $value) {
             $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
-            $data[$key]->child = DB::table($this->table)->where('induk_id', $value->id)->get();
+            $data[$key]->children = DB::table($this->table)->where('induk_id', $value->id)->get();
         }
 
         return [

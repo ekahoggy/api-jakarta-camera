@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VoucherController;
@@ -81,6 +82,10 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/detail/{id}', [KategoriController::class, 'getDetail']);
             Route::post('/save', [KategoriController::class, 'simpan']);
             Route::post('/status', [KategoriController::class, 'changeStatus']);
+        });
+
+        Route::group(['prefix' => 'brand'], function (){
+            Route::get('/', [BrandController::class, 'getData']);
         });
 
         Route::group(['prefix' => 'promo'], function (){
