@@ -34,7 +34,6 @@ class SliderController extends Controller
 
     public function getDataById($id){
         try {
-            // $params = (array) $request->all();
             $data = $this->slider->getById($id);
 
             return response()->json([
@@ -93,13 +92,29 @@ class SliderController extends Controller
         }
     }
 
+    public function changeStatus(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->slider->changeStatus($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
     public function moveSlider(Request $request) {
         $params = (array) $request->all();
         try {
             $payload['index_position'] = $params['curr'];
 
             $model = Slider::find($params['id']);
-            // dd($payload);
             if($model->index_position < $payload['index_position']){
                 Slider::where('index_position', '>',$payload['index_position'])->increment('index_position', 1);
                 Slider::where('index_position','>',$model->index_position)->decrement('index_position', 1);

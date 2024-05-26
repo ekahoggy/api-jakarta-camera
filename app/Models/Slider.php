@@ -55,6 +55,7 @@ class Slider extends Model
             $query->limit($params['limit']);
         }
 
+        $query->where('is_status', 1);
         $data = $query->orderBy('index_position', 'ASC')->get();
 
         foreach ($data as $key => $value) {
@@ -105,6 +106,12 @@ class Slider extends Model
         $params['picture_mobile'] = $service->saveImage("slider/", $params['picture_mobile']);
 
         return DB::table($this->table)->insert($params);
+    }
+
+    public function changeStatus($params) {
+        $id = $params['id'];
+        $params['is_status'] = 0;
+        return DB::table($this->table)->where('id', $id)->update($params);
     }
 
     public function getSlider(){
