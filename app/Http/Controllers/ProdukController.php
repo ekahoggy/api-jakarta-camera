@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Produk;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
@@ -11,7 +12,7 @@ class ProdukController extends Controller
 
     public function __construct()
     {
-        // $this->middleware('auth:api', ['except' => ['produk']]);
+        $this->middleware('auth:api', ['except' => ['produk']]);
         $this->produk = new Produk();
     }
 
@@ -20,7 +21,12 @@ class ProdukController extends Controller
         $params = (array) $request->all();
 
         $produk = $produkModel->getAll($params);
-
+        foreach ($produk['list'] as $key => $value) {
+            $value->variant = $produkModel->getVariant($value->id);
+            $value->photo_product = $produkModel->getPhoto($value->id);
+            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->rowspan = count($value->variant);
+        }
         return response()->json(['success' => true, "data" => $produk]);
     }
 
@@ -116,5 +122,32 @@ class ProdukController extends Controller
         else{
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
         }
+    }
+
+    public function prosesVariant(Request $request){
+        $params = (array) $request->all();
+        $data_utama = (array) $params['data_utama'];
+        $data_second = (array) $params['data_second'];
+        $splitDataUtama = [];
+        foreach ($data_utama as $key => $value) {
+            $splitDataUtama[$value['varian1']][] = $value;
+        }
+
+        foreach ($splitDataUtama as $key => $value) {
+            foreach ($data_second as $i => $s) {
+                foreach ($value as $k => $v) {
+                    if($i === $k){
+                        $splitDataUtama[$key][$k]['varian2'] = $s['nama'];
+                    }
+                }
+            }
+        }
+        $data = [];
+        foreach ($splitDataUtama as $key => $value) {
+            foreach ($value as $k => $v) {
+                $data[] = $v;
+            }
+        }
+        return response()->json(['status_code' => 200, 'data' => array_values($data)], 200);
     }
 }
