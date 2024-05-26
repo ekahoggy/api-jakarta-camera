@@ -122,6 +122,13 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/prosesVariant', [ProdukController::class, 'prosesVariant']);
         });
 
+        Route::group(['prefix' => 'order'], function (){
+            Route::get('/', [OrderController::class, 'getData']);
+            Route::get('/{id}', [OrderController::class, 'getDataById']);
+            Route::post('/save', [OrderController::class, 'simpan']);
+            Route::post('/status', [OrderController::class, 'changeStatus']);
+        });
+        
         Route::group(['prefix' => 'stok'], function (){
             Route::get('/available', [StokMasukController::class, 'getAvailable']);
 
@@ -160,8 +167,8 @@ Route::group(['middleware' => 'api'], function (){
 
             // public
             Route::get('/kategori', [KategoriController::class, 'kategori'])->name('kategori');
-            Route::get('/produk', [ProdukController::class, 'produk'])->name('produk');
-            Route::get('/getProdukSlug', [ProdukController::class, 'getProdukSlug'])->name('getProdukSlug');
+            Route::get('/produk', [SiteController::class, 'getProduct'])->name('produk');
+            Route::get('/getProdukSlug', [SiteController::class, 'getProdukSlug'])->name('getProdukSlug');
             Route::get('/katalog', [ProdukController::class, 'katalog'])->name('katalog');
             Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
         });

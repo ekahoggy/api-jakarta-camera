@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Models\Service;
 
 class Customer extends Model

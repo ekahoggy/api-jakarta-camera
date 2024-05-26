@@ -69,8 +69,7 @@ class AuthController extends Controller
         $request->phone_number = ltrim($request->phone_number, '+62');
         $request->phone_number = ltrim($request->phone_number, '62');
 
-        $user = User::create([
-            'id' => $id,
+        $user = User::create([  'id' => $id,
             'type' => 'customer',
             'username' => $request->username,
             'name' => $request->name,

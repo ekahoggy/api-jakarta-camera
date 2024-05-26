@@ -11,7 +11,69 @@ class OrderController extends Controller
 
     public function __construct()
     {
+        $this->middleware('auth:api', ['except' => ['kategori']]);
         $this->order = new Order();
+    }
+
+    public function getData(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->order->getAll($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getDataById($id){
+        try {
+            $data = $this->order->getById($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function simpan(Request $request){
+        try {
+            $params = (array) $request->only('id', 'type', 'username', 'name', 'email', 'password', 'phone_code', 'phone_number', 'remember_token', 'address', 'photo', 'roles_id', 'kode', 'email_expired', 'is_active',);
+            $data = $this->order->simpan($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,   
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function order() {
+        $order = $this->order->getCustomer();
+
+        if($order){
+            return response()->json(['status_code' => 200, 'data' => $order], 200);
+        }
+        else{
+            return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
+        }
     }
 
     public function createOrder(Request $request) {

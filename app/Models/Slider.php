@@ -60,6 +60,7 @@ class Slider extends Model
 
         foreach ($data as $key => $value) {
             $data[$key]->picture = Storage::url('images/slider/' . $value->picture);
+            $data[$key]->picture_mobile = Storage::url('images/slider/' . $value->picture_mobile);
         }
 
         return [
