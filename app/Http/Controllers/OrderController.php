@@ -11,7 +11,7 @@ class OrderController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['kategori']]);
+        $this->middleware('auth:api', ['except' => ['order']]);
         $this->order = new Order();
     }
 

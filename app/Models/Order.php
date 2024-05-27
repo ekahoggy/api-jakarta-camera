@@ -25,7 +25,7 @@ class Order extends Model
     ];
 
     public function getOrder($params) {
-        $data = DB::table($this->table)
+        $orders = DB::table($this->table)
             ->select(
                 't_order.id',
                 't_order.product_id',
@@ -34,11 +34,24 @@ class Order extends Model
                 'm_produk.nama',
                 'm_produk.harga'
             )
-            ->leftJoin('m_produk', 'm_produk.id', '=', 't_order.product_id')
             ->where($params)
             ->get();
+        
+        foreach($orders as $order) {
+            $order->detail = DB::table('t_order_detail')
+                ->select(
+                    't_order_detail.id',
+                    't_order_detail.product_id',
+                    't_order_detail.user_id',
+                    't_order_detail.quantity',
+                    'm_produk.nama',
+                    'm_produk.harga'
+                )
+                ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
+                ->get();
+        }
 
-        return $data;
+        return $orders;
     }
 
     public function createOrder($params) {

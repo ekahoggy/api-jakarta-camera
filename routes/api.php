@@ -200,6 +200,7 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::prefix('order')->group(function (){
+            Route::post('/get', [OrderController::class, 'getOrder'])->name('getOrder');
             Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
         });
 
