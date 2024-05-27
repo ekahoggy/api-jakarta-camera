@@ -27,7 +27,7 @@ class ProdukController extends Controller
             $value->foto = Storage::url('images/produk/' . $value->media_link);
             $value->rowspan = count($value->variant);
         }
-        return response()->json(['success' => true, "data" => $produk]);    
+        return response()->json(['success' => true, "data" => $produk]);
     }
 
     public function getProdukById(Request $request, $id){
@@ -91,13 +91,25 @@ class ProdukController extends Controller
         $produkModel = new Produk();
         $variant = $produkModel->getVariant($id);
 
-        $groupVarian = [];
-        foreach ($variant as $key => $value) {
-            dd($value);
+        $groupedData = [];
+        $varian1 = '';
+        $varian2 = '';
+        foreach ($variant as $item) {
+            $varian1 = $item->varian1_type;
+            $varian2 = $item->varian2_type;
+            $var = $item->varian1;
+            if (!isset($groupedData[$var])) {
+                $groupedData[$var] = [];
+            }
+            $groupedData[$var][] = $item;
         }
-
         if($variant){
-            return response()->json(['status_code' => 200, 'data' => $variant], 200);
+            return response()->json(['status_code' => 200,
+            'data' => $variant,
+            'group' => array_values($groupedData),
+            'varian1' => $varian1,
+            'varian2' => $varian2
+        ], 200);
         }
         else{
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
