@@ -78,6 +78,15 @@ class Produk extends Model
                 }
             }
         }
+
+        if (isset($params['kategori']) && !empty($params['kategori'])) {
+            $query->where('m_kategori.slug', $params['kategori']);
+        }
+
+        if (isset($params['brand']) && !empty($params['brand'])) {
+            $query->where('m_brand.slug', $params['brand']);
+        }
+
         if (isset($params['offset']) && !empty($params['offset'])) {
             $query->offset($params['offset']);
         }
@@ -96,8 +105,9 @@ class Produk extends Model
 
     public function getBySlug($slug){
         $query = DB::table('m_produk')
-                ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_produk_media.media_link')
+                ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_brand.brand, m_brand.slug as slug_brand,m_produk_media.media_link')
                 ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+                ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
                 ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
                 ->where('m_produk_media.is_main', 1)
                 ->where('m_produk.slug', $slug)
@@ -192,11 +202,16 @@ class Produk extends Model
     }
 
     public function getPhoto($produkId) {
-        $photo = DB::table('m_produk_media')->where('m_produk_id', $produkId)->get();
+        $photo = DB::table('m_produk_media')->where('m_produk_id', $produkId)
+        ->orderBy('urutan', 'ASC')
+        ->get();
 
         if (!empty($photo)) {
             foreach($photo as $i => $image) {
-                $photo[$i]->foto = Storage::url('images/produk/' . $image->media_link);
+                if($image->media_link !== ''){
+                    $photo[$i]->foto = Storage::url('images/produk/' . $image->media_link);
+                    $photo[$i]->isFoto = true;
+                }
             }
         }
 
@@ -212,7 +227,6 @@ class Produk extends Model
                     $listVariant[$i]->image = Storage::url('images/produk-variant/' . $variant->image);
                 }
             }
-
             return $listVariant;
         }
 

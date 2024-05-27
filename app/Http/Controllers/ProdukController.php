@@ -104,6 +104,11 @@ class ProdukController extends Controller
         $produkModel = new Produk();
         $variant = $produkModel->getVariant($id);
 
+        $groupVarian = [];
+        foreach ($variant as $key => $value) {
+            dd($value);
+        }
+
         if($variant){
             return response()->json(['status_code' => 200, 'data' => $variant], 200);
         }
