@@ -59,12 +59,25 @@ class Produk extends Model
             ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
             ->where('m_produk_media.is_main', 1);
 
-        $totalItems = $query->count();
-
-        if (isset($params['kategori']) && !empty($params['kategori'])) {
-            $query->where("m_kategori.slug", "!=", $params['kategori']);
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if($key === 'nama'){
+                    $query->where('nama', 'like', '%' . $value . '%');
+                    // $query->orWhere('sku', 'like', '%' . $value . '%');
+                }
+                if($key === 'm_kategori_id'){
+                    if($value !== null){
+                        $query->where('m_kategori_id', $value);
+                    }
+                }
+                if($key === 'm_brand_id'){
+                    if($value !== null){
+                        $query->where('m_brand_id', $value);
+                    }
+                }
+            }
         }
-
         if (isset($params['offset']) && !empty($params['offset'])) {
             $query->offset($params['offset']);
         }
@@ -74,7 +87,7 @@ class Produk extends Model
         }
 
         $data = $query->orderBy('m_produk.created_at', 'DESC')->get();
-
+        $totalItems = $query->count();
         return [
             'list' => $data,
             'totalItems' => $totalItems
@@ -126,6 +139,7 @@ class Produk extends Model
         $params['id'] = Generator::uuid4()->toString();
         $params['slug'] = Str::slug($params['nama'], '-');
         $params['updated_at'] = date('Y-m-d H:i:s');
+        $params['sku'] = 'JC-'.date('ymdhms');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
             $this->savePhoto($params['id'], $params['photo']);
