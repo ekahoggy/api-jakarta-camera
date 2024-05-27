@@ -27,26 +27,13 @@ class ProdukController extends Controller
             $value->foto = Storage::url('images/produk/' . $value->media_link);
             $value->rowspan = count($value->variant);
         }
-        return response()->json(['success' => true, "data" => $produk]);
+        return response()->json(['success' => true, "data" => $produk]);    
     }
 
     public function getProdukById(Request $request, $id){
         $data = Produk::where('is_active', 1)->where('id', $id)->first();
 
         return response()->json(['success' => true, "data" => $data]);
-    }
-
-    public function katalog(Request $request) {
-        $produkModel = new Produk();
-        $params = (array) $request->all();
-
-        $produk = $produkModel->getAll($params);
-
-        if ($produk){
-            return response()->json(['status_code' => 200, 'data' => $produk], 200);
-        } else{
-            return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
-        }
     }
 
     public function produk() {
