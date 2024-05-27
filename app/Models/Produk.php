@@ -59,10 +59,32 @@ class Produk extends Model
             ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
             ->where('m_produk_media.is_main', 1);
 
-        $totalItems = $query->count();
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if($key === 'nama'){
+                    $query->where('nama', 'like', '%' . $value . '%');
+                    // $query->orWhere('sku', 'like', '%' . $value . '%');
+                }
+                if($key === 'm_kategori_id'){
+                    if($value !== null){
+                        $query->where('m_kategori_id', $value);
+                    }
+                }
+                if($key === 'm_brand_id'){
+                    if($value !== null){
+                        $query->where('m_brand_id', $value);
+                    }
+                }
+            }
+        }
 
         if (isset($params['kategori']) && !empty($params['kategori'])) {
-            $query->where("m_kategori.slug", "!=", $params['kategori']);
+            $query->where('m_kategori.slug', $params['kategori']);
+        }
+
+        if (isset($params['brand']) && !empty($params['brand'])) {
+            $query->where('m_brand.slug', $params['brand']);
         }
 
         if (isset($params['offset']) && !empty($params['offset'])) {
@@ -74,7 +96,7 @@ class Produk extends Model
         }
 
         $data = $query->orderBy('m_produk.created_at', 'DESC')->get();
-
+        $totalItems = $query->count();
         return [
             'list' => $data,
             'totalItems' => $totalItems
@@ -83,12 +105,13 @@ class Produk extends Model
 
     public function getBySlug($slug){
         $query = DB::table('m_produk')
-            ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_produk_media.media_link')
-            ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
-            ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
-            ->where('m_produk_media.is_main', 1)
-            ->where('m_produk.slug', $slug)
-            ->first();
+                ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_brand.brand, m_brand.slug as slug_brand,m_produk_media.media_link')
+                ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+                ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
+                ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
+                ->where('m_produk_media.is_main', 1)
+                ->where('m_produk.slug', $slug)
+                ->first();
 
         $query->detail_foto = DB::table('m_produk_media')->where('m_produk_id', $query->id)->get();
 
@@ -126,6 +149,7 @@ class Produk extends Model
         $params['id'] = Generator::uuid4()->toString();
         $params['slug'] = Str::slug($params['nama'], '-');
         $params['updated_at'] = date('Y-m-d H:i:s');
+        $params['sku'] = 'JC-'.date('ymdhms');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
             $this->savePhoto($params['id'], $params['photo']);
@@ -178,11 +202,16 @@ class Produk extends Model
     }
 
     public function getPhoto($produkId) {
-        $photo = DB::table('m_produk_media')->where('m_produk_id', $produkId)->get();
+        $photo = DB::table('m_produk_media')->where('m_produk_id', $produkId)
+        ->orderBy('urutan', 'ASC')
+        ->get();
 
         if (!empty($photo)) {
             foreach($photo as $i => $image) {
-                $photo[$i]->foto = Storage::url('images/produk/' . $image->media_link);
+                if($image->media_link !== ''){
+                    $photo[$i]->foto = Storage::url('images/produk/' . $image->media_link);
+                    $photo[$i]->isFoto = true;
+                }
             }
         }
 
@@ -198,7 +227,6 @@ class Produk extends Model
                     $listVariant[$i]->image = Storage::url('images/produk-variant/' . $variant->image);
                 }
             }
-
             return $listVariant;
         }
 
@@ -213,5 +241,11 @@ class Produk extends Model
         }
 
         return $data;
+    }
+
+    public function updateStok($params) {
+        $model = DB::table('m_produk_varian')->where('id', $params['id'])->update(['stok' => $params['stok']]);
+
+        return true;
     }
 }

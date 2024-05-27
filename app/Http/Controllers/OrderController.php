@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Xendit;
 use Illuminate\Http\Request;
-
 class OrderController extends Controller
 {
     protected $order;
+    protected $xendit;
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['order']]);
+        $this->middleware('auth:api', ['except' => ['kategori', 'checkout', 'xenditCallback']]);
         $this->order = new Order();
+        $this->xendit = new Xendit();
     }
 
     public function getData(Request $request){
@@ -59,7 +61,7 @@ class OrderController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => $th,   
+                'message' => $th,
                 'status_code' => 500
             ], 500);
         }
@@ -85,6 +87,8 @@ class OrderController extends Controller
             $this->order->createOrderDetail($item);
         }
 
+        dd($model);
+
         if (!empty($model)) {
             return response()->json(['status_code' => 200, 'message' => 'Successfully create order'], 200);
         }
@@ -94,6 +98,18 @@ class OrderController extends Controller
 
     public function getOrder(Request $request) {
         $params = $request->all();
+        $data = $this->order->getOrder($params);
+
+        return response()->json([
+            'data' => $data,
+            'status_code' => 200,
+            'message' => 'Successfully create order'
+        ], 200);
+    }
+
+    public function xenditCallback(Request $request) {
+        $params = $request->all();
+        dd($params);
         $data = $this->order->getOrder($params);
 
         return response()->json([
