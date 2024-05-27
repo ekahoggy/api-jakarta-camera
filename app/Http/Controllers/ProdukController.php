@@ -112,6 +112,19 @@ class ProdukController extends Controller
         }
     }
 
+    public function updateStok(Request $request){
+        $params = (array) $request->all();
+        $produkModel = new Produk();
+        $data = $produkModel->updateStok($params);
+
+        if($data){
+            return response()->json(['status_code' => 200, 'data' => $data], 200);
+        }
+        else{
+            return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
+        }
+    }
+
     public function varian($type){
         $produkModel = new Produk();
         $variant = $produkModel->varian($type);
@@ -130,6 +143,7 @@ class ProdukController extends Controller
         $data_second = (array) $params['data_second'];
         $splitDataUtama = [];
         foreach ($data_utama as $key => $value) {
+            $value['image'] = '';
             $splitDataUtama[$value['varian1']][] = $value;
         }
 

@@ -214,4 +214,10 @@ class Produk extends Model
 
         return $data;
     }
+
+    public function updateStok($params) {
+        $model = DB::table('m_produk_varian')->where('id', $params['id'])->update(['stok' => $params['stok']]);
+
+        return true;
+    }
 }

@@ -120,6 +120,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/variant/type/{type}', [ProdukController::class, 'varian']);
             Route::post('/save', [ProdukController::class, 'simpan']);
             Route::post('/prosesVariant', [ProdukController::class, 'prosesVariant']);
+            Route::post('/updateStok', [ProdukController::class, 'updateStok']);
         });
 
         Route::group(['prefix' => 'order'], function (){
