@@ -127,8 +127,14 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/{id}', [OrderController::class, 'getDataById']);
             Route::post('/save', [OrderController::class, 'simpan']);
             Route::post('/status', [OrderController::class, 'changeStatus']);
+            Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
+            Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
         });
-        
+
+        Route::group(['prefix' => 'xendit'], function (){
+            Route::post('/callback', [OrderController::class, 'xenditCallback']);
+        });
+
         Route::group(['prefix' => 'stok'], function (){
             Route::get('/available', [StokMasukController::class, 'getAvailable']);
 
@@ -197,10 +203,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/subdistrict', [RegionController::class, 'subdistrict'])->name('subdistrict');
             Route::get('/city', [RegionController::class, 'city'])->name('city');
             Route::get('/province', [RegionController::class, 'province'])->name('province');
-        });
-
-        Route::prefix('order')->group(function (){
-            Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
         });
 
         Route::get('/make-password', function() {
