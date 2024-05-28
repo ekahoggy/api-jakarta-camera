@@ -49,9 +49,10 @@ class SiteController extends Controller
     public function getProdukSlug(Request $request) {
         $produk = $this->product->getBySlug($request->slug);
         $produk->variant = $this->product->getVariant($produk->id);
+        $produk->foto = $this->product->getMainPhotoProduk($produk->id);
 
         foreach ($produk->detail_foto as $value) {
-            $value->foto = $this->product->getMainPhotoProduk($value->id);
+            $value->foto = Storage::url('images/produk/' . $value->media_link);
         }
 
         if($produk){

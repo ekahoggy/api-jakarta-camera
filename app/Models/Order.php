@@ -36,7 +36,7 @@ class Order extends Model
             )
             ->where($params)
             ->get();
-        
+
         foreach($orders as $order) {
             $order->detail = DB::table('t_order_detail')
                 ->select(
@@ -93,18 +93,19 @@ class Order extends Model
 
     private function generateCodeInvoice() {
         $totalOrder = DB::table('t_order')->where('date', "=", date("Y-m-d"))->count();
-        $count = $totalOrder += 1;
+        $count = $totalOrder + 1;
         $date = date("ymd");
 
+        //sequence tidak jalan
         if (strlen($count) == 1) {
-            $sequence = "00$count"; 
+            $sequence = "00$count";
         } else if (strlen($count) == 2) {
-            $sequence = "0$count"; 
+            $sequence = "0$count";
         } else if (strlen($count) == 3) {
-            $sequence = "$count"; 
+            $sequence = "$count";
         }
 
-        return "INV/$date/$sequence";
+        return "INV-JC/$date/".date('is');
     }
 
     public function getAll($params){
@@ -149,11 +150,11 @@ class Order extends Model
 
         return [
             'data' => $data,
-            'detail' => $detail 
+            'detail' => $detail
         ];
     }
 
-    public function simpan($params) { 
+    public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateOrder($params);
         } else {
