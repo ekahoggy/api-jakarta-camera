@@ -2,25 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Kategori;
+use App\Models\News;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 
-class KategoriController extends Controller
+class NewsController extends Controller
 {
-    protected $kategori;
+    protected $news;
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['kategori']]);
-        $this->kategori = new Kategori();
+        $this->middleware('auth:api', ['except' => ['news']]);
+        $this->news = new News();
     }
 
     public function getData(Request $request){
         try {
             $params = (array) $request->all();
-            $data = $this->kategori->getAll($params);
+            $data = $this->news->getAll($params);
 
             return response()->json([
                 'data' => $data,
@@ -36,8 +35,24 @@ class KategoriController extends Controller
 
     public function getDataById($id){
         try {
-            // $params = (array) $request->all();
-            $data = $this->kategori->getById($id);
+            $data = $this->news->getById($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function changeStatus(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->news->changeStatus($params);
 
             return response()->json([
                 'data' => $data,
@@ -54,11 +69,12 @@ class KategoriController extends Controller
     public function simpan(Request $request){
         $params = (array) $request->all();
         $validator = Validator::make($params, [
-            "kategori"  => "required",
-            "icon"  => "required"
+            "judul"  => "required",
+            "image"  => "required",
+            "tags"  => "required|array"
         ]);
         if ($validator->valid()) {
-            $data = $this->kategori->simpan($params);
+            $data = $this->news->simpan($params);
 
             return response()->json([
                 'data' => $data,
@@ -73,27 +89,11 @@ class KategoriController extends Controller
         }
     }
 
-    public function getDetail($id){
-        try {
-            $data = $this->kategori->getDetail($id);
+    public function news() {
+        $news = $this->news->getNews();
 
-            return response()->json([
-                'data' => $data,
-                'status_code' => 200
-            ], 200);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'message' => $th,
-                'status_code' => 500
-            ], 500);
-        }
-    }
-
-    public function kategori() {
-        $categories = $this->kategori->getKategori();
-
-        if($categories){
-            return response()->json(['status_code' => 200, 'data' => $categories], 200);
+        if($news){
+            return response()->json(['status_code' => 200, 'data' => $news], 200);
         }
         else{
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/route-cache', function() {
+    Artisan::call('storage:link');
     Artisan::call('route:cache');
     Artisan::call('config:cache');
     Artisan::call('cache:clear');

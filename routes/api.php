@@ -11,6 +11,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
@@ -119,8 +120,11 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
             Route::get('/variant/type/{type}', [ProdukController::class, 'varian']);
             Route::post('/save', [ProdukController::class, 'simpan']);
+            Route::post('/ubahStatus', [ProdukController::class, 'ubahStatus']);
             Route::post('/prosesVariant', [ProdukController::class, 'prosesVariant']);
+            Route::post('/prosesPhotoVarian', [ProdukController::class, 'prosesPhotoVarian']);
             Route::post('/updateStok', [ProdukController::class, 'updateStok']);
+            Route::post('/updateStokProduk', [ProdukController::class, 'updateStokProduk']);
         });
 
         Route::group(['prefix' => 'order'], function (){
@@ -134,6 +138,14 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::group(['prefix' => 'xendit'], function (){
             Route::post('/callback', [OrderController::class, 'xenditCallback']);
+        });
+
+        Route::group(['prefix' => 'news'], function (){
+            Route::get('/', [NewsController::class, 'getData']);
+            Route::get('/{id}', [NewsController::class, 'getDataById']);
+            Route::get('/detail/{id}', [NewsController::class, 'getDetail']);
+            Route::post('/save', [NewsController::class, 'simpan']);
+            Route::post('/status', [NewsController::class, 'changeStatus']);
         });
 
         Route::group(['prefix' => 'stok'], function (){
