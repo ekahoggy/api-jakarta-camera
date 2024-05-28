@@ -175,4 +175,22 @@ class Order extends Model
 
         return DB::table('users')->insert($params);
     }
+
+    public function payment($data) {
+        if (isset($data['payment_id'])) {
+            $model = DB::table('t_payment')->where('payment_id', $data['payment_id'])->update($data);
+        } else {
+            $data['payment_id'] = Generator::uuid4()->toString();
+            DB::table('t_payment')->insert($data);
+            $model = $data;
+        }
+
+        return $model;
+    }
+
+    public function updateOrderPaymentId($params) {
+        $id = $params['id']; unset($params['id']);
+
+        return DB::table('t_order')->where('id', $id)->update($params);
+    }
 }

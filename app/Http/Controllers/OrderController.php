@@ -12,7 +12,7 @@ class OrderController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['kategori', 'checkout', 'xenditCallback']]);
+        $this->middleware('auth:api', ['except' => ['createOrder', 'kategori', 'checkout', 'xenditCallback']]);
         $this->order = new Order();
         $this->xendit = new Xendit();
     }
@@ -89,6 +89,20 @@ class OrderController extends Controller
 
         if (!empty($model)) {
             $generateInvoice = $this->xendit->createInvoice($model);
+            $dataPayment['payment_type'] = 'x';
+            $dataPayment['payment_total'] = $model['grand_total'];
+            $dataPayment['payment_status'] = 'n';
+            $dataPayment['payment_code']    = $generateInvoice['id'];
+            $dataPayment['payment_expired'] = $generateInvoice['expiry_date'];
+            $dataPayment['payment_link']    = $generateInvoice['invoice_url'];
+            $payment = $this->order->payment($dataPayment);
+
+            $updateOrder = [
+                'id' => $model['id'],
+                'payment_id' => $payment['payment_id']
+            ];
+            $this->order->updateOrderPaymentId($updateOrder);
+
             return response()->json(['status_code' => 200, 'message' => 'Successfully create order', 'link' => $generateInvoice['invoice_url']], 200);
         }
 
