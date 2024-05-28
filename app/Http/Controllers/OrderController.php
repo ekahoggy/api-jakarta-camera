@@ -122,13 +122,21 @@ class OrderController extends Controller
 
     public function xenditCallback(Request $request) {
         $params = $request->all();
-        dd($params);
-        $data = $this->order->getOrder($params);
+        $status = $params['status'];
+
+        if($status === 'PAID'){
+            $paymentData = [
+                'method' => $params['payment_method'],
+                'payment_status' => 'p',
+                'channel' => $params['bank_code'],
+            ];
+
+            $this->order->updateStatusOrder($params['id'], $params['external_id'], $paymentData);
+        }
 
         return response()->json([
-            'data' => $data,
-            'status_code' => 200,
-            'message' => 'Successfully create order'
+            'data' => [],
+            'status_code' => 200
         ], 200);
     }
 }

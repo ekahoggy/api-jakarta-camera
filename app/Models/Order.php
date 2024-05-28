@@ -193,4 +193,12 @@ class Order extends Model
 
         return DB::table('t_order')->where('id', $id)->update($params);
     }
+
+    function updateStatusOrder($id, $inv, $params) {
+        DB::table('t_payment')->where('payment_code', $id)->update($params);
+        $status_order = $params['payment_status'] == 'p' ? 'processed' : 'ordered';
+        $order = DB::table('t_order')->where('invoice_number', $inv)->update(['status_order' => $status_order]);
+
+        return $order;
+    }
 }
