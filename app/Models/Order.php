@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid as Generator;
 
@@ -74,6 +75,9 @@ class Order extends Model
         $payload["note"] = isset($params["note"]) ? $params["note"] : "";
         $payload["date"] = date("Y-m-d H:i:s");
         $payload["status_order"] = "ordered";
+
+        $payload['created_by'] = Auth::user()->id;
+        $payload['created_at'] = date('Y-m-d H:i:s');
 
         DB::table($this->table)->insert($payload);
 
@@ -164,9 +168,11 @@ class Order extends Model
 
     public function updateOrder($params) {
         $id = $params['id']; unset($params['id']);
-        $params['updated_at'] = date('Y-m-d H:i:s');
+        $data['status_order'] = $params['status_order'];
+        $data['updated_by'] = Auth::user()->id;
+        $data['updated_at'] = date('Y-m-d H:i:s');
 
-        return DB::table('users')->where('id', $id)->update($params);
+        return DB::table('t_order')->where('id', $id)->update($data);
     }
 
     public function insertOrder($params) {

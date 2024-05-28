@@ -12,6 +12,8 @@
         "laravel/socialite": "^5.12",
         "laravel/tinker": "^2.8",
         "ramsey/uuid": "^4.7",
+        "symfony/http-client": "^7.0",
+        "symfony/mailgun-mailer": "^7.0",
         "tymon/jwt-auth": "^2.1",
         "xendit/xendit-php": "^5.0"
     },

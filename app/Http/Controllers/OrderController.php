@@ -17,11 +17,32 @@ class OrderController extends Controller
         $this->xendit = new Xendit();
     }
 
+    function statusOrder($status) {
+        if($status === 'ordered'){
+            return 'Belum Bayar';
+        }
+        else if($status === 'processed'){
+            return 'Konfirmasi';
+        }
+        else if($status === 'sent'){
+            return 'Kirim';
+        }
+        else if($status === 'received'){
+            return 'Selesai';
+        }
+        else{
+            return 'Batal';
+        }
+    }
+
     public function getData(Request $request){
         try {
             $params = (array) $request->all();
             $data = $this->order->getAll($params);
 
+            foreach ($data['list'] as $key => $value) {
+                $value->status_order_convert = $this->statusOrder($value->status_order);
+            }
             return response()->json([
                 'data' => $data,
                 'status_code' => 200
@@ -116,7 +137,16 @@ class OrderController extends Controller
         return response()->json([
             'data' => $data,
             'status_code' => 200,
-            'message' => 'Successfully create order'
+        ], 200);
+    }
+
+    public function changeStatus(Request $request) {
+        $params = $request->all();
+        $data = $this->order->updateOrder($params);
+
+        return response()->json([
+            'data' => $data,
+            'status_code' => 200
         ], 200);
     }
 
