@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid as Generator;
+use App\Models\Produk;
 
 class Cart extends Model
 {
@@ -25,18 +26,25 @@ class Cart extends Model
     ];
 
     public function getCart($params) {
+        $produk = new Produk();
+
         $data = DB::table($this->table)
             ->select(
                 't_cart.id',
                 't_cart.product_id',
                 't_cart.user_id',
                 't_cart.quantity',
+                'm_produk.id as produk_id',
                 'm_produk.nama',
                 'm_produk.harga'
             )
             ->leftJoin('m_produk', 'm_produk.id', '=', 't_cart.product_id')
             ->where($params)
             ->get();
+
+        foreach ($data as $value) {
+            $value->foto = $produk->getMainPhotoProduk($value->produk_id);
+        }
 
         return $data;
     }

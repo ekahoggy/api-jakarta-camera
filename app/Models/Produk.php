@@ -266,6 +266,7 @@ class Produk extends Model
     public function getMainPhotoProduk($id) {
         $data = DB::table('m_produk_media')->where('m_produk_id', $id)->where('is_main', 1)->first();
         $url = Storage::url('images/produk/' . $data->media_link);
+        
         return $url;
     }
 }
