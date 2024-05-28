@@ -40,7 +40,7 @@ class SiteController extends Controller
         foreach ($produk['list'] as $key => $value) {
             $value->variant = $this->product->getVariant($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
-            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->rowspan = count($value->variant);
         }
         return response()->json(['success' => true, "data" => $produk]);
@@ -49,10 +49,9 @@ class SiteController extends Controller
     public function getProdukSlug(Request $request) {
         $produk = $this->product->getBySlug($request->slug);
         $produk->variant = $this->product->getVariant($produk->id);
-        $produk->foto = Storage::url('images/produk/' . $produk->media_link);
 
         foreach ($produk->detail_foto as $value) {
-            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = $this->product->getMainPhotoProduk($value->id);
         }
 
         if($produk){
