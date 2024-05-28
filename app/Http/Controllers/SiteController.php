@@ -52,7 +52,7 @@ class SiteController extends Controller
         $produk->foto = $this->product->getMainPhotoProduk($produk->id);
 
         foreach ($produk->detail_foto as $value) {
-            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = $value->foto = Storage::url('images/produk/' . $value->media_link);
         }
 
         if($produk){
