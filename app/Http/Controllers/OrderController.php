@@ -87,10 +87,9 @@ class OrderController extends Controller
             $this->order->createOrderDetail($item);
         }
 
-        dd($model);
-
         if (!empty($model)) {
-            return response()->json(['status_code' => 200, 'message' => 'Successfully create order'], 200);
+            $generateInvoice = $this->xendit->createInvoice($model);
+            return response()->json(['status_code' => 200, 'message' => 'Successfully create order', 'link' => $generateInvoice['invoice_url']], 200);
         }
 
         return response()->json(['status_code' => 422, 'message' => 'An error occurred on the server'], 422);

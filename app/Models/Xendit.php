@@ -21,9 +21,9 @@ class Xendit extends Model
     {
         $apiInstance = new InvoiceApi();
         $create_invoice_request = new CreateInvoiceRequest([
-            'external_id' => $data['external_id'],
-            'description' => $data['description'],
-            'amount' => $data['amount'],
+            'external_id' => $data['invoice_number'],
+            'description' => isset($data['description']) ? $data['description'] : '-',
+            'amount' => $data['grand_total'],
             'currency' => 'IDR',
             'reminder_time' => 1
         ]);
