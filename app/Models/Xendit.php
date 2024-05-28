@@ -25,7 +25,9 @@ class Xendit extends Model
             'description' => isset($data['description']) ? $data['description'] : '-',
             'amount' => $data['grand_total'],
             'currency' => 'IDR',
-            'reminder_time' => 1
+            'reminder_time' => 1,
+            'success_redirect_url' => 'https://jakartacamera.moodstudio.id/complete-order',
+            'failure_redirect_url' => 'https://jakartacamera.moodstudio.id/home'
         ]);
 
         try {
