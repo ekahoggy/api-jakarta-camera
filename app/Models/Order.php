@@ -76,7 +76,7 @@ class Order extends Model
         $payload["date"] = date("Y-m-d H:i:s");
         $payload["status_order"] = "ordered";
 
-        $payload['created_by'] = Auth::user()->id;
+        // $payload['created_by'] = Auth::user()->id;
         $payload['created_at'] = date('Y-m-d H:i:s');
 
         DB::table($this->table)->insert($payload);
