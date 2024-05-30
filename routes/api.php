@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NewsController;
@@ -46,6 +47,11 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
             Route::get('/checkAuthorization',  [AuthController::class, 'checkToken']);
+        });
+
+        Route::group(['prefix' => 'dashboard'], function (){
+            Route::get('/pendapatan', [DashboardController::class, 'pendapatan']);
+            Route::get('/penjualanhariini', [DashboardController::class, 'penjualanhariini']);
         });
 
         Route::group(['prefix' => 'user'], function (){
@@ -136,6 +142,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
             Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
         });
+
 
         Route::group(['prefix' => 'xendit'], function (){
             Route::post('/callback', [OrderController::class, 'xenditCallback']);

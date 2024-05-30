@@ -123,6 +123,14 @@ class Order extends Model
             $query->where("id", "!=", $params['notEqual']);
         }
 
+        if (isset($params['bulan']) && !empty($params['bulan'])) {
+            $query->whereMonth('date', '=', $params['bulan']);
+        }
+
+        if (isset($params['hari']) && !empty($params['hari'])) {
+            $query->whereDate('date', '=', $params['hari']);
+        }
+
         if (isset($params['offset']) && !empty($params['offset'])) {
             $query->offset($params['offset']);
         }
