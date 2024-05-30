@@ -19,10 +19,13 @@ class News extends Model
 
     protected $fillable = [
         'id',
+        'm_news_kategori_id',
         'judul',
         'slug',
         'image',
+        'image_alt',
         'content',
+        'meta_content',
         'tags',
         'views',
         'is_publish',
@@ -42,10 +45,12 @@ class News extends Model
         $query = DB::table($this->table)
         ->select(
             'm_news.*',
+            'm_news_kategori.kategori',
             'a.name as pembuat',
             'b.name as pengubah',
             'p.name as publish',
         )
+        ->leftJoin('m_news_kategori','m_news_kategori.id', '=', 'm_news.m_news_kategori_id')
         ->leftJoin('users as a','a.id', '=', 'm_news.created_by')
         ->leftJoin('users as b','b.id', '=', 'm_news.updated_by')
         ->leftJoin('users as p','p.id', '=', 'm_news.publish_by');
@@ -103,7 +108,12 @@ class News extends Model
     }
 
     public function simpan($params) {
+        $modelKategori = new NewsKategori();
         $params['tags'] = implode(", ", $params['tags']);
+        if(is_string($params['m_news_kategori_id'])){
+            $params['m_news_kategori_id'] = $modelKategori->simpan($params['m_news_kategori_id']);
+        }
+
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateNews($params);
         } else {

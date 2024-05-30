@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NewsKategoriController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
@@ -146,6 +147,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/detail/{id}', [NewsController::class, 'getDetail']);
             Route::post('/save', [NewsController::class, 'simpan']);
             Route::post('/status', [NewsController::class, 'changeStatus']);
+        });
+
+        Route::group(['prefix' => 'news-kategori'], function (){
+            Route::get('/', [NewsKategoriController::class, 'kategori']);
+            Route::get('/{id}', [NewsKategoriController::class, 'getDataById']);
+            Route::post('/save', [NewsKategoriController::class, 'simpan']);
         });
 
         Route::group(['prefix' => 'stok'], function (){
