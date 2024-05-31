@@ -11,8 +11,24 @@ class DashboardController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => []]);
+        $this->middleware('auth:api', ['except' => ['counterPesanan']]);
         $this->order = new Order();
+    }
+
+    public function counterPesanan(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->order->getCounted();
+            return response()->json([
+                'data' => $data[0],
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
     }
 
     public function pendapatan(Request $request){

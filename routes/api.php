@@ -50,6 +50,7 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::group(['prefix' => 'dashboard'], function (){
+            Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
             Route::get('/pendapatan', [DashboardController::class, 'pendapatan']);
             Route::get('/penjualanhariini', [DashboardController::class, 'penjualanhariini']);
         });
@@ -205,6 +206,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
             Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
             Route::get('/brand', [SiteController::class, 'getBrand']);
+
+            Route::get('/stok', [SiteController::class, 'getStok']);
         });
 
         // Cart

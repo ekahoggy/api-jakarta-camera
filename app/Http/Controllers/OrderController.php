@@ -58,6 +58,7 @@ class OrderController extends Controller
     public function getDataById($id){
         try {
             $data = $this->order->getById($id);
+            $data['data']->status_order_convert = $this->statusOrder($data['data']->status_order);
 
             return response()->json([
                 'data' => $data,

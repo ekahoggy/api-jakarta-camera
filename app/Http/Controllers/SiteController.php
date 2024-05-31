@@ -8,18 +8,21 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Slider;
 use App\Models\Produk;
 use App\Models\Brand;
+use App\Models\Order;
 
 class SiteController extends Controller
 {
     protected $slider;
     protected $product;
     protected $brand;
+    protected $order;
 
     public function __construct()
     {
         $this->slider = new Slider();
         $this->product = new Produk();
         $this->brand = new Brand();
+        $this->order = new Order();
     }
 
     public function slider() {
@@ -70,7 +73,7 @@ class SiteController extends Controller
         foreach ($produk['list'] as $key => $value) {
             $value->variant = $this->product->getVariant($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
-            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->rowspan = count($value->variant);
         }
 
@@ -85,6 +88,23 @@ class SiteController extends Controller
         try {
             $params = (array) $request->all();
             $data = $this->brand->getAll($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getStok(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->product->stok($params);
 
             return response()->json([
                 'data' => $data,

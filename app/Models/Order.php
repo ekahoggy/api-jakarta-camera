@@ -114,7 +114,12 @@ class Order extends Model
 
     public function getAll($params){
         $query = DB::table($this->table)
-            ->select('t_order.*', 'users.name', 'users.username', 'users.email')
+            ->select(
+                't_order.*',
+                'users.name',
+                'users.username',
+                'users.email'
+            )
             ->leftJoin('users', 'users.id', '=', 't_order.user_id');
 
         $totalItems = $query->count();
@@ -145,6 +150,27 @@ class Order extends Model
             'list' => $data,
             'totalItems' => $totalItems
         ];
+    }
+
+    public function getCounted(){
+        $query = DB::table($this->table)
+            ->select(
+                array(
+                    DB::raw("SUM(CASE
+                        WHEN t_order.status_order = 'ordered' THEN 1 ELSE 0 END) AS total_pending"),
+                    DB::raw("SUM(CASE
+                        WHEN t_order.status_order = 'processed' THEN 1 ELSE 0 END) AS total_konfirmasi"),
+                    DB::raw("SUM(CASE
+                        WHEN t_order.status_order = 'sent' THEN 1 ELSE 0 END) AS total_kirim"),
+                    DB::raw("SUM(CASE
+                        WHEN t_order.status_order = 'received' THEN 1 ELSE 0 END) AS total_selesai"),
+                    DB::raw("SUM(CASE
+                        WHEN t_order.status_order = 'canceled' THEN 1 ELSE 0 END) AS total_batal"),
+                )
+            );
+
+        $data = $query->get();
+        return $data;
     }
 
     public function getById($id){
