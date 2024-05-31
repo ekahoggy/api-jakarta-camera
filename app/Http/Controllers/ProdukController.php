@@ -119,7 +119,8 @@ class ProdukController extends Controller
         $groupedData = [];
         $varian1 = '';
         $varian2 = '';
-        foreach ($variant as $item) {
+        foreach ($variant['all_varian'] as $item) {
+            $item->image = Storage::url('images/produk-variant/' . $item->image);
             $varian1 = $item->varian1_type;
             $varian2 = $item->varian2_type;
             $var = $item->varian1;
@@ -128,9 +129,9 @@ class ProdukController extends Controller
             }
             $groupedData[$var][] = $item;
         }
-        if($variant){
+        if($variant['all_varian']){
             return response()->json(['status_code' => 200,
-            'data' => $variant,
+            'data' => $variant['all_varian'],
             'group' => array_values($groupedData),
             'varian1' => $varian1,
             'varian2' => $varian2
