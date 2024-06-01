@@ -51,6 +51,10 @@ class Promo extends Model
             }
         }
 
+        if (isset($params['status']) && !empty($params['status'])) {
+            $query->where("is_status", "=", $params['status']);
+        }
+
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
             $query->where("id", "!=", $params['notEqual']);
         }
