@@ -195,7 +195,7 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::prefix('public')->group(function (){
             // user post
-            Route::post('/checkEmail', [UserController::class, 'checkEmail']);
+            Route::get('/checkEmail', [UserController::class, 'checkEmail']);
             Route::post('/register', [UserController::class, 'register']);
             Route::post('/login', [UserController::class, 'login']);
 

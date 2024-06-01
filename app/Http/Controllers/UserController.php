@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\MailNotification;
 use App\Providers\ImageServiceProvider as ImageServiceProvider;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +17,7 @@ class UserController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api', ['except' => ['checkEmail']]);
         $this->user = new User();
     }
 
@@ -165,5 +167,17 @@ class UserController extends Controller
                 'status_code' => 500
             ], 500);
         }
+    }
+
+    public function checkEmail (){
+        $user = User::all();
+        $data = "Ini adalah contoh data";
+        //dibawah ini merupakan
+        //contoh mengirimkan notifikasi ke semua user
+        Notification::send($user, new MailNotification($data));
+
+        return response()->json([
+            'message' => 'Notifikasi berhasil dikirim'
+        ]);
     }
 }
