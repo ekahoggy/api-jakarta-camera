@@ -9,9 +9,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\NewsKategoriController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
@@ -45,6 +47,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
             Route::get('/checkAuthorization',  [AuthController::class, 'checkToken']);
+        });
+
+        Route::group(['prefix' => 'dashboard'], function (){
+            Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
+            Route::get('/pendapatan', [DashboardController::class, 'pendapatan']);
+            Route::get('/penjualanhariini', [DashboardController::class, 'penjualanhariini']);
         });
 
         Route::group(['prefix' => 'user'], function (){
@@ -136,6 +144,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
         });
 
+
         Route::group(['prefix' => 'xendit'], function (){
             Route::post('/callback', [OrderController::class, 'xenditCallback']);
         });
@@ -146,6 +155,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/detail/{id}', [NewsController::class, 'getDetail']);
             Route::post('/save', [NewsController::class, 'simpan']);
             Route::post('/status', [NewsController::class, 'changeStatus']);
+        });
+
+        Route::group(['prefix' => 'news-kategori'], function (){
+            Route::get('/', [NewsKategoriController::class, 'kategori']);
+            Route::get('/{id}', [NewsKategoriController::class, 'getDataById']);
+            Route::post('/save', [NewsKategoriController::class, 'simpan']);
         });
 
         Route::group(['prefix' => 'stok'], function (){
@@ -180,7 +195,7 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::prefix('public')->group(function (){
             // user post
-            Route::post('/checkEmail', [UserController::class, 'checkEmail']);
+            Route::get('/checkEmail', [UserController::class, 'checkEmail']);
             Route::post('/register', [UserController::class, 'register']);
             Route::post('/login', [UserController::class, 'login']);
 
@@ -191,6 +206,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
             Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
             Route::get('/brand', [SiteController::class, 'getBrand']);
+
+            Route::get('/stok', [SiteController::class, 'getStok']);
         });
 
         // Cart

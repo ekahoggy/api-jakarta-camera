@@ -59,11 +59,11 @@ class PromoController extends Controller
             $detail = [];
             foreach ($params['detail'] as $key => $value) {
                 $detail[$key]['m_promo_id'] = $data['id'];
-                $detail[$key]['m_produk_id'] = $value['produk'];
-                $detail[$key]['persen'] = $value['diskon'];
-                $detail[$key]['nominal'] = ((double)$value['diskon'] / 100) * (int)$value['harga'];
+                $detail[$key]['m_produk_id'] = $value['m_produk_id'];
+                $detail[$key]['persen'] = $value['persen'];
+                $detail[$key]['nominal'] = ((double)$value['persen'] / 100) * (int)$value['harga'];
                 $detail[$key]['promo_used'] = 0;
-                $detail[$key]['qty'] = $value['jumlah'];
+                $detail[$key]['qty'] = $value['qty'];
             }
 
             // simpan detail promo

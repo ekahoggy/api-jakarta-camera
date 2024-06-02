@@ -71,7 +71,8 @@ class NewsController extends Controller
         $validator = Validator::make($params, [
             "judul"  => "required",
             "image"  => "required",
-            "tags"  => "required|array"
+            "tags"  => "required|array",
+            "m_news_kategori_id"  => "required|array"
         ]);
         if ($validator->valid()) {
             $data = $this->news->simpan($params);

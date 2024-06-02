@@ -36,6 +36,25 @@ class Promo extends Model
     public function getAll($params){
         $query = DB::table($this->table);
 
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if($key === 'kode'){
+                    $query->where('promo', 'like', '%' . $value . '%');
+                    // $query->orWhere('sku', 'like', '%' . $value . '%');
+                }
+                if($key === 'is_status'){
+                    if($value !== null){
+                        $query->where('is_status', $value);
+                    }
+                }
+            }
+        }
+
+        if (isset($params['status']) && !empty($params['status'])) {
+            $query->where("is_status", "=", $params['status']);
+        }
+
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
             $query->where("id", "!=", $params['notEqual']);
         }

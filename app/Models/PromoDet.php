@@ -76,4 +76,20 @@ class PromoDet extends Model
         $params['id'] = Generator::uuid4()->toString();
         return DB::table($this->table)->insert($params);
     }
+
+    public function getDetailPromoAktif(){
+        $query = DB::table($this->table)
+        ->select(
+            'm_promo.*',
+            'm_promo_det.*',
+            'm_produk.id as m_produk_id',
+            'm_produk.nama',
+            'm_produk.sku',
+            'm_produk.harga'
+        )
+        ->leftJoin('m_promo', 'm_promo.id', '=', 'm_promo_det.m_promo_id')
+        ->leftJoin('m_produk', 'm_produk.id', '=', 'm_promo_det.m_produk_id')
+        ->where('m_promo.is_status', 1);
+        return $query->get();
+    }
 }

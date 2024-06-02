@@ -223,13 +223,55 @@ class Produk extends Model
     public function getVariant($produkId) {
         $listVariant = DB::table('m_produk_varian')->where('m_produk_id', $produkId)->get();
 
-        if (!empty($listVariant)) {
-            foreach($listVariant as $i => $variant) {
-                if ($variant->image)  {
-                    $listVariant[$i]->image = Storage::url('images/produk-variant/' . $variant->image);
+        $varian1 = '';
+        $varian2 = '';
+        $group_varian = [];
+        $arr_varian1 = [];
+        if(isset($listVariant)){
+            foreach ($listVariant as $product) {
+                if($product->varian1 !== null || $product->varian1 !== ''){
+                    $varian1 = $product->varian1_type;
+                    //set detail varian 1
+                    $v1 = $product->varian1;
+                    if (!isset($arr_varian1[$v1])) {
+                        $arr_varian1[$v1] = [];
+                    }
+                    $arr_varian1[$v1][] = $product;
+                }
+
+                if($product->varian2 !== null || $product->varian2 !== ''){
+                    $varian2 = $product->varian2_type;
+                    //set detail varian 2
+                    $v2 = $product->varian2;
+                    if (!isset($arr_varian2[$v2])) {
+                        $arr_varian2[$v2] = [];
+                    }
+                    $arr_varian2[$v2][] = $product;
                 }
             }
-            return $listVariant;
+
+            $detail_varian1 = [];
+            if(isset($arr_varian1)){
+                foreach ($arr_varian1 as $k => $value) {
+                    array_push($detail_varian1, $k);
+                }
+            }
+            $detail_varian2 = [];
+            if(isset($arr_varian2)){
+                foreach ($arr_varian2 as $k => $value) {
+                    array_push($detail_varian2, $k);
+                }
+            }
+
+            $group_varian = [
+                'all_varian'        => $listVariant,
+                'varian1'           => $varian1,
+                'varian1_detail'    => $detail_varian1,
+                'varian2'           => $varian2,
+                'varian2_detail'    => $detail_varian2,
+            ];
+
+            return $group_varian;
         }
 
         return [];
@@ -266,7 +308,23 @@ class Produk extends Model
     public function getMainPhotoProduk($id) {
         $data = DB::table('m_produk_media')->where('m_produk_id', $id)->where('is_main', 1)->first();
         $url = Storage::url('images/produk/' . $data->media_link);
-        
+
         return $url;
     }
+
+    public function stok($param) {
+        $query = DB::table('m_produk_varian')
+        ->where('m_produk_id', $param['m_produk_id'])
+        ->where('varian1', $param['varian1']);
+
+        if(isset($param['varian2'])){
+            $query->where('varian2', $param['varian2']);
+        }
+        $data = $query->first();
+        //set image
+        $data->foto = Storage::url('images/produk-variant/' . $data->image);
+
+        return $data;
+    }
+
 }
