@@ -40,10 +40,10 @@ class ProdukController extends Controller
     public function produk() {
         $produkModel = new Produk();
         $produk = $produkModel->getAll();
-        if($produk){
+        
+        if ($produk){
             return response()->json(['status_code' => 200, 'data' => $produk], 200);
-        }
-        else{
+        } else{
             return response()->json(['status_code' => 422, 'pesan' => 'Data Tidak ada'], 422);
         }
     }
