@@ -128,6 +128,10 @@ class Order extends Model
             $query->where("id", "!=", $params['notEqual']);
         }
 
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $query->where("user_id", "=", $params['user_id']);
+        }
+
         if (isset($params['bulan']) && !empty($params['bulan'])) {
             $query->whereMonth('date', '=', $params['bulan']);
         }
@@ -156,16 +160,11 @@ class Order extends Model
         $query = DB::table($this->table)
             ->select(
                 array(
-                    DB::raw("SUM(CASE
-                        WHEN t_order.status_order = 'ordered' THEN 1 ELSE 0 END) AS total_pending"),
-                    DB::raw("SUM(CASE
-                        WHEN t_order.status_order = 'processed' THEN 1 ELSE 0 END) AS total_konfirmasi"),
-                    DB::raw("SUM(CASE
-                        WHEN t_order.status_order = 'sent' THEN 1 ELSE 0 END) AS total_kirim"),
-                    DB::raw("SUM(CASE
-                        WHEN t_order.status_order = 'received' THEN 1 ELSE 0 END) AS total_selesai"),
-                    DB::raw("SUM(CASE
-                        WHEN t_order.status_order = 'canceled' THEN 1 ELSE 0 END) AS total_batal"),
+                    DB::raw("SUM(CASE WHEN t_order.status_order = 'ordered' THEN 1 ELSE 0 END) AS total_pending"),
+                    DB::raw("SUM(CASE WHEN t_order.status_order = 'processed' THEN 1 ELSE 0 END) AS total_konfirmasi"),
+                    DB::raw("SUM(CASE WHEN t_order.status_order = 'sent' THEN 1 ELSE 0 END) AS total_kirim"),
+                    DB::raw("SUM(CASE WHEN t_order.status_order = 'received' THEN 1 ELSE 0 END) AS total_selesai"),
+                    DB::raw("SUM(CASE WHEN t_order.status_order = 'canceled' THEN 1 ELSE 0 END) AS total_batal"),
                 )
             );
 
@@ -240,5 +239,70 @@ class Order extends Model
         $order = DB::table('t_order')->where('invoice_number', $inv)->update(['status_order' => $status_order]);
 
         return $order;
+    }
+
+    function getOrderUer($params) {
+        $query = DB::table('t_order AS order')
+            ->select(
+                'order.id', 'order.invoice_number', 'order.total_voucher', 'order.total_pengiriman', 'order.grand_total', 'order.status_order', 'order.date',
+                'detail.promo_id', 'detail.product_id', 'detail.varian_id', 'detail.qty', 'detail.price', 'detail.promo_amount', 'detail.promo_percent', 'detail.subtotal',
+                'produk.nama'
+            )
+            ->leftJoin('t_order_detail AS detail', 'detail.order_id', '=', 'order.id')
+            ->leftJoin('m_produk AS produk', 'produk.id', '=', 'detail.product_id');
+
+        $totalItems = $query->count();
+
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $query->where("user_id", "=", $params['user_id']);
+        }
+
+        if (isset($params['nama']) && !empty($params['nama'])) {
+            $query->where("nama", "like", "%".$params['nama']."%");
+        }
+
+        if (isset($params['status']) && !empty($params['status'])) {
+            $query->where("status_order", "=", $params['status']);
+        }
+
+        if (isset($params['offset']) && !empty($params['offset'])) {
+            $query->offset($params['offset']);
+        }
+
+        if (isset($params['limit']) && !empty($params['limit'])) {
+            $query->limit($params['limit']);
+        }
+
+        $orders = $query->orderBy('date', 'ASC')->get();
+
+        $data = [];
+        foreach($orders as $i => $order) {
+            $data[$i]['id'] = $order->id;
+            $data[$i]['invoice_number'] = $order->invoice_number;
+            $data[$i]['total_voucher'] = $order->total_voucher;
+            $data[$i]['total_pengiriman'] = $order->total_pengiriman;
+            $data[$i]['grand_total'] = $order->grand_total;
+            $data[$i]['status_order'] = $order->status_order;
+            $data[$i]['date'] = date('d M Y', strtotime($order->date));
+
+            $data[$i]['detail'][$order->id]['nama'] = $order->nama;
+            $data[$i]['detail'][$order->id]['promo_id'] = $order->promo_id;
+            $data[$i]['detail'][$order->id]['product_id'] = $order->product_id;
+            $data[$i]['detail'][$order->id]['varian_id'] = $order->varian_id;
+            $data[$i]['detail'][$order->id]['qty'] = $order->qty;
+            $data[$i]['detail'][$order->id]['price'] = $order->price;
+            $data[$i]['detail'][$order->id]['promo_amount'] = $order->promo_amount;
+            $data[$i]['detail'][$order->id]['promo_percent'] = $order->promo_percent;
+            $data[$i]['detail'][$order->id]['subtotal'] = $order->subtotal;
+        }
+
+        foreach ($data as $i => $order) {
+            $data[$i]['detail'] = array_values($data[$i]['detail']);
+        }
+
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
     }
 }

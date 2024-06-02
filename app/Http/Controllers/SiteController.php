@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 
+use App\Models\User;
+use App\Models\Customer;
 use App\Models\Slider;
 use App\Models\Produk;
 use App\Models\Brand;
@@ -14,6 +16,8 @@ use App\Models\PromoDet;
 
 class SiteController extends Controller
 {
+    protected $user;
+    protected $customer;
     protected $slider;
     protected $product;
     protected $brand;
@@ -23,6 +27,8 @@ class SiteController extends Controller
 
     public function __construct()
     {
+        $this->user = new User();
+        $this->customer = new Customer();
         $this->slider = new Slider();
         $this->product = new Produk();
         $this->brand = new Brand();
@@ -102,7 +108,7 @@ class SiteController extends Controller
         $params = (array) $request->all();
         $produk = $this->product->getAll($params);
 
-        foreach ($produk['list'] as $key => $value) {
+        foreach ($produk['list'] as $value) {
             $value->variant = $this->product->getVariant($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
@@ -147,6 +153,72 @@ class SiteController extends Controller
                 'message' => $th,
                 'status_code' => 500
             ], 500);
+        }
+    }
+
+    public function getUser(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->user->getDetailUser($params['id']);
+            $data->photo = Storage::url('images/customer/' . $data->photo);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function saveUser(Request $request){
+        try {
+            $params = (array) $request->only('id', 'type', 'username', 'name', 'email', 'password', 'phone_code', 'phone_number', 'remember_token', 'address', 'photo', 'roles_id', 'kode', 'email_expired', 'is_active',);
+            $data = $this->customer->simpan($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,   
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getOrder(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->order->getOrderUer($params);
+
+            foreach ($data['list'] as $i => $order) {
+                foreach ($order['detail'] as $k => $detail) {
+                    $data['list'][$i]['detail'][$k]['photo'] = $this->product->getMainPhotoProduk($detail['product_id']);
+                }
+            }
+
+            return response()->json([ 'data' => $data, 'status_code' => 200 ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([ 'message' => $th, 'status_code' => 500], 500);
+        }
+    }
+
+    function statusOrder($status) {
+        if ($status === 'ordered'){
+            return 'Belum Bayar';
+        } else if ($status === 'processed'){
+            return 'Konfirmasi';
+        } else if ($status === 'sent'){
+            return 'Kirim';
+        } else if ($status === 'received'){
+            return 'Selesai';
+        } else{
+            return 'Batal';
         }
     }
 }

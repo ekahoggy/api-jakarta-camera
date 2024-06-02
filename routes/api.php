@@ -199,6 +199,11 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/register', [UserController::class, 'register']);
             Route::post('/login', [UserController::class, 'login']);
 
+            // Account
+            Route::get('/user', [SiteController::class, 'getUser']);
+            Route::post('/user-save', [SiteController::class, 'saveUser']);
+            Route::get('/orders', [SiteController::class, 'getOrder']);
+
             // public
             Route::get('/kategori', [KategoriController::class, 'kategori'])->name('kategori');
             Route::get('/produk', [SiteController::class, 'getProduct'])->name('produk');

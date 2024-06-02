@@ -38,7 +38,7 @@ class UserController extends Controller
         }
     }
 
-    public function getDetailUser(Request $request, $id){
+    public function getDetailUser($id){
         try {
             $data = $this->user->getDetailUser($id);
 
@@ -54,7 +54,10 @@ class UserController extends Controller
         }
     }
 
-    public function create(Request $request){
+    public function create(Request $request) {
+        $params = $request->all();
+
+        // validasi
         $request->validate([
             'username' => 'required|string|max:255',
             'name' => 'required|string|max:255',
@@ -68,29 +71,30 @@ class UserController extends Controller
         try {
             //upload image
             $photo = '';
-            if (!empty($request->photo)) {
-                $photo = ImageServiceProvider::uploadImage($request->photo, 'images/users/photo');
+            if (!empty($params['photo'])) {
+                $photo = ImageServiceProvider::uploadImage($params['photo'], 'images/users/photo');
             }
 
             $id = Generator::uuid4()->toString();
-            $request->phone_number = ltrim($request->phone_number, '0');
-            $request->phone_number = ltrim($request->phone_number, '+62');
-            $request->phone_number = ltrim($request->phone_number, '62');
+            $params['phone_number'] = ltrim($params['phone_number'], '0');
+            $params['phone_number'] = ltrim($params['phone_number'], '+62');
+            $params['phone_number'] = ltrim($params['phone_number'], '62');
 
             $user = User::create([
                 'id' => $id,
-                'type' => $request->type ? $request->type : 'customer' ,
-                'username' => $request->username,
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'phone_code' => $request->phone_code,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
+                'type' => $request['type'] ? $request['type'] : 'customer' ,
+                'username' => $request['username'],
+                'name' => $request['name'],
+                'email' => $request['email'],
+                'password' => Hash::make($request['password']),
+                'phone_code' => $request['phone_code'],
+                'phone_number' => $request['phone_number'],
+                'address' => $request['address'],
                 'photo' => $photo,
-                'roles_id' => $request->roles_id,
-                'is_active' => $request->is_active ? $request->is_active : 'aktif',
+                'roles_id' => $request['roles_id'],
+                'is_active' => $request['is_active'] ? $request['is_active'] : 'aktif',
             ]);
+
             $user->id = $id;
 
             return response()->json([

@@ -81,32 +81,33 @@ class User extends Authenticatable implements JWTSubject
         }
 
         $data = $query->limit(20)
-                    ->orderBy('name', 'ASC')
-                    ->get();
+            ->orderBy('name', 'ASC')
+            ->get();
 
         return $data;
     }
 
     public function getDetailUser($id){
         $data = DB::table($this->table)
-                    ->where("id", $id)
-                    ->first();
+            ->select('id', 'type', 'username', 'name', 'email', 'phone_code', 'phone_number', 'address', 'photo', 'roles_id', 'kode', 'email_expired', 'is_active', 'created_at', 'updated_at')
+            ->where("id", $id)
+            ->first();
 
         return $data;
     }
 
     public function changeStatus($id, $status = 'aktif'){
         $query = DB::table($this->table)
-                    ->where('id', $id)
-                    ->update(['is_active' => $status]);
+            ->where('id', $id)
+            ->update(['is_active' => $status]);
 
         return $query;
     }
 
     public function updateData($id, $data = []){
         $query = DB::table($this->table)
-                    ->where('id', $id)
-                    ->update($data);
+            ->where('id', $id)
+            ->update($data);
 
         return $query;
     }
@@ -117,8 +118,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function checkEmail($email){
         $query = DB::table($this->table)
-                    ->where('email', $email)
-                    ->orWhere('name', 'like', '%' . $email . '%')->get();
+            ->where('email', $email)
+            ->orWhere('name', 'like', '%' . $email . '%')->get();
+
         return $query;
     }
 }
