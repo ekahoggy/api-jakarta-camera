@@ -37,7 +37,7 @@ class SiteController extends Controller
         $params = (array) $request->all();
 
         $produk = $this->product->getAll($params);
-        foreach ($produk['list'] as $key => $value) {
+        foreach ($produk['list'] as $value) {
             $value->variant = $this->product->getVariant($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
@@ -67,10 +67,10 @@ class SiteController extends Controller
         $params = (array) $request->all();
         $produk = $this->product->getAll($params);
 
-        foreach ($produk['list'] as $key => $value) {
+        foreach ($produk['list'] as $value) {
             $value->variant = $this->product->getVariant($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
-            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->rowspan = count($value->variant);
         }
 
