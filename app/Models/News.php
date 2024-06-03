@@ -58,10 +58,21 @@ class News extends Model
         if (isset($params['filter']) && !empty($params['filter'])) {
             $filter = json_decode($params['filter']);
             foreach ($filter as $key => $value) {
-                if($key === 'judul'){
+                if($key === 'judul' && !empty($value)){
                     $query->where('judul', 'like', '%' . $value . '%');
                 }
+                if($key === 'kategori' && !empty($value)){
+                    $query->where('m_news_kategori.kategori', '=', $value);
+                }
             }
+        }
+
+        if (isset($params['judul']) && !empty($params['judul'])) {
+            $query->where('judul', 'like', '%' . $value . '%');
+        }
+
+        if (isset($params['kategori']) && !empty($params['kategori'])) {
+            $query->where('m_news_kategori.kategori', '=', $params['kategori']);
         }
 
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
@@ -86,6 +97,31 @@ class News extends Model
         return [
             'list' => $data,
             'totalItems' => $totalItems
+        ];
+    }
+
+    public function getBySlug($slug){
+        $query = DB::table($this->table)
+        ->select(
+            'm_news.*',
+            'm_news_kategori.kategori',
+            'a.name as pembuat',
+            'b.name as pengubah',
+            'p.name as publish',
+        )
+        ->where('slug', '=', $slug)
+        ->leftJoin('m_news_kategori','m_news_kategori.id', '=', 'm_news.m_news_kategori_id')
+        ->leftJoin('users as a','a.id', '=', 'm_news.created_by')
+        ->leftJoin('users as b','b.id', '=', 'm_news.updated_by')
+        ->leftJoin('users as p','p.id', '=', 'm_news.publish_by');
+
+        $data = $query->first();
+
+        $data->tags = explode(",", $data->tags);
+        $data->image = Storage::url('images/news/' . $data->image);
+
+        return [
+            'article' => $data
         ];
     }
 
