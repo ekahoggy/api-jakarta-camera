@@ -19,6 +19,7 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StokKategoriController;
@@ -118,6 +119,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/save', [SliderController::class, 'simpan']);
             Route::post('/status', [SliderController::class, 'changeStatus']);
             Route::post('/moveSlider', [SliderController::class, 'moveSlider']);
+        });
+
+        Route::group(['prefix' => 'setting'], function (){
+            Route::get('/', [SettingController::class, 'getSetting']);
+            Route::get('/{id}', [SettingController::class, 'getDataById']);
+            Route::post('/save', [SettingController::class, 'simpan']);
         });
 
         Route::group(['prefix' => 'produk'], function (){
