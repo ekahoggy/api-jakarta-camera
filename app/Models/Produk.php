@@ -229,6 +229,7 @@ class Produk extends Model
         $arr_varian1 = [];
         if(isset($listVariant)){
             foreach ($listVariant as $product) {
+                $product->image = Storage::url('images/produk-variant/' . $product->image);
                 if($product->varian1 !== null || $product->varian1 !== ''){
                     $varian1 = $product->varian1_type;
                     //set detail varian 1

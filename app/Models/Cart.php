@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid as Generator;
 use App\Models\Produk;
+use Illuminate\Support\Facades\Storage;
 
 class Cart extends Model
 {
@@ -22,6 +23,8 @@ class Cart extends Model
         'id',
         'user_id',
         'product_id',
+        'product_varian_id',
+        'promo_id',
         'quantity',
     ];
 
@@ -32,18 +35,33 @@ class Cart extends Model
             ->select(
                 't_cart.id',
                 't_cart.product_id',
+                't_cart.product_varian_id',
+                't_cart.promo_id',
                 't_cart.user_id',
                 't_cart.quantity',
                 'm_produk.id as produk_id',
                 'm_produk.nama',
-                'm_produk.harga'
+                'm_produk.sku',
+                'm_produk.harga',
+                'm_produk.stok',
+                'm_produk_varian.sku',
+                'm_produk_varian.image',
+                'm_produk_varian.varian1_type',
+                'm_produk_varian.varian1',
+                'm_produk_varian.varian2_type',
+                'm_produk_varian.varian2',
+                'm_produk_varian.harga as harga_varian',
+                'm_produk_varian.stok as stok_varian',
+                'm_produk_varian.berat as berat_varian'
             )
             ->leftJoin('m_produk', 'm_produk.id', '=', 't_cart.product_id')
+            ->leftJoin('m_produk_varian', 'm_produk_varian.id', '=', 't_cart.product_varian_id')
             ->where($params)
             ->get();
 
         foreach ($data as $value) {
             $value->foto = $produk->getMainPhotoProduk($value->produk_id);
+            $value->foto_varian = Storage::url('images/produk-variant/' . $value->image);
         }
 
         return $data;
@@ -53,6 +71,7 @@ class Cart extends Model
         $payload = [];
         $payload['user_id'] = $params['user_id'];
         $payload['product_id'] = $params['product_id'];
+        $payload['product_varian_id'] = $params['product_varian_id'];
 
         return DB::table($this->table)
             ->select('quantity')
@@ -68,6 +87,7 @@ class Cart extends Model
     public function updateCart($params) {
         $payload['user_id'] = $params['user_id'];
         $payload['product_id'] = $params['product_id'];
+        $payload['product_id'] = $params['product_id'];
 
         return DB::table($this->table)->where($payload)->update($params);
     }
@@ -75,6 +95,7 @@ class Cart extends Model
     public function changeCart($params) {
         $payload['user_id'] = $params['user_id'];
         $payload['product_id'] = $params['product_id'];
+        $payload['product_varian_id'] = $params['product_varian_id'];
 
         return DB::table($this->table)->where($payload)->update(['quantity' => $params['quantity']]);
     }

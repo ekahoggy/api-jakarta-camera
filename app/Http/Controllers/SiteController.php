@@ -55,14 +55,14 @@ class SiteController extends Controller
         $produk = $this->product->getAll($params);
 
         foreach ($produk['list'] as $key => $value) {
+            $value->variant = $this->product->getVariant($value->id);
+            $value->foto = $this->product->getMainPhotoProduk($value->id);
+            $value->photo_product = $this->product->getPhoto($value->id);
+
             $value->is_promo = false;
             $value->is_flashsale = false;
             $value->promo = [];
             $value->harga_promo = $value->harga;
-            $value->variant = $this->product->getVariant($value->id);
-            $value->photo_product = $this->product->getPhoto($value->id);
-            $value->foto = $this->product->getMainPhotoProduk($value->id);
-
             foreach ($promo as $k => $p) {
                 if($p->m_produk_id === $value->id){
                     $value->is_promo = true;
@@ -88,12 +88,38 @@ class SiteController extends Controller
     }
 
     public function getProdukSlug(Request $request) {
+        $promo = $this->promoDet->getDetailPromoAktif();
         $produk = $this->product->getBySlug($request->slug);
         $produk->variant = $this->product->getVariant($produk->id);
         $produk->foto = $this->product->getMainPhotoProduk($produk->id);
+        $produk->is_promo = false;
+        $produk->is_flashsale = false;
+        $produk->promo = [];
+        $produk->harga_promo = $produk->harga;
 
         foreach ($produk->detail_foto as $value) {
             $value->foto = $value->foto = Storage::url('images/produk/' . $value->media_link);
+        }
+
+        foreach ($promo as $k => $p) {
+            if($p->m_produk_id === $produk->id){
+                $produk->is_promo = true;
+                $hitungPromo = ($p->persen / 100) * $produk->harga;
+                $produk->harga_promo = $produk->harga - $hitungPromo;
+                $produk->promo = [
+                    'm_promo_id' => $p->m_promo_id,
+                    'kode' => $p->kode,
+                    'promo' => $p->promo,
+                    'tanggal_mulai' => $p->tanggal_mulai,
+                    'jam_mulai' => $p->jam_mulai,
+                    'tanggal_selesai' => $p->tanggal_selesai,
+                    'jam_selesai' => $p->jam_selesai,
+                    'persen' => $p->persen,
+                    'nominal' => $p->nominal,
+                    'qty' => $p->qty,
+                    'promo_min_beli' => $p->promo_min_beli
+                ];
+            }
         }
 
         if($produk){
@@ -106,6 +132,7 @@ class SiteController extends Controller
 
     public function katalog(Request $request) {
         $params = (array) $request->all();
+        $promo = $this->promoDet->getDetailPromoAktif();
         $produk = $this->product->getAll($params);
 
         foreach ($produk['list'] as $value) {
@@ -113,6 +140,31 @@ class SiteController extends Controller
             $value->photo_product = $this->product->getPhoto($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->rowspan = count($value->variant);
+            $value->is_promo = false;
+            $value->is_flashsale = false;
+            $value->promo = [];
+            $value->harga_promo = $value->harga;
+
+            foreach ($promo as $k => $p) {
+                if($p->m_produk_id === $value->id){
+                    $value->is_promo = true;
+                    $hitungPromo = ($p->persen / 100) * $value->harga;
+                    $value->harga_promo = $value->harga - $hitungPromo;
+                    $value->promo = [
+                        'm_promo_id' => $p->m_promo_id,
+                        'kode' => $p->kode,
+                        'promo' => $p->promo,
+                        'tanggal_mulai' => $p->tanggal_mulai,
+                        'jam_mulai' => $p->jam_mulai,
+                        'tanggal_selesai' => $p->tanggal_selesai,
+                        'jam_selesai' => $p->jam_selesai,
+                        'persen' => $p->persen,
+                        'nominal' => $p->nominal,
+                        'qty' => $p->qty,
+                        'promo_min_beli' => $p->promo_min_beli
+                    ];
+                }
+            }
         }
 
         if ($produk){
@@ -185,7 +237,7 @@ class SiteController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => $th,   
+                'message' => $th,
                 'status_code' => 500
             ], 500);
         }
