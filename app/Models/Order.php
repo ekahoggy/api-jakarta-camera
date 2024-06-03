@@ -61,7 +61,6 @@ class Order extends Model
         $payload['invoice_number'] = $this->generateCodeInvoice();
         $payload["user_id"] = $params["user_id"];
         $payload["payment_id"] = "pay001";
-        $payload["total"] = $params["total"];
         $payload["grand_total"] = $params["grand_total"];
         $payload["recipient"] = $params["recipient"];
         $payload["phone_code"] = $params["phone_code"];
@@ -89,8 +88,7 @@ class Order extends Model
         $payload["order_id"] = $params["order_id"];
         $payload["product_id"] = $params["product_id"];
         $payload["price"] = $params["price"];
-        $payload["subtotal_price"] = $params["subtotal_price"];
-        $payload["grandtotal_price"] = $params["grandtotal_price"];
+        $payload["subtotal"] = $params["subtotal_price"];
 
         return DB::table("t_order_detail")->insert($payload);
     }
