@@ -10,13 +10,16 @@ use App\Models\Customer;
 use App\Models\Slider;
 use App\Models\Produk;
 use App\Models\Brand;
+use App\Models\News;
 use App\Models\Order;
 use App\Models\Promo;
 use App\Models\PromoDet;
+use App\Models\NewsKategori;
 
 class SiteController extends Controller
 {
     protected $user;
+    protected $news;
     protected $customer;
     protected $slider;
     protected $product;
@@ -24,6 +27,7 @@ class SiteController extends Controller
     protected $order;
     protected $promo;
     protected $promoDet;
+    protected $newsCategory;
 
     public function __construct()
     {
@@ -35,6 +39,8 @@ class SiteController extends Controller
         $this->order = new Order();
         $this->promo = new Promo();
         $this->promoDet = new PromoDet();
+        $this->news = new News();
+        $this->newsCategory = new NewsKategori();
     }
 
     public function slider() {
@@ -257,6 +263,56 @@ class SiteController extends Controller
             return response()->json([ 'data' => $data, 'status_code' => 200 ], 200);
         } catch (\Throwable $th) {
             return response()->json([ 'message' => $th, 'status_code' => 500], 500);
+        }
+    }
+
+    public function getNews(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->news->getAll($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getCategoryNews(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->newsCategory->getAll($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getDataBySlug($slug){
+        try {
+            $data = $this->news->getBySlug($slug);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
         }
     }
 

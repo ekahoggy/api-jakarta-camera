@@ -218,6 +218,9 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
             Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
             Route::get('/brand', [SiteController::class, 'getBrand']);
+            Route::get('/news', [SiteController::class, 'getNews']);
+            Route::get('/category-news', [SiteController::class, 'getCategoryNews']);
+            Route::get('/news/{slug}', [SiteController::class, 'getDataBySlug']);
 
             Route::get('/stok', [SiteController::class, 'getStok']);
         });

@@ -35,7 +35,25 @@ class NewsController extends Controller
 
     public function getDataById($id){
         try {
+            
             $data = $this->news->getById($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getDataBySlug(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->news->getBySlug($params);
 
             return response()->json([
                 'data' => $data,
