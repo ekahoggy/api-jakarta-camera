@@ -45,6 +45,15 @@ class GoogleLoginController extends Controller
                 'authorisation' => $this->respondWithToken($token)
             ]);
         }
+        else{
+            $token = Auth::login($user);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User created successfully',
+                'user' => $user,
+                'authorisation' => $this->respondWithToken($token)
+            ]);
+        }
     }
 
     protected function respondWithToken($token)
