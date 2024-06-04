@@ -35,6 +35,8 @@ class User extends Authenticatable implements JWTSubject
         'kode',
         'email_expired',
         'is_active',
+        'gauth_id',
+        'gauth_type',
         'created_at',
         'updated_at',
     ];

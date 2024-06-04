@@ -9,7 +9,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
-        "laravel/socialite": "^5.12",
+        "laravel/socialite": "^5.14",
         "laravel/tinker": "^2.8",
         "ramsey/uuid": "^4.7",
         "symfony/http-client": "^7.0",
