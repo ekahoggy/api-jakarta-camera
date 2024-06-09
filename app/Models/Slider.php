@@ -93,8 +93,8 @@ class Slider extends Model
         $service = new Service();
 
         $id = $params['id']; unset($params['id']);
-        // if(isset($params['picture']))
-        // $params['picture'] = $service->saveImage("slider/", $params['picture']);
+        $params['picture'] = $service->saveImage("slider/", $params['picture']);
+        $params['picture_mobile'] = $service->saveImage("slider/", $params['picture_mobile']);
 
         return DB::table($this->table)->where('id', $id)->update($params);
     }
