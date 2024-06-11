@@ -46,13 +46,13 @@ class Produk extends Model
 
     public function getAll($params = []){
         $query = DB::table('m_produk')
-            ->selectRaw(
-                'm_produk.*,
+            ->selectRaw('
+                m_produk.*,
                 m_kategori.kategori,
                 m_kategori.slug as slug_kategori,
                 m_brand.brand,
-                m_brand.slug as slug_brand'
-            )
+                m_brand.slug as slug_brand
+            ')
             ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
             ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id');
 
@@ -76,6 +76,16 @@ class Produk extends Model
                 if($key === 'is_active'){
                     if($value !== null){
                         $query->where('is_active', $value);
+                    }
+                }
+                if($key == 'category'){
+                    if(!empty($value) && isset($value)){
+                        $query->whereIn('m_kategori.slug', $value);
+                    }
+                }
+                if($key == 'brand'){
+                    if(!empty($value) && isset($value)){
+                        $query->whereIn('m_brand.slug', $value);
                     }
                 }
             }
