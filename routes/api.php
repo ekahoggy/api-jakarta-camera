@@ -1,11 +1,9 @@
 <?php
 
-use App\Http\Controllers\AddressController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Artisan;
 
 use App\Http\Controllers\GoogleLoginController;
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
@@ -18,6 +16,7 @@ use App\Http\Controllers\NewsKategoriController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\PromoSliderController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
@@ -26,8 +25,8 @@ use App\Http\Controllers\SliderController;
 use App\Http\Controllers\StokKategoriController;
 use App\Http\Controllers\StokKeluarController;
 use App\Http\Controllers\StokMasukController;
+use App\Http\Controllers\StokUpdateController;
 use App\Http\Controllers\UserController;
-use App\Models\StokUpdate;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +113,14 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/status', [VoucherController::class, 'changeStatus']);
         });
 
+        Route::group(['prefix' => 'promo-slider'], function (){
+            Route::get('/', [PromoSliderController::class, 'getData']);
+            Route::get('/{id}', [PromoSliderController::class, 'getDataById']);
+            Route::post('/save', [PromoSliderController::class, 'simpan']);
+            Route::post('/status', [PromoSliderController::class, 'changeStatus']);
+            Route::post('/moveSlider', [PromoSliderController::class, 'moveSlider']);
+        });
+
         Route::group(['prefix' => 'slider'], function (){
             Route::get('/', [SliderController::class, 'getData']);
             Route::get('/{id}', [SliderController::class, 'getDataById']);
@@ -126,6 +133,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/', [SettingController::class, 'getSetting']);
             Route::get('/{id}', [SettingController::class, 'getDataById']);
             Route::post('/save', [SettingController::class, 'simpan']);
+            Route::post('/updatePopup', [SettingController::class, 'updatePopUp']);
         });
 
         Route::group(['prefix' => 'produk'], function (){
@@ -194,10 +202,10 @@ Route::group(['middleware' => 'api'], function (){
                 Route::post('/status', [StokKeluarController::class, 'changeStatus']);
             });
             Route::group(['prefix' => 'opname'], function (){
-                Route::get('/', [StokUpdate::class, 'getData']);
-                Route::get('/{id}', [StokUpdate::class, 'getDataById']);
-                Route::post('/save', [StokUpdate::class, 'simpan']);
-                Route::post('/status', [StokUpdate::class, 'changeStatus']);
+                Route::get('/', [StokUpdateController::class, 'getData']);
+                Route::get('/{id}', [StokUpdateController::class, 'getDataById']);
+                Route::post('/save', [StokUpdateController::class, 'simpan']);
+                Route::post('/status', [StokUpdateController::class, 'changeStatus']);
             });
         });
 
@@ -213,6 +221,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/orders', [SiteController::class, 'getOrder']);
 
             // public
+            Route::get('/settingPopup', [SettingController::class, 'getSetting']);
+            Route::get('/popup', [PromoSliderController::class, 'slider']);
             Route::get('/kategori', [KategoriController::class, 'kategori'])->name('kategori');
             Route::get('/produk', [SiteController::class, 'getProduct'])->name('produk');
             Route::get('/getProdukSlug', [SiteController::class, 'getProdukSlug'])->name('getProdukSlug');

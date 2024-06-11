@@ -36,10 +36,10 @@ class MailNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-        ->subject('Example Notification')
-        ->greeting('Hello!')
-        ->line('Test isi Notifikasi:'.$this->data)
-        ->action('Notification Action', url('/'))
+        ->subject('Verifikasi Email')
+        ->greeting('Hello! Name')
+        ->line('Untuk mengaktifkan akun mu silahkan verifikasi dengan klik tombol Verifikasi:'.$this->data)
+        ->action('Verifikasi', url('/'))
         ->salutation('Ini adalah contoh notifikasi dengan mail');
     }
 
