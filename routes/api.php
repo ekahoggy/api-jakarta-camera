@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 
+use App\Http\Controllers\GoogleLoginController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
@@ -48,6 +49,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
             Route::get('/checkAuthorization',  [AuthController::class, 'checkToken']);
+
+
         });
 
         Route::group(['prefix' => 'dashboard'], function (){

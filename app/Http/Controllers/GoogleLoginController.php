@@ -9,18 +9,34 @@ use Illuminate\Support\Facades\Auth;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Uuid as Generator;
+use Throwable;
 
 class GoogleLoginController extends Controller
 {
+    // public function __construct()
+    // {
+    //     # By default we are using here auth:api middleware
+    //     $this->middleware('auth:api', ['except' => ['redirectToGoogle', 'handleGoogleCallback']]);
+    // }
+
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
-
     public function handleGoogleCallback()
     {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (Throwable $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'login failed'
+            ]);
+        }
+        return;
         $googleUser = Socialite::driver('google')->stateless()->user();
+        dd($googleUser);
         $user = User::where('email', $googleUser->email)->first();
         if(!$user)
         {
@@ -37,6 +53,15 @@ class GoogleLoginController extends Controller
             ]);
 
             $user->id = $id;
+            $token = Auth::login($user);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User created successfully',
+                'user' => $user,
+                'authorisation' => $this->respondWithToken($token)
+            ]);
+        }
+        else{
             $token = Auth::login($user);
             return response()->json([
                 'status' => 'success',
