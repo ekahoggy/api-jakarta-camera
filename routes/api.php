@@ -49,8 +49,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
             Route::get('/checkAuthorization',  [AuthController::class, 'checkToken']);
-
-
         });
 
         Route::group(['prefix' => 'dashboard'], function (){
