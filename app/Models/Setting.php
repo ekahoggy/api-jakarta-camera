@@ -76,4 +76,10 @@ class Setting extends Model
         }
         return $params;
     }
+
+    public function updateSettingPopup($params) {
+        DB::table($this->table)->where('setting_name', 'popup')->update(['setting_value' => $params['value']]);
+
+        return $params;
+    }
 }
