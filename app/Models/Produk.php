@@ -60,7 +60,9 @@ class Produk extends Model
             $filter = json_decode($params['filter']);
             foreach ($filter as $key => $value) {
                 if($key === 'nama'){
-                    $query->where('nama', 'like', '%' . $value . '%');
+                    if(!empty($value)){
+                        $query->where('nama', 'like', '%' . $value . '%');
+                    }
                     // $query->orWhere('sku', 'like', '%' . $value . '%');
                 }
                 if($key === 'm_kategori_id'){
