@@ -60,6 +60,7 @@ class News extends Model
             foreach ($filter as $key => $value) {
                 if($key === 'judul' && !empty($value)){
                     $query->where('judul', 'like', '%' . $value . '%');
+                    $query->orWhere('content', 'like', '%' . $value . '%');
                 }
                 if($key === 'kategori' && !empty($value)){
                     $query->where('m_news_kategori.kategori', '=', $value);
