@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\User;
 use App\Models\Customer;
@@ -15,6 +15,7 @@ use App\Models\Order;
 use App\Models\Promo;
 use App\Models\PromoDet;
 use App\Models\NewsKategori;
+use App\Models\NewsKomentar;
 
 class SiteController extends Controller
 {
@@ -28,6 +29,7 @@ class SiteController extends Controller
     protected $promo;
     protected $promoDet;
     protected $newsCategory;
+    protected $newsKomentar;
 
     public function __construct()
     {
@@ -41,6 +43,7 @@ class SiteController extends Controller
         $this->promoDet = new PromoDet();
         $this->news = new News();
         $this->newsCategory = new NewsKategori();
+        $this->newsKomentar = new NewsKomentar();
     }
 
     public function slider() {
@@ -311,6 +314,56 @@ class SiteController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getComment($id){
+        try {
+            $data = $this->newsKomentar->getByNewsId($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function validasiKomentar($request) {
+        $validator = Validator::make($request->all(), [
+            "nama" => "required",
+            "email" => "required",
+            "komentar" => "required",
+        ]);
+    
+        return $validator;
+    }
+
+    public function postComment(Request $request) {
+        try {
+            $params = (array) $request->only('news_id', 'nama', 'email', 'komentar', 'user_id');
+            $validator = $this->validasiKomentar($request);
+    
+            // Periksa jika validasi gagal
+            if ($validator->fails()) {
+                return response()->json(['status_code' => 422, 'message' => $validator->errors()], 422);
+            }
+
+            $data = $this->newsKomentar->postKomentar($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,   
                 'status_code' => 500
             ], 500);
         }
