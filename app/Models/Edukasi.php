@@ -103,6 +103,14 @@ class Edukasi extends Model
         return $data;
     }
 
+    public function getBySlug($slug){
+        $data = DB::table($this->table)
+            ->where('slug', $slug)
+            ->first();
+
+        return $data;
+    }
+
     public function simpan($params) {
         if (isset($params['data']['id']) && !empty($params['data']['id'])) {
             return $this->updateEdukasi($params);

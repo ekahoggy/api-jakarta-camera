@@ -263,6 +263,14 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/news/{slug}', [SiteController::class, 'getDataBySlug']);
 
             Route::get('/stok', [SiteController::class, 'getStok']);
+
+            // Edukasi
+            Route::prefix('edukasi')->group(function (){
+                Route::get('/slider', [EdukasiSliderController::class, 'slider']);
+                Route::get('/kategori', [EdukasiKategoriController::class, 'kategori']);
+                Route::get('/list', [EdukasiController::class, 'edukasi']);
+                Route::get('/{slug}', [EdukasiController::class, 'getDataBySlug']);
+            });
         });
 
         // Cart
@@ -272,6 +280,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/update', [CartController::class, 'updateCart'])->name('updateCart');
             Route::post('/delete', [CartController::class, 'deleteCart'])->name('deleteCart');
         });
+
 
         // Address
         Route::prefix('address')->group(function (){

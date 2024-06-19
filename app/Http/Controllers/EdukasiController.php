@@ -13,7 +13,7 @@ class EdukasiController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['edukasi']]);
+        $this->middleware('auth:api', ['except' => ['edukasi', 'getDataBySlug']]);
         $this->edukasi = new Edukasi();
     }
 
@@ -90,6 +90,24 @@ class EdukasiController extends Controller
             }
             return response()->json([
                 'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getDataBySlug($slug){
+        try {
+            $data = $this->edukasi->getBySlug($slug);
+            $detail = $this->edukasi->getDetail($data->id);
+
+            return response()->json([
+                'data' => $data,
+                'detail' => $detail,
                 'status_code' => 200
             ], 200);
         } catch (\Throwable $th) {
