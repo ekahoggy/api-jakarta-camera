@@ -32,6 +32,9 @@ use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\StokUpdateController;
 use App\Http\Controllers\UserController;
 
+use App\Mail\VerifikasiEmail;
+use Illuminate\Support\Facades\Mail;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -320,9 +323,17 @@ Route::group(['middleware' => 'api'], function (){
                 'password' => $password
             ]);
         });
+
+        Route::post('/send-email', function() {
+            $data = [
+                'subject' => 'Subjek',
+                'message' => 'Ini adalah contoh email custom'
+            ];
+    
+            Mail::to('sgalih1234@gmail.com')->send(new VerifikasiEmail($data));
+    
+            return response()->json(['message' => 'Email sent successfully!']);
+        });
     });
 });
 
-Route::prefix('v1')->group(function (){
-
-});

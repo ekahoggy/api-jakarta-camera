@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Notifications\MailNotification;
 use App\Providers\ImageServiceProvider as ImageServiceProvider;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid as Generator;
+
+# email
+use App\Mail\VerifikasiEmail;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -174,11 +175,12 @@ class UserController extends Controller
     }
 
     public function checkEmail (){
-        $user = User::all();
-        $data = "Ini adalah contoh data";
-        //dibawah ini merupakan
-        //contoh mengirimkan notifikasi ke semua user
-        Notification::send($user, new MailNotification($data));
+        $data = [
+            'subject' => 'Subjek',
+            'message' => 'Ini adalah contoh email custom'
+        ];
+
+        Mail::to('sgalih1234@gmail.com')->send(new VerifikasiEmail($data));
 
         return response()->json([
             'message' => 'Notifikasi berhasil dikirim'
