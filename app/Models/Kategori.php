@@ -108,7 +108,7 @@ class Kategori extends Model
 
         $params['id'] = Generator::uuid4()->toString();
         $params['slug'] = Str::slug($params['kategori'], '-');
-        $params['updated_at'] = date('Y-m-d H:i:s');
+        $params['created_at'] = date('Y-m-d H:i:s');
         $params['icon'] = $service->saveImage("kategori/", $params['icon']);
 
         return DB::table('m_kategori')->insert($params);

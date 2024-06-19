@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Models\Service;
 
 class Slider extends Model
@@ -120,6 +119,7 @@ class Slider extends Model
 
         foreach ($data as $key => $value) {
             $data[$key]->picture = Storage::url('images/slider/' . $value->picture);
+            $data[$key]->picture_mobile = Storage::url('images/slider/' . $value->picture_mobile);
         }
 
         return $data;

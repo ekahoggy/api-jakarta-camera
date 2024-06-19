@@ -9,6 +9,9 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EdukasiController;
+use App\Http\Controllers\EdukasiKategoriController;
+use App\Http\Controllers\EdukasiSliderController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NewsController;
@@ -104,6 +107,32 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/{id}', [PromoController::class, 'getDataById']);
             Route::post('/save', [PromoController::class, 'simpan']);
             Route::post('/status', [PromoController::class, 'changeStatus']);
+        });
+
+        Route::group(['prefix' => 'edukasi'], function (){
+            Route::group(['prefix' => 'daftar'], function (){
+                Route::get('/', [EdukasiController::class, 'getData']);
+                Route::get('/{id}', [EdukasiController::class, 'getDataById']);
+                Route::get('/detail/{id}', [EdukasiController::class, 'getDetail']);
+                Route::post('/save', [EdukasiController::class, 'simpan']);
+                Route::post('/status', [EdukasiController::class, 'changeStatus']);
+            });
+
+            Route::group(['prefix' => 'kategori'], function (){
+                Route::get('/', [EdukasiKategoriController::class, 'getData']);
+                Route::get('/{id}', [EdukasiKategoriController::class, 'getDataById']);
+                Route::get('/detail/{id}', [EdukasiKategoriController::class, 'getDetail']);
+                Route::post('/save', [EdukasiKategoriController::class, 'simpan']);
+                Route::post('/status', [EdukasiKategoriController::class, 'changeStatus']);
+            });
+
+            Route::group(['prefix' => 'slider'], function (){
+                Route::get('/', [EdukasiSliderController::class, 'getData']);
+                Route::get('/{id}', [EdukasiSliderController::class, 'getDataById']);
+                Route::post('/save', [EdukasiSliderController::class, 'simpan']);
+                Route::post('/status', [EdukasiSliderController::class, 'changeStatus']);
+                Route::post('/moveSlider', [EdukasiSliderController::class, 'moveSlider']);
+            });
         });
 
         Route::group(['prefix' => 'voucher'], function (){

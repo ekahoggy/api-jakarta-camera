@@ -25,7 +25,7 @@ class Service extends Model
             $imageData = substr($image['base64'], strlen($prefixToRemove));
             $imageData = base64_decode($imageData);
             $fileName = Str::random(10) . $extension;
-            
+
             if (Storage::put("public/images/$path" . $fileName, $imageData)) {
                 return $fileName;
             } else {
@@ -35,5 +35,24 @@ class Service extends Model
 
         $arrImage = explode("/", $image);
         return end($arrImage);
+    }
+
+    public function saveVideo($path = '', $video) {
+        if (str_contains($video, 'data:video')) {
+            $video_parts = explode(';base64,', $video);
+            $video_type_aux = explode('video/', $video_parts[0]);
+            $video_type = $video_type_aux[1];
+            $video_base64 = base64_decode($video_parts[1]);
+            $namaVideo = uniqid() . '.' . $video_type;
+            $fileVideo = $path . $namaVideo;
+            if (Storage::put("public/videos/" . $fileVideo, $video_base64)) {
+                return $fileVideo;
+            } else {
+                return null;
+            }
+        }
+
+        $arrVideo = explode("/", $video);
+        return end($arrVideo);
     }
 }
