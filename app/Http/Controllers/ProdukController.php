@@ -67,7 +67,13 @@ class ProdukController extends Controller
         ]);
 
         if ($validator->valid()) {
-            $params = (array) $request->all();
+            $params = (array) $request->only(
+                "id", "nama", "sku", "photo", "slug", "deskripsi", "detail_produk", "harga", "in_box", "is_active", 
+                "m_brand_id", "m_kategori_id", "min_beli", "lebar", "berat", "panjang", "tinggi", "stok", "tags", "type", "variant", 
+                "link_blibli", "link_bukalapak", "link_lazada", "link_shopee", "link_tokped", "link_video",
+                "created_at", "created_by", "updated_at", "updated_by"
+            );
+
             $data = $this->produk->simpan($params);
 
             return response()->json([

@@ -16,6 +16,7 @@ use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsKategoriController;
+use App\Http\Controllers\NewsKomentarController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
@@ -30,6 +31,9 @@ use App\Http\Controllers\StokKeluarController;
 use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\StokUpdateController;
 use App\Http\Controllers\UserController;
+
+use App\Mail\VerifikasiEmail;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -208,6 +212,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/save', [NewsKategoriController::class, 'simpan']);
         });
 
+        Route::group(['prefix' => 'news-komentar'], function (){
+            Route::get('/', [NewsKomentarController::class, 'kategori']);
+            Route::get('/{id}', [NewsKomentarController::class, 'getDataById']);
+            Route::post('/post', [NewsKomentarController::class, 'post']);
+        });
+
         Route::group(['prefix' => 'stok'], function (){
             Route::get('/available', [StokMasukController::class, 'getAvailable']);
 
@@ -258,11 +268,16 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
             Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
             Route::get('/brand', [SiteController::class, 'getBrand']);
-            Route::get('/news', [SiteController::class, 'getNews']);
             Route::get('/category-news', [SiteController::class, 'getCategoryNews']);
-            Route::get('/news/{slug}', [SiteController::class, 'getDataBySlug']);
 
             Route::get('/stok', [SiteController::class, 'getStok']);
+
+            Route::prefix('news')->group(function (){
+                Route::get('/', [SiteController::class, 'getNews']);
+                Route::get('/{slug}', [SiteController::class, 'getDataBySlug']);
+                Route::get('/comment/{id}', [SiteController::class, 'getComment']);
+                Route::post('/post', [SiteController::class, 'postComment']);
+            });
 
             // Edukasi
             Route::prefix('edukasi')->group(function (){
@@ -308,9 +323,17 @@ Route::group(['middleware' => 'api'], function (){
                 'password' => $password
             ]);
         });
+
+        Route::post('/send-email', function() {
+            $data = [
+                'subject' => 'Subjek',
+                'message' => 'Ini adalah contoh email custom'
+            ];
+    
+            Mail::to('sgalih1234@gmail.com')->send(new VerifikasiEmail($data));
+    
+            return response()->json(['message' => 'Email sent successfully!']);
+        });
     });
 });
 
-Route::prefix('v1')->group(function (){
-
-});
