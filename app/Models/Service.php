@@ -46,7 +46,7 @@ class Service extends Model
             $namaVideo = uniqid() . '.' . $video_type;
             $fileVideo = $path . $namaVideo;
             if (Storage::put("public/videos/" . $fileVideo, $video_base64)) {
-                return $fileVideo;
+                return $namaVideo;
             } else {
                 return null;
             }

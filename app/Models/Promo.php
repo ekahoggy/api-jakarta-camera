@@ -19,7 +19,9 @@ class Promo extends Model
     protected $fillable = [
         'id',
         'kode',
+        'type',
         'promo',
+        'kategori_id',
         'tanggal_mulai',
         'tanggal_selesai',
         'jam_mulai',
@@ -41,7 +43,7 @@ class Promo extends Model
             foreach ($filter as $key => $value) {
                 if($key === 'kode'){
                     $query->where('promo', 'like', '%' . $value . '%');
-                    // $query->orWhere('sku', 'like', '%' . $value . '%');
+                    $query->orWhere('kode', 'like', '%' . $value . '%');
                 }
                 if($key === 'is_status'){
                     if($value !== null){

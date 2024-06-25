@@ -50,7 +50,7 @@ class VoucherController extends Controller
 
     public function simpan(Request $request){
         try {
-            $params = (array) $request->only('id', 'redeem_code', 'voucher', 'tanggal_mulai', 'tanggal_selesai', 'jam_mulai', 'jam_selesai', 'gambar', 'deskripsi', 'kategori', 'qty', 'voucher_used', 'type', 'voucher_value', 'voucher_max', 'voucher_min_beli', 'is_status');
+            $params = (array) $request->only('id', 'user_id', 'jenis', 'redeem_code', 'voucher', 'tanggal_mulai', 'tanggal_selesai', 'jam_mulai', 'jam_selesai', 'gambar', 'deskripsi', 'kategori', 'qty', 'voucher_used', 'type', 'voucher_value', 'voucher_max', 'voucher_min_beli', 'is_status','untuk');
             $data = $this->voucher->simpan($params);
 
             return response()->json([

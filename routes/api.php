@@ -172,6 +172,7 @@ Route::group(['middleware' => 'api'], function (){
         Route::group(['prefix' => 'produk'], function (){
             Route::get('/', [ProdukController::class, 'getData']);
             Route::get('/{id}', [ProdukController::class, 'getDataById']);
+            Route::get('/byKategori/{id}', [ProdukController::class, 'getProdukByKategori']);
             Route::get('/detail/{id}', [ProdukController::class, 'getDetail']);
             Route::get('/photo/{id}', [ProdukController::class, 'getPhoto']);
             Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
@@ -329,9 +330,9 @@ Route::group(['middleware' => 'api'], function (){
                 'subject' => 'Subjek',
                 'message' => 'Ini adalah contoh email custom'
             ];
-    
+
             Mail::to('sgalih1234@gmail.com')->send(new VerifikasiEmail($data));
-    
+
             return response()->json(['message' => 'Email sent successfully!']);
         });
     });

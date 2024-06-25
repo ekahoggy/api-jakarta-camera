@@ -26,6 +26,7 @@ class ProdukController extends Controller
             $value->variant = $produkModel->getVariant($value->id);
             $value->photo_product = $produkModel->getPhoto($value->id);
             $value->foto = $produkModel->getMainPhotoProduk($value->id);
+            $value->video = $produkModel->getVideo($value->id);
             $value->rowspan = count($value->variant);
         }
         return response()->json(['success' => true, "data" => $produk]);
@@ -37,10 +38,16 @@ class ProdukController extends Controller
         return response()->json(['success' => true, "data" => $data]);
     }
 
+    public function getProdukByKategori(Request $request, $id){
+        $data = Produk::where('is_active', 1)->where('m_kategori_id', $id)->get();
+
+        return response()->json(['success' => true, "data" => $data]);
+    }
+
     public function produk() {
         $produkModel = new Produk();
         $produk = $produkModel->getAll();
-        
+
         if ($produk){
             return response()->json(['status_code' => 200, 'data' => $produk], 200);
         } else{
@@ -68,9 +75,9 @@ class ProdukController extends Controller
 
         if ($validator->valid()) {
             $params = (array) $request->only(
-                "id", "nama", "sku", "photo", "slug", "deskripsi", "detail_produk", "harga", "in_box", "is_active", 
-                "m_brand_id", "m_kategori_id", "min_beli", "lebar", "berat", "panjang", "tinggi", "stok", "tags", "type", "variant", 
-                "link_blibli", "link_bukalapak", "link_lazada", "link_shopee", "link_tokped", "link_video",
+                "id", "nama", "sku", "photo", "slug", "deskripsi", "detail_produk", "harga", "in_box", "is_active",
+                "m_brand_id", "m_kategori_id", "min_beli", "lebar", "berat", "panjang", "tinggi", "stok", "tags", "type", "variant",
+                "link_blibli", "link_bukalapak", "link_lazada", "link_shopee", "link_tokped", "video", "link_video",
                 "created_at", "created_by", "updated_at", "updated_by"
             );
 

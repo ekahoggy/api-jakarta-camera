@@ -18,6 +18,7 @@ class Voucher extends Model
 
     protected $fillable = [
         'id',
+        'user_id',
         'redeem_code',
         'voucher',
         'tanggal_mulai',
@@ -30,9 +31,11 @@ class Voucher extends Model
         'qty',
         'voucher_used',
         'type',
+        'jenis',
         'voucher_value',
         'voucher_max',
         'voucher_min_beli',
+        'untuk',
         'is_status',
     ];
 
@@ -43,6 +46,21 @@ class Voucher extends Model
     public function getAll($params){
         $query = DB::table($this->table);
         $totalItems = $query->count();
+
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if($key === 'kode'){
+                    $query->where('voucher', 'like', '%' . $value . '%');
+                    $query->orWhere('redeem_code', 'like', '%' . $value . '%');
+                }
+                if($key === 'is_status'){
+                    if($value !== null){
+                        $query->where('is_status', $value);
+                    }
+                }
+            }
+        }
 
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
             $query->where("id", "!=", $params['notEqual']);
@@ -76,7 +94,7 @@ class Voucher extends Model
         return $data;
     }
 
-    public function simpan($params) { 
+    public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateVoucher($params);
         } else {

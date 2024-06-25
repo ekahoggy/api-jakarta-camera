@@ -151,6 +151,11 @@ class Produk extends Model
             unset($params['photo']);
         }
 
+        if (isset($params['video']) && !empty(isset($params['video']))) {
+            $this->saveVideo($id, $params['video']);
+            unset($params['video']);
+        }
+
         if (isset($params['variant']) && !empty(isset($params['variant']))) {
             $this->saveVariant($id, $params['variant']);
             unset($params['variant']);
@@ -168,6 +173,11 @@ class Produk extends Model
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
             $this->savePhoto($params['id'], $params['photo']);
             unset($params['photo']);
+        }
+
+        if (isset($params['video']) && !empty(isset($params['video']))) {
+            $this->saveVideo($params['id'], $params['video']);
+            unset($params['video']);
         }
 
         if (isset($params['variant']) && !empty(isset($params['variant']))) {
@@ -196,6 +206,20 @@ class Produk extends Model
         }
     }
 
+    public function saveVideo($produkId, $video) {
+        $service = new Service();
+
+        DB::table('m_produk_media')->where('m_produk_id', '=', $produkId)->where('is_video', 'ya')->delete();
+        $data['id'] = Generator::uuid4()->toString();
+        $data['m_produk_id'] = $produkId;
+        $data['is_video'] = 'ya';
+        $data['is_main'] = 0;
+        $data['urutan'] = 0;
+        $data['media_link'] = $service->saveVideo("produk/", $video);
+
+        DB::table('m_produk_media')->insert($data);
+    }
+
     public function saveVariant($produkId, $listVariant) {
         $service = new Service();
 
@@ -215,8 +239,23 @@ class Produk extends Model
         }
     }
 
+    public function getVideo($produkId) {
+        $data = DB::table('m_produk_media')
+        ->where('m_produk_id', $produkId)
+        ->where('is_video', 'ya')
+        ->first();
+
+        if($data){
+            $url = Storage::url('videos/produk/' . $data->media_link);
+            return $url;
+        }
+        return null;
+    }
+
     public function getPhoto($produkId) {
-        $photo = DB::table('m_produk_media')->where('m_produk_id', $produkId)
+        $photo = DB::table('m_produk_media')
+        ->where('m_produk_id', $produkId)
+        ->where('is_video', 'tidak')
         ->orderBy('urutan', 'ASC')
         ->get();
 

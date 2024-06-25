@@ -18,10 +18,12 @@ class PromoDet extends Model
         'id',
         'm_promo_id',
         'm_produk_id',
+        'm_edukasi_id',
         'persen',
         'nominal',
         'promo_used',
-        'qty'
+        'qty',
+        'status',
     ];
 
     protected $casts = [

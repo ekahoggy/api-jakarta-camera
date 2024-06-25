@@ -40,6 +40,10 @@ class PromoController extends Controller
             $data = $this->promo->getById($id);
             $data->detail = $this->promoDet->getDetailByPromo($id);
 
+            foreach ($data->detail as $key => $value) {
+                $value->promo_used = $value->qty - $value->promo_used;
+            }
+
             return response()->json([
                 'data' => $data,
                 'status_code' => 200
@@ -61,9 +65,10 @@ class PromoController extends Controller
                 $detail[$key]['m_promo_id'] = $data['id'];
                 $detail[$key]['m_produk_id'] = $value['m_produk_id'];
                 $detail[$key]['persen'] = $value['persen'];
-                $detail[$key]['nominal'] = ((double)$value['persen'] / 100) * (int)$value['harga'];
+                $detail[$key]['nominal'] = $value['nominal'];
                 $detail[$key]['promo_used'] = 0;
                 $detail[$key]['qty'] = $value['qty'];
+                $detail[$key]['status'] = $value['status'] == true ? 1 : 0;
             }
 
             // simpan detail promo

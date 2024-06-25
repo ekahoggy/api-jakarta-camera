@@ -86,7 +86,7 @@ class EdukasiController extends Controller
             $data = $this->edukasi->getDetail($id);
 
             foreach ($data as $key => $value) {
-                $data[$key]->video_url = Storage::url('videos/' . $value->video_url);
+                $data[$key]->video_url = Storage::url('videos/edukasi/' . $value->video_url);
             }
             return response()->json([
                 'data' => $data,
