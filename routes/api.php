@@ -265,7 +265,9 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/popup', [PromoSliderController::class, 'slider']);
             Route::get('/kategori', [KategoriController::class, 'kategori'])->name('kategori');
             Route::get('/produk', [SiteController::class, 'getProduct'])->name('produk');
+            Route::get('/produkPromo', [SiteController::class, 'getProductPromo']);
             Route::get('/getProdukSlug', [SiteController::class, 'getProdukSlug'])->name('getProdukSlug');
+            Route::post('/getLastSeenProduk', [SiteController::class, 'getLastSeenProduk']);
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
             Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
             Route::get('/brand', [SiteController::class, 'getBrand']);
@@ -275,6 +277,8 @@ Route::group(['middleware' => 'api'], function (){
 
             Route::prefix('news')->group(function (){
                 Route::get('/', [SiteController::class, 'getNews']);
+                Route::post('/view/{id}', [SiteController::class, 'clickToViewNews']);
+                Route::get('/getNewsTerbaru', [SiteController::class, 'getNewsTerbaru']);
                 Route::get('/{slug}', [SiteController::class, 'getDataBySlug']);
                 Route::get('/comment/{id}', [SiteController::class, 'getComment']);
                 Route::post('/post', [SiteController::class, 'postComment']);

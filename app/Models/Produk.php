@@ -93,6 +93,10 @@ class Produk extends Model
             }
         }
 
+        if (isset($params['lastseen']) && !empty($params['lastseen'])) {
+            $query->whereIn('m_produk.id', $params['lastseen']);
+        }
+
         if (isset($params['kategori']) && !empty($params['kategori'])) {
             $query->where('m_kategori.slug', $params['kategori']);
         }

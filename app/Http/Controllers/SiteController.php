@@ -96,6 +96,88 @@ class SiteController extends Controller
         return response()->json(['success' => true, "data" => $produk]);
     }
 
+    public function getProductPromo(Request $request){
+        $params = (array) $request->all();
+
+        $promo = $this->promoDet->getDetailPromoAktif();
+        $produk = $this->product->getAll($params);
+
+        foreach ($promo as $k => $p) {
+            foreach ($produk['list'] as $key => $value) {
+                if($p->m_produk_id === $value->id){
+                    $p->slug = $value->slug;
+                    $p->variant = $this->product->getVariant($value->id);
+                    $p->foto = $this->product->getMainPhotoProduk($value->id);
+                    $p->photo_product = $this->product->getPhoto($value->id);
+                    $p->harga_promo = $value->harga;
+
+                    $p->is_promo = true;
+                    $hitungPromo = ($p->persen / 100) * $value->harga;
+                    $p->harga_promo = $value->harga - $hitungPromo;
+                    $p->promo = [
+                        'm_promo_id' => $p->m_promo_id,
+                        'kode' => $p->kode,
+                        'promo' => $p->promo,
+                        'tanggal_mulai' => $p->tanggal_mulai,
+                        'jam_mulai' => $p->jam_mulai,
+                        'tanggal_selesai' => $p->tanggal_selesai,
+                        'jam_selesai' => $p->jam_selesai,
+                        'persen' => $p->persen,
+                        'nominal' => $p->nominal,
+                        'qty' => $p->qty,
+                        'promo_min_beli' => $p->promo_min_beli
+                    ];
+                }
+            }
+        }
+
+        return response()->json(['success' => true, "data" => $promo]);
+    }
+
+    public function getLastSeenProduk(Request $request) {
+        $params = (array) $request->all();
+        if(!empty($params['lastseen'])){
+
+            $promo = $this->promoDet->getDetailPromoAktif();
+            $produk = $this->product->getAll($params);
+
+            foreach ($produk['list'] as $key => $value) {
+                $value->variant = $this->product->getVariant($value->id);
+                $value->foto = $this->product->getMainPhotoProduk($value->id);
+                $value->photo_product = $this->product->getPhoto($value->id);
+
+                $value->is_promo = false;
+                $value->is_flashsale = false;
+                $value->promo = [];
+                $value->harga_promo = $value->harga;
+                foreach ($promo as $k => $p) {
+                    if($p->m_produk_id === $value->id){
+                        $value->is_promo = true;
+                        $hitungPromo = ($p->persen / 100) * $value->harga;
+                        $value->harga_promo = $value->harga - $hitungPromo;
+                        $value->promo = [
+                            'm_promo_id' => $p->m_promo_id,
+                            'kode' => $p->kode,
+                            'promo' => $p->promo,
+                            'tanggal_mulai' => $p->tanggal_mulai,
+                            'jam_mulai' => $p->jam_mulai,
+                            'tanggal_selesai' => $p->tanggal_selesai,
+                            'jam_selesai' => $p->jam_selesai,
+                            'persen' => $p->persen,
+                            'nominal' => $p->nominal,
+                            'qty' => $p->qty,
+                            'promo_min_beli' => $p->promo_min_beli
+                        ];
+                    }
+                }
+            }
+            return response()->json(['success' => true, "data" => $produk]);
+        }
+        else{
+            return response()->json(['success' => true, "data" => []]);
+        }
+    }
+
     public function getProdukSlug(Request $request) {
         $promo = $this->promoDet->getDetailPromoAktif();
         $produk = $this->product->getBySlug($request->slug);
@@ -319,9 +401,41 @@ class SiteController extends Controller
         }
     }
 
+    public function getNewsTerbaru(){
+        try {
+            $data = $this->news->newsTerbaru();
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
     public function getComment($id){
         try {
             $data = $this->newsKomentar->getByNewsId($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function clickToViewNews($id){
+        try {
+            $data = $this->news->clickToViews($id);
 
             return response()->json([
                 'data' => $data,
@@ -341,7 +455,7 @@ class SiteController extends Controller
             "email" => "required",
             "komentar" => "required",
         ]);
-    
+
         return $validator;
     }
 
@@ -349,7 +463,7 @@ class SiteController extends Controller
         try {
             $params = (array) $request->only('news_id', 'nama', 'email', 'komentar', 'user_id');
             $validator = $this->validasiKomentar($request);
-    
+
             // Periksa jika validasi gagal
             if ($validator->fails()) {
                 return response()->json(['status_code' => 422, 'message' => $validator->errors()], 422);
@@ -363,7 +477,7 @@ class SiteController extends Controller
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => $th,   
+                'message' => $th,
                 'status_code' => 500
             ], 500);
         }

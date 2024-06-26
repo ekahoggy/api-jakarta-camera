@@ -104,6 +104,16 @@ class EdukasiController extends Controller
         try {
             $data = $this->edukasi->getBySlug($slug);
             $detail = $this->edukasi->getDetail($data->id);
+            $data->mainVideo = '';
+            $data->lockMainVideo = true;
+
+            foreach ($detail as $key => $value) {
+                $value->url_video = Storage::url('videos/edukasi/' . $value->video_url);
+                if($value->urutan === 1 && $value->is_lock === 0){
+                    $data->mainVideo = Storage::url('videos/edukasi/' . $value->video_url);
+                    $data->lockMainVideo = false;
+                }
+            }
 
             return response()->json([
                 'data' => $data,

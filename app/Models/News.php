@@ -126,11 +126,46 @@ class News extends Model
         ];
     }
 
+    public function newsTerbaru(){
+        $data = DB::table($this->table)
+        ->selectRaw('judul, slug, image, tags, image_alt, created_at')
+        ->where('is_publish', 1)
+        ->limit(3)->get();
+
+        $tags = [];
+        $arrTags = [];
+        foreach ($data as $key => $value) {
+            $arrTags = explode(",", $value->tags);
+            $value->image = Storage::url('images/news/' . $value->image);
+
+            array_push($tags, $arrTags);
+        }
+
+        // Menggabungkan semua elemen array menjadi satu
+        $merged_tags = array_merge(...$tags);
+        // Menghapus duplikat
+        $unique_tags = array_unique($merged_tags);
+
+        return [
+            'article'   => $data,
+            'tags'      => $unique_tags
+        ];
+    }
+
     public function getById($id){
         $data = DB::table($this->table)
             ->where('id', $id)
             ->first();
 
+        return $data;
+    }
+
+    public function clickToViews($id){
+        $data = DB::table($this->table)
+            ->where('id', $id)
+            ->first();
+
+        DB::table($this->table)->where('id', $id)->update(['views' => $data->views + 1]);
         return $data;
     }
 
