@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Edukasi;
 use App\Models\EdukasiOrder;
+use App\Models\Xendit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -12,12 +13,14 @@ class EdukasiController extends Controller
 {
     protected $edukasi;
     protected $order;
+    protected $xendit;
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['edukasi', 'getDataBySlug']]);
+        $this->middleware('auth:api', ['except' => ['edukasi', 'pay', 'getDataBySlug']]);
         $this->edukasi = new Edukasi();
         $this->order = new EdukasiOrder();
+        $this->xendit = new Xendit();
     }
 
     public function getData(Request $request){

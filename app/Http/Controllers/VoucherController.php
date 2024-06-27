@@ -65,9 +65,9 @@ class VoucherController extends Controller
         }
     }
 
-    public function voucher() {
-        $voucherModel = new voucher();
-        $voucher = $voucherModel->getVoucher();
+    public function voucher(Request $request) {
+        $params = (array) $request->all();
+        $voucher = $this->voucher->getVoucher($params);
 
         if($voucher){
             return response()->json(['status_code' => 200, 'data' => $voucher], 200);

@@ -59,23 +59,38 @@ class Order extends Model
         $payload = [];
         $payload['id'] = Generator::uuid4()->toString();
         $payload['invoice_number'] = $this->generateCodeInvoice();
-        $payload["user_id"] = $params["user_id"];
+        $payload["user_id"] = $params['data']["user_id"];
+        $payload["voucher_id"] = $params['voucher']["id"];
         $payload["payment_id"] = "pay001";
-        $payload["grand_total"] = $params["grand_total"];
-        $payload["recipient"] = $params["recipient"];
-        $payload["phone_code"] = $params["phone_code"];
-        $payload["phone_number"] = $params["phone_number"];
-        $payload["province_name"] = $params["province_name"];
-        $payload["city_name"] = $params["city_name"];
-        $payload["subdistrict_name"] = $params["subdistrict_name"];
-        $payload["village_name"] = $params["village_name"];
-        $payload["address"] = $params["address"];
-        $payload["postal_code"] = $params["postal_code"];
-        $payload["note"] = isset($params["note"]) ? $params["note"] : "";
+        $payload["recipient"] = $params['data']["recipient"];
+        $payload["phone_code"] = $params['data']["phone_code"];
+        $payload["phone_number"] = $params['data']["phone_number"];
+        $payload["province_name"] = $params['data']["province_name"];
+        $payload["city_name"] = $params['data']["city_name"];
+        $payload["subdistrict_name"] = $params['data']["subdistrict_name"];
+        $payload["village_name"] = $params['data']["village_name"];
+        $payload["address"] = $params['data']["address"];
+        $payload["postal_code"] = $params['data']["postal_code"];
+        $payload["latitude"] = $params['data']["latitude"];
+        $payload["longitude"] = $params['data']["longitude"];
+        $payload["note"] = isset($params['data']["note"]) ? $params['data']["note"] : "";
         $payload["date"] = date("Y-m-d H:i:s");
+
+        $payload["shipping_service"] = $params['kurir']["courier_service_code"];
+        $payload["shipping_sender"] = $params['kurir']["courier_name"];
+        $payload["shipping_sender_code"] = $params['kurir']["courier_code"];
+        $payload["shipping_etd"] = $params['kurir']["etd"];
+        $payload["shipping_type"] = $params['kurir']["shipping_type"];
+        $payload["shipping_group"] = $params['kurir']["service_type"];
+
+        $payload["total_voucher"] = $params['data']["total_voucher"];
+        $payload["total_pengiriman"] = $params['data']["total_pengiriman"];
+        $payload["total_price"] = $params['data']["total_price"];
+        $payload["grand_total"] = $params['data']["grand_total"];
+
         $payload["status_order"] = "ordered";
 
-        // $payload['created_by'] = Auth::user()->id;
+        $payload['created_by'] = $params['data']["user_id"];
         $payload['created_at'] = date('Y-m-d H:i:s');
 
         DB::table($this->table)->insert($payload);
@@ -234,6 +249,8 @@ class Order extends Model
     function updateStatusOrder($id, $inv, $params) {
         DB::table('t_payment')->where('payment_code', $id)->update($params);
         $status_order = $params['payment_status'] == 'p' ? 'processed' : 'ordered';
+
+        DB::table('t_order_edukasi')->where('invoice_number', $inv)->update(['status_order' => $status_order]);
         $order = DB::table('t_order')->where('invoice_number', $inv)->update(['status_order' => $status_order]);
 
         return $order;

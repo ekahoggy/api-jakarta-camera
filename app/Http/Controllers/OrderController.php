@@ -101,8 +101,8 @@ class OrderController extends Controller
     }
 
     public function createOrder(Request $request) {
-        $params = $request->only('data', "detail");
-        $model = $this->order->createOrder($params["data"]);
+        $params = $request->only('data', "detail", "kurir", "voucher");
+        $model = $this->order->createOrder($params);
 
         foreach($params["detail"] as $item) {
             $item["order_id"] = $model["id"];

@@ -93,6 +93,26 @@ class PromoDet extends Model
         ->leftJoin('m_produk', 'm_produk.id', '=', 'm_promo_det.m_produk_id')
         ->where('m_promo.type', 'produk')
         ->where('m_promo.is_status', 1)
+        ->where('m_promo.is_flashsale', 0)
+        ->where('m_promo_det.status', 1);
+        return $query->get();
+    }
+
+    public function getFlashsale(){
+        $query = DB::table($this->table)
+        ->select(
+            'm_promo.*',
+            'm_promo_det.*',
+            'm_produk.id as m_produk_id',
+            'm_produk.nama',
+            'm_produk.sku',
+            'm_produk.harga'
+        )
+        ->leftJoin('m_promo', 'm_promo.id', '=', 'm_promo_det.m_promo_id')
+        ->leftJoin('m_produk', 'm_produk.id', '=', 'm_promo_det.m_produk_id')
+        ->where('m_promo.type', 'produk')
+        ->where('m_promo.is_status', 1)
+        ->where('m_promo.is_flashsale', 1)
         ->where('m_promo_det.status', 1);
         return $query->get();
     }

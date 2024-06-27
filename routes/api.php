@@ -261,11 +261,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/orders', [SiteController::class, 'getOrder']);
 
             // public
-            Route::get('/settingPopup', [SettingController::class, 'getSetting']);
+            Route::get('/setting', [SettingController::class, 'getSetting']);
             Route::get('/popup', [PromoSliderController::class, 'slider']);
             Route::get('/kategori', [KategoriController::class, 'kategori'])->name('kategori');
             Route::get('/produk', [SiteController::class, 'getProduct'])->name('produk');
             Route::get('/produkPromo', [SiteController::class, 'getProductPromo']);
+            Route::get('/flashsale', [SiteController::class, 'getFlashsale']);
             Route::get('/getProdukSlug', [SiteController::class, 'getProdukSlug'])->name('getProdukSlug');
             Route::post('/getLastSeenProduk', [SiteController::class, 'getLastSeenProduk']);
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
@@ -274,6 +275,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/category-news', [SiteController::class, 'getCategoryNews']);
 
             Route::get('/stok', [SiteController::class, 'getStok']);
+            Route::post('/getRates', [SiteController::class, 'getRates']);
 
             Route::prefix('news')->group(function (){
                 Route::get('/', [SiteController::class, 'getNews']);
@@ -294,6 +296,11 @@ Route::group(['middleware' => 'api'], function (){
             });
         });
 
+        // Voucher
+        Route::prefix('voucher')->group(function (){
+            Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
+        });
+
         // Cart
         Route::prefix('cart')->group(function (){
             Route::get('/get', [CartController::class, 'getCart'])->name('getCart');
@@ -301,7 +308,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/update', [CartController::class, 'updateCart'])->name('updateCart');
             Route::post('/delete', [CartController::class, 'deleteCart'])->name('deleteCart');
         });
-
 
         // Address
         Route::prefix('address')->group(function (){

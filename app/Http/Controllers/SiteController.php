@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\BiteShip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -30,6 +32,7 @@ class SiteController extends Controller
     protected $promoDet;
     protected $newsCategory;
     protected $newsKomentar;
+    protected $biteship;
 
     public function __construct()
     {
@@ -44,6 +47,7 @@ class SiteController extends Controller
         $this->news = new News();
         $this->newsCategory = new NewsKategori();
         $this->newsKomentar = new NewsKomentar();
+        $this->biteship = new BiteShip();
     }
 
     public function slider() {
@@ -100,6 +104,44 @@ class SiteController extends Controller
         $params = (array) $request->all();
 
         $promo = $this->promoDet->getDetailPromoAktif();
+        $produk = $this->product->getAll($params);
+
+        foreach ($promo as $k => $p) {
+            foreach ($produk['list'] as $key => $value) {
+                if($p->m_produk_id === $value->id){
+                    $p->slug = $value->slug;
+                    $p->variant = $this->product->getVariant($value->id);
+                    $p->foto = $this->product->getMainPhotoProduk($value->id);
+                    $p->photo_product = $this->product->getPhoto($value->id);
+                    $p->harga_promo = $value->harga;
+
+                    $p->is_promo = true;
+                    $hitungPromo = ($p->persen / 100) * $value->harga;
+                    $p->harga_promo = $value->harga - $hitungPromo;
+                    $p->promo = [
+                        'm_promo_id' => $p->m_promo_id,
+                        'kode' => $p->kode,
+                        'promo' => $p->promo,
+                        'tanggal_mulai' => $p->tanggal_mulai,
+                        'jam_mulai' => $p->jam_mulai,
+                        'tanggal_selesai' => $p->tanggal_selesai,
+                        'jam_selesai' => $p->jam_selesai,
+                        'persen' => $p->persen,
+                        'nominal' => $p->nominal,
+                        'qty' => $p->qty,
+                        'promo_min_beli' => $p->promo_min_beli
+                    ];
+                }
+            }
+        }
+
+        return response()->json(['success' => true, "data" => $promo]);
+    }
+
+    public function getFlashsale(Request $request){
+        $params = (array) $request->all();
+
+        $promo = $this->promoDet->getFlashsale();
         $produk = $this->product->getAll($params);
 
         foreach ($promo as $k => $p) {
@@ -286,6 +328,23 @@ class SiteController extends Controller
         try {
             $params = (array) $request->all();
             $data = $this->product->stok($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getRates(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->biteship->getRates($params);
 
             return response()->json([
                 'data' => $data,
