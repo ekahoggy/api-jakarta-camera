@@ -290,6 +290,7 @@ Route::group(['middleware' => 'api'], function (){
                 Route::get('/kategori', [EdukasiKategoriController::class, 'kategori']);
                 Route::get('/list', [EdukasiController::class, 'edukasi']);
                 Route::get('/{slug}', [EdukasiController::class, 'getDataBySlug']);
+                Route::post('/pay', [EdukasiController::class, 'pay']);
             });
         });
 

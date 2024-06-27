@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Edukasi;
+use App\Models\EdukasiOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -10,11 +11,13 @@ use Illuminate\Support\Facades\Validator;
 class EdukasiController extends Controller
 {
     protected $edukasi;
+    protected $order;
 
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['edukasi', 'getDataBySlug']]);
         $this->edukasi = new Edukasi();
+        $this->order = new EdukasiOrder();
     }
 
     public function getData(Request $request){
@@ -81,6 +84,16 @@ class EdukasiController extends Controller
         ], 200);
     }
 
+    public function pay(Request $request){
+        $params = (array) $request->all();
+        $data = $this->order->createOrder($params);
+
+        return response()->json([
+            'data' => $data,
+            'status_code' => 200
+        ], 200);
+    }
+
     public function getDetail($id){
         try {
             $data = $this->edukasi->getDetail($id);
@@ -104,6 +117,7 @@ class EdukasiController extends Controller
         try {
             $data = $this->edukasi->getBySlug($slug);
             $detail = $this->edukasi->getDetail($data->id);
+            $data->url_gambar = Storage::url('images/edukasi/' . $data->gambar);
             $data->mainVideo = '';
             $data->lockMainVideo = true;
 
