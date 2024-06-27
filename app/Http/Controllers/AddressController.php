@@ -26,6 +26,8 @@ class AddressController extends Controller
             "village_id" => "required",
             "postal_code" => "required",
             "address" => "required",
+            "latitude" => "required",
+            "longitude" => "required",
         ]);
     
         return $validator;
