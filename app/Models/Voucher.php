@@ -94,6 +94,21 @@ class Voucher extends Model
         return $data;
     }
 
+    public function getVoucher($params){
+        $data = DB::table('m_voucher')
+            ->where('is_status', 1);
+
+        if (isset($params['jenis']) && !empty($params['jenis'])) {
+            $data->where('jenis', $params['jenis']);
+        }
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $data->where('untuk', 'user');
+            $data->where('user_id', $params['user_id']);
+        }
+
+        return $data->get();
+    }
+
     public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateVoucher($params);
