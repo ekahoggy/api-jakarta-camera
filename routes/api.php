@@ -32,8 +32,10 @@ use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\StokUpdateController;
 use App\Http\Controllers\UserController;
 
+// Email
 use App\Mail\VerifikasiEmail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,14 +50,16 @@ use Illuminate\Support\Facades\Mail;
 
 Route::group(['middleware' => 'api'], function (){
     Route::group(['prefix' => 'v1'], function (){
-        Route::group(['prefix' => 'auth'], function (){
+        Route::group(['prefix' => 'auth'], function () {
             Route::post('/login', [AuthController::class, 'login']);
             Route::post('/register', [AuthController::class, 'register']);
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
-            Route::get('/checkAuthorization',  [AuthController::class, 'checkToken']);
+            Route::get('/verif-email', [AuthController::class, 'verif']);
+            Route::get('/checkAuthorization', [AuthController::class, 'checkToken']);
         });
+        
 
         Route::group(['prefix' => 'dashboard'], function (){
             Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
@@ -331,8 +335,10 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::post('/send-email', function() {
             $data = [
-                'subject' => 'Subjek',
-                'message' => 'Ini adalah contoh email custom'
+                'id' => 1234,
+                'name' => "Galih",
+                'email' => "wgalih1234@gmail.com",
+                'link_verif' => env('APP_URL') . "/api/v1/auth/verif-email?token=" . urlencode(Crypt::encrypt(1234))
             ];
 
             Mail::to('sgalih1234@gmail.com')->send(new VerifikasiEmail($data));

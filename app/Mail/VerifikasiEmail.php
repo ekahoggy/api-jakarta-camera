@@ -21,7 +21,7 @@ class VerifikasiEmail extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
-        $this->subject = 'Verifikasi Email';
+        $this->subject = 'Verifikasi Email Anda untuk pendaftaran Jakarta Camera';
     }
 
     public function build()

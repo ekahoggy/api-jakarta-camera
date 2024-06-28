@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Uuid as Generator;
+use Illuminate\Support\Facades\Crypt;
+
+// Email
+use App\Mail\VerifikasiEmail;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -18,7 +23,7 @@ class AuthController extends Controller
     public function __construct()
     {
         # By default we are using here auth:api middleware
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'me']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register', 'me', 'verif']]);
     }
 
     /**
@@ -32,6 +37,7 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
+
         $credentials = $request->only('email', 'password');
         $token = Auth::attempt($credentials);
         if (!$token) {
@@ -64,9 +70,12 @@ class AuthController extends Controller
 
         $id = Generator::uuid4()->toString();
 
-        $request->phone_number = ltrim($request->phone_number, '0');
-        $request->phone_number = ltrim($request->phone_number, '+62');
-        $request->phone_number = ltrim($request->phone_number, '62');
+        $phoneNumber = $request->phone_number;
+        if (isset($phoneNumber)) {
+            $payloadPhoneNumber = ltrim($phoneNumber, '0');
+            $payloadPhoneNumber = ltrim($phoneNumber, '+62');
+            $payloadPhoneNumber = ltrim($phoneNumber, '62');
+        }
 
         $user = User::create([
             'id' => $id,
@@ -76,19 +85,42 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone_code' => $request->phone_code,
-            'phone_number' => $request->phone_number,
-            'phone_number' => $request->phone_number,
+            'phone_number' => $payloadPhoneNumber,
             'is_active' => 'verifikasi',
         ]);
 
+        $appUrl = env("appUrl", "http://localhost:8000");
+
+        $data = [
+            'id' => $id,
+            'name' => $request->name,
+            'email' => $request->email,
+            'link_verif' => "$appUrl/api/v1/auth/verif-email?token=" . urlencode(Crypt::encrypt($id))
+        ];
+
+        Mail::to($request->email)->send(new VerifikasiEmail($data));
+
         $user->id = $id;
         $token = Auth::login($user);
+
         return response()->json([
             'status' => 'success',
             'message' => 'User created successfully',
             'user' => $user,
             'authorisation' => $this->respondWithToken($token)
         ]);
+    }
+
+    public function verif(Request $request){
+        $user = new User();
+        $params = $request->only('token');
+
+        $tokenVerif = urldecode($params['token']);
+        $id = Crypt::decrypt($tokenVerif);
+
+        $user->changeStatus($id, 'aktif');
+
+        return redirect(env('APP_CLIENT_URL', 'http://localhost:4200/') . 'login');
     }
 
     /**
