@@ -120,7 +120,7 @@ class AuthController extends Controller
 
         $user->changeStatus($id, 'aktif');
 
-        return redirect(env('APP_CLIENT_URL', 'http://localhost:4200/') . 'login');
+        return redirect(env('APP_CLIENT_URL', 'http://localhost:4200/') . 'success-verification');
     }
 
     /**
