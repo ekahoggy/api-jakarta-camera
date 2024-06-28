@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BiteShip;
 use App\Models\Order;
 use App\Models\Xendit;
 use Illuminate\Http\Request;
@@ -9,12 +10,14 @@ class OrderController extends Controller
 {
     protected $order;
     protected $xendit;
+    protected $biteship;
 
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['createOrder', 'kategori', 'checkout', 'xenditCallback']]);
         $this->order = new Order();
         $this->xendit = new Xendit();
+        $this->biteship = new BiteShip();
     }
 
     function statusOrder($status) {
@@ -131,6 +134,16 @@ class OrderController extends Controller
         return response()->json(['status_code' => 422, 'message' => 'An error occurred on the server'], 422);
     }
 
+    public function kirim(Request $request) {
+        $params = $request->all();
+        $data = $this->biteship->order($params);
+
+        return response()->json([
+            'data' => $data,
+            'status_code' => 200,
+        ], 200);
+    }
+
     public function getOrder(Request $request) {
         $params = $request->all();
         $data = $this->order->getOrder($params);
@@ -144,6 +157,16 @@ class OrderController extends Controller
     public function changeStatus(Request $request) {
         $params = $request->all();
         $data = $this->order->updateOrder($params);
+
+        return response()->json([
+            'data' => $data,
+            'status_code' => 200
+        ], 200);
+    }
+
+    public function updatePengiriman(Request $request) {
+        $params = $request->all();
+        $data = $this->order->updatePengiriman($params);
 
         return response()->json([
             'data' => $data,

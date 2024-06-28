@@ -193,7 +193,7 @@ class Order extends Model
             ->first();
 
         $detail = DB::table('t_order_detail')
-            ->select('t_order_detail.*', 'm_produk.nama', 'm_produk.sku')
+            ->select('t_order_detail.*', 'm_produk.*')
             ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
             ->where('order_id', $id)
             ->get();
@@ -210,6 +210,14 @@ class Order extends Model
         } else {
             return $this->insertOrder($params);
         }
+    }
+
+    public function updatePengiriman($params){
+        $id = $params['id']; unset($params['id']);
+        $data = $params;
+        $data['shipping_date'] = date('Y-m-d H:i:s');
+
+        return DB::table('t_order')->where('id', $id)->update($data);
     }
 
     public function updateOrder($params) {

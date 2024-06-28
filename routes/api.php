@@ -192,6 +192,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/status', [OrderController::class, 'changeStatus']);
             Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
             Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+            Route::post('/kirim', [OrderController::class, 'kirim'])->name('kirim');
+            Route::post('/statusPengiriman', [OrderController::class, 'updatePengiriman']);
         });
 
 
