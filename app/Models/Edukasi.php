@@ -125,13 +125,20 @@ class Edukasi extends Model
 
     public function updateEdukasi($params) {
         $service = new Service();
+        $modelDetail = new EdukasiVideo();
 
-        $id = $params['id']; unset($params['id']);
-        $params['slug'] = Str::slug($params['judul'], '-');
-        $params['gambar'] = $service->saveImage("edukasi/", $params['gambar']);
-        // $params['updated_at'] = strtotime(date('Y-m-d H:i:s'));
+        $id = $params['data']['id']; unset($params['data']['id']);
+        $params['data']['slug'] = Str::slug($params['data']['judul'], '-');
+        $params['data']['gambar'] = $service->saveImage("edukasi/", $params['data']['gambar']);
+        $params['data']['updated_at'] = strtotime(date('Y-m-d H:i:s'));
 
-        return DB::table($this->table)->where('id', $id)->update($params);
+        $data = DB::table($this->table)->where('id', $id)->update($params['data']);
+
+        foreach ($params['detail'] as $key => $value) {
+            $value['urutan'] = $key + 1;
+            $modelDetail->simpan($value, $id);
+        }
+        return $data;
     }
 
     public function insertEdukasi($params) {
@@ -143,6 +150,7 @@ class Edukasi extends Model
         $params['data']['slug'] = Str::slug($params['data']['judul'], '-');
         $params['data']['gambar'] = $service->saveImage("edukasi/", $params['data']['gambar']);
         $params['data']['tanggal'] = date('Y-m-d H:i:s');
+        $params['data']['created_at'] = strtotime(date('Y-m-d H:i:s'));
 
         $data = DB::table($this->table)->insert($params['data']);
         foreach ($params['detail'] as $key => $value) {
