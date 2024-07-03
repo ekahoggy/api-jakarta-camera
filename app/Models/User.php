@@ -69,17 +69,17 @@ class User extends Authenticatable implements JWTSubject
         'password', 'remember_token',
     ];
 
-    public function getUser($req){
+    public function getUser($params){
         $query = DB::table($this->table);
 
-        if($req->type !== null){
-            $query->where("type", $req->type);
+        if($params->type !== null){
+            $query->where("type", $params->type);
         }
-        if($req->name !== null){
-            $query->where('name', 'like', '%' . $req->name . '%');
+        if($params->name !== null){
+            $query->where('name', 'like', '%' . $params->name . '%');
         }
-        if($req->is_active !== null){
-            $query->where("is_active", $req->is_active);
+        if($params->is_active !== null){
+            $query->where("is_active", $params->is_active);
         }
 
         $data = $query->limit(20)
@@ -124,6 +124,16 @@ class User extends Authenticatable implements JWTSubject
             ->orWhere('name', 'like', '%' . $email . '%')->get();
 
         return $query;
+    }
+
+    public function getByEmail($email){
+        return DB::table($this->table)->where('email', '=', $email);
+    }
+
+    public function updatePasswordByEmail($params){
+        return DB::table($this->table)
+            ->where('email', $params['email'])
+            ->update(['password' => $params['password']]);
     }
 }
 
