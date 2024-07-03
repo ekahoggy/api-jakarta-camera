@@ -11,17 +11,17 @@ use Illuminate\Http\RedirectResponse;
 
 class GoogleLoginController extends Controller
 {
-    // public function __construct()
-    // {
-    //     $this->middleware('auth:api', ['except' => ['redirectToGoogle', 'handleGoogleCallback']]);
-    // }
+    public function __construct()
+    {
+        $this->middleware('auth:api', ['except' => ['redirectToGoogle', 'handleGoogleCallback']]);
+    }
 
     public function redirectToGoogle(): RedirectResponse
     {
         return Socialite::driver('google')->redirect();
     }
 
-    public function handleGoogleCallback(): RedirectResponse
+    public function handleGoogleCallback()
     {
         $googleUser = Socialite::driver('google')->stateless()->user();
         $user = User::where('email', $googleUser->email)->first();

@@ -59,7 +59,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/verif-email', [AuthController::class, 'verif']);
             Route::get('/checkAuthorization', [AuthController::class, 'checkToken']);
         });
-        
 
         Route::group(['prefix' => 'dashboard'], function (){
             Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
