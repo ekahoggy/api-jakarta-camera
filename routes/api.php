@@ -63,7 +63,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/forgot-password', [AuthController::class, 'forgot']);
             Route::post('/reset-password', [AuthController::class, 'reset']);
         });
-        
 
         Route::group(['prefix' => 'dashboard'], function (){
             Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
