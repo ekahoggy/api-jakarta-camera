@@ -49,7 +49,8 @@ class GoogleLoginController extends Controller
             ]);
         }
         else{
-            $token = Auth::login($user);
+            $u = User::updated($user, ['id'=>$user->id]);
+            $token = Auth::login($u);
             return response()->json([
                 'status' => 'success',
                 'message' => 'User created successfully',

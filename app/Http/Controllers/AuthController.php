@@ -24,7 +24,7 @@ class AuthController extends Controller
     public function __construct()
     {
         # By default we are using here auth:api middleware
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'me', 'verif', 'forgot', 'reset']]);
+        $this->middleware('auth:api', ['except' => ['loginGoogle', 'login', 'register', 'me', 'verif']]);
     }
 
     /**
@@ -57,6 +57,59 @@ class AuthController extends Controller
                 'status_code' => 200,
                 'data'  => $data,
             ], 200);
+    }
+
+    public function loginGoogle(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if(!$user)
+        {
+            $id = Generator::uuid4()->toString();
+            $user = User::create([
+                'id' => $id,
+                'gauth_id' => $request->id,
+                'type' => 'customer',
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make(rand(100000,999999)),
+                'photo' => $request->avatar,
+                'is_active' => 'aktif',
+            ]);
+
+            $user->id = $id;
+            $userData = User::where("id", $user->id)->first();
+            $token = Auth::login($userData);
+            $u = Auth::user();
+            $data = [
+                'user' => $u,
+                'auth' => $this->respondWithToken($token)
+            ];
+            return response()->json([
+                'status_code' => 200,
+                'data'  => $data,
+            ], 200);
+        }
+        else{
+            User::where("id", $user->id)->update([
+                "name" => $request->name,
+                "gauth_id" => $request->id,
+                "gauth_type" => "google",
+                "photo" => $request->photoUrl,
+                "is_active" => "aktif"
+            ]);
+
+            $userData = User::where("id", $user->id)->first();
+            $token = Auth::login($userData);
+            $u = Auth::user();
+            $data = [
+                'user' => $u,
+                'auth' => $this->respondWithToken($token)
+            ];
+            return response()->json([
+                'status_code' => 200,
+                'data'  => $data,
+            ], 200);
+        }
     }
 
     public function register(Request $request){
