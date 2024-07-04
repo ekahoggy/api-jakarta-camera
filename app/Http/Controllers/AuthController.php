@@ -24,7 +24,7 @@ class AuthController extends Controller
     public function __construct()
     {
         # By default we are using here auth:api middleware
-        $this->middleware('auth:api', ['except' => ['loginGoogle', 'login', 'register', 'me', 'verif']]);
+        $this->middleware('auth:api', ['except' => ['loginGoogle','login', 'register', 'me', 'verif', 'forgot', 'reset']]);
     }
 
     /**
