@@ -57,8 +57,12 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
             Route::post('/me', [AuthController::class, 'me']);
-            Route::get('/verif-email', [AuthController::class, 'verif']);
             Route::get('/checkAuthorization', [AuthController::class, 'checkToken']);
+
+            # auth
+            Route::get('/verif-email', [AuthController::class, 'verif']);
+            Route::post('/forgot-password', [AuthController::class, 'forgot']);
+            Route::post('/reset-password', [AuthController::class, 'reset']);
         });
 
         Route::group(['prefix' => 'dashboard'], function (){

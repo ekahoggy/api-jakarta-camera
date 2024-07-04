@@ -59,18 +59,18 @@ class Produk extends Model
         if (isset($params['filter']) && !empty($params['filter'])) {
             $filter = json_decode($params['filter']);
             foreach ($filter as $key => $value) {
-                if($key === 'nama'){
+                if ($key === 'nama'){
                     if(!empty($value)){
                         $query->where('nama', 'like', '%' . $value . '%');
                     }
                     // $query->orWhere('sku', 'like', '%' . $value . '%');
                 }
-                if($key === 'm_kategori_id'){
+                if ($key === 'm_kategori_id'){
                     if($value !== null){
                         $query->where('m_kategori_id', $value);
                     }
                 }
-                if($key === 'm_brand_id'){
+                if ($key === 'm_brand_id'){
                     if($value !== null){
                         $query->where('m_brand_id', $value);
                     }

@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class VerifikasiEmail extends Mailable
+class ResetKataSandi extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,12 +19,12 @@ class VerifikasiEmail extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
-        $this->subject = 'Verifikasi Email Anda untuk pendaftaran Jakarta Camera';
+        $this->subject = 'Reset Kata Sandi Akun Jakarta Camera';
     }
 
     public function build()
     {
-        return $this->view('emails.verifikasi-email')
+        return $this->view('emails.reset-sandi')
             ->with('data', $this->data)
             ->subject($this->subject);
     }

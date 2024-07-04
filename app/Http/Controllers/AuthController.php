@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\Crypt;
 
 // Email
+use App\Mail\ResetKataSandi;
 use App\Mail\VerifikasiEmail;
 use Illuminate\Support\Facades\Mail;
 
@@ -142,8 +143,7 @@ class AuthController extends Controller
             'is_active' => 'verifikasi',
         ]);
 
-        $appUrl = env("appUrl", "http://localhost:8000");
-
+        $appUrl = env("APP_URL", "http://localhost:8000");
         $data = [
             'id' => $id,
             'name' => $request->name,
@@ -167,13 +167,60 @@ class AuthController extends Controller
     public function verif(Request $request){
         $user = new User();
         $params = $request->only('token');
-
         $tokenVerif = urldecode($params['token']);
         $id = Crypt::decrypt($tokenVerif);
 
         $user->changeStatus($id, 'aktif');
 
-        return redirect(env('APP_CLIENT_URL', 'http://localhost:4200/') . 'success-verification');
+        return redirect(env('APP_CLIENT_URL', 'https://jakartacamera.moodstudio.id/') . 'success-verification');
+    }
+
+    public function forgot(Request $request) {
+        $user = new User();
+        $params = $request->only('email');
+        $users = $user->getByEmail($params['email']);
+
+        if (empty($users)) {
+            return response()->json([
+                'status_code' => 401,
+                'message' => 'Email belum terdaftar!',
+            ], 401);
+        }
+
+        $appUrl = env('APP_CLIENT_URL', 'http:localhost:4200/');
+        $data = [
+            'link_reset' => "{$appUrl}api/v1/auth/reset-password?token=" . urlencode(Crypt::encrypt($params['email']))
+        ];
+
+        Mail::to($params['email'])->send(new ResetKataSandi($data));
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Sukses! Email untuk reset kata sandi telah berhasil dikirim. Silakan periksa kotak masuk Anda untuk instruksi lebih lanjut.',
+        ], 200);
+    }
+
+    public function reset(Request $request) {
+        $user = new User();
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $params = $request->only('password', 'password_confirmation', 'token');
+        $tokenVerif = urldecode($params['token']);
+        $email = Crypt::decrypt($tokenVerif);
+
+        $payload = [
+            'email' => $email,
+            'password' => $params['password']
+        ];
+
+        $user->updatePasswordByEmail($payload);
+
+        return response()->json([
+            'status_code' => 200,
+            'message' => 'Sukses! Email untuk reset kata sandi telah berhasil dikirim. Silakan periksa kotak masuk Anda untuk instruksi lebih lanjut.',
+        ], 200);
     }
 
     /**
