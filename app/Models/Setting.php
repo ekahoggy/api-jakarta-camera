@@ -64,9 +64,15 @@ class Setting extends Model
     public function simpan($params) {
         $service = new Service();
 
-        $params['favicon'] = $service->saveImage("setting/", $params['favicon']);
-        $params['icon'] = $service->saveImage("setting/", $params['icon']);
-        $params['keyword'] = implode(',', $params['keyword']);
+        if(isset($params['favicon'])){
+            $params['favicon'] = $service->saveImage("setting/", $params['favicon']);
+        }
+        if(isset($params['icon'])){
+            $params['icon'] = $service->saveImage("setting/", $params['icon']);
+        }
+        if(isset($params['keyword'])){
+            $params['keyword'] = implode(',', $params['keyword']);
+        }
 
         foreach ($params as $key => $value) {
             $up = [

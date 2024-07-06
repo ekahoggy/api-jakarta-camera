@@ -20,6 +20,7 @@ Route::get('/route-cache', function() {
     Artisan::call('config:cache');
     Artisan::call('cache:clear');
     Artisan::call('config:clear');
+    Artisan::call('view:cache');
     Artisan::call('view:clear');
     Artisan::call('optimize:clear');
     Artisan::call('optimize');
