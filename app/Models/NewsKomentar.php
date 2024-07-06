@@ -36,7 +36,17 @@ class NewsKomentar extends Model
     }
 
     public function getNewsKomentar(){
-        return DB::table($this->table)->orderBy('kategori', 'ASC')->get();
+        $query = DB::table($this->table)
+                ->select('m_news_komentar.*','m_news.judul')
+                ->leftJoin('m_news','m_news.id', '=', 'm_news_komentar.news_id');
+        $data = $query->orderBy('is_publish', 'ASC')
+                    ->orderBy('tanggal', 'DESC')
+                    ->get();
+        $totalItems = $query->count();
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
     }
 
     public function getNewsKomentarByName($kategori){
@@ -53,6 +63,7 @@ class NewsKomentar extends Model
     public function getByNewsId($id){
         $query = DB::table($this->table)
             ->where('news_id', '=', $id)
+            ->where('is_publish', 1)
             ->orderBy('created_at', 'ASC');
 
         $data = $query->get();
@@ -62,6 +73,25 @@ class NewsKomentar extends Model
             'list' => $data,
             'totalItems' => $totalItems
         ];
+    }
+
+    public function postBalasan($data) {
+        $payload = [
+            'balasan' => $data['balasan'],
+            'tanggal_balasan' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        return DB::table($this->table)->update($payload, ['id' => $data['id']]);
+    }
+
+    public function changeStatus($data) {
+        $payload = [
+            'is_publish' => $data['is_publish'],
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        return DB::table($this->table)->update($payload, ['id' => $data['id']]);
     }
 
     public function postKomentar($data) {
@@ -75,7 +105,7 @@ class NewsKomentar extends Model
             'created_at' => date('Y-m-d H:i:s'),
             'created_by' => $data['user_id'],
         ];
-        
+
         return DB::table($this->table)->insert($payload);
     }
 }

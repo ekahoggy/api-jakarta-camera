@@ -224,9 +224,11 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::group(['prefix' => 'news-komentar'], function (){
-            Route::get('/', [NewsKomentarController::class, 'kategori']);
+            Route::get('/', [NewsKomentarController::class, 'getKomentar']);
             Route::get('/{id}', [NewsKomentarController::class, 'getDataById']);
             Route::post('/post', [NewsKomentarController::class, 'post']);
+            Route::post('/saveBalasan', [NewsKomentarController::class, 'postKomentar']);
+            Route::post('/status', [NewsKomentarController::class, 'changeStatus']);
         });
 
         Route::group(['prefix' => 'stok'], function (){
