@@ -127,7 +127,6 @@ class OrderController extends Controller
                 $this->subscribe->sendEmail($dataSub);
             }
         }
-        dd($params);
         $model = $this->order->createOrder($params);
 
         foreach($params["detail"] as $item) {
@@ -136,6 +135,7 @@ class OrderController extends Controller
         }
 
         if (!empty($model)) {
+            $model['email'] = $params['data']['email'];
             $generateInvoice = $this->xendit->createInvoice($model);
             $dataPayment['payment_type'] = 'x';
             $dataPayment['payment_total'] = $model['grand_total'];

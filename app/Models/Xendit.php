@@ -20,14 +20,17 @@ class Xendit extends Model
     public function createInvoice($data)
     {
         $apiInstance = new InvoiceApi();
+        $appUrl = env("APP_CLIENT_URL", "http://localhost:3200");
         $create_invoice_request = new CreateInvoiceRequest([
             'external_id' => $data['invoice_number'],
+            'payer_email' => $data['email'],
+            'should_send_email' => true,
             'description' => isset($data['description']) ? $data['description'] : '-',
             'amount' => $data['grand_total'],
             'currency' => 'IDR',
             'reminder_time' => 1,
-            'success_redirect_url' => 'https://jakartacamera.moodstudio.id/complete-order',
-            'failure_redirect_url' => 'https://jakartacamera.moodstudio.id/home'
+            'success_redirect_url' => $appUrl."/complete-order",
+            'failure_redirect_url' => $appUrl."/home"
         ]);
 
         try {
