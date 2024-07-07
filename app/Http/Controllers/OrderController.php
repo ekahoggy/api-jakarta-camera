@@ -108,7 +108,7 @@ class OrderController extends Controller
 
     public function createOrder(Request $request) {
         $params = $request->only('data', "detail", "kurir", "voucher");
-        if($params['data']['subscribe']){
+        if(isset($params['data']['subscribe'])){
             $dataSub = [
                 'email' => $params['data']['email'],
                 'created_by' => $params['data']['user_id'],
