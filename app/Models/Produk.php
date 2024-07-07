@@ -123,15 +123,18 @@ class Produk extends Model
 
     public function getBySlug($slug){
         $query = DB::table('m_produk')
-                ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_brand.brand, m_brand.slug as slug_brand,m_produk_media.media_link')
+                ->selectRaw('m_produk.*, m_kategori.slug as slug_kategori, m_kategori.kategori, m_brand.brand, m_brand.slug as slug_brand')
                 ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
                 ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
-                ->leftJoin('m_produk_media', 'm_produk_media.m_produk_id', '=', 'm_produk.id')
-                ->where('m_produk_media.is_main', 1)
                 ->where('m_produk.slug', $slug)
                 ->first();
 
-        $query->detail_foto = DB::table('m_produk_media')->where('m_produk_id', $query->id)->get();
+        $query->detail_foto = DB::table('m_produk_media')
+            ->where('m_produk_id', $query->id)
+            ->orderBy('is_video', 'ASC')
+            ->orderBy('is_main', 'DESC')
+            ->orderBy('urutan', 'ASC')
+            ->get();
 
         return $query;
     }

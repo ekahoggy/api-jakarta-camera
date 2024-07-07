@@ -225,13 +225,18 @@ class SiteController extends Controller
         $produk = $this->product->getBySlug($request->slug);
         $produk->variant = $this->product->getVariant($produk->id);
         $produk->foto = $this->product->getMainPhotoProduk($produk->id);
+        $produk->video = $this->product->getVideo($produk->id);
         $produk->is_promo = false;
         $produk->is_flashsale = false;
         $produk->promo = [];
         $produk->harga_promo = $produk->harga;
 
         foreach ($produk->detail_foto as $value) {
-            $value->foto = $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = Storage::url('images/produk/' . $value->media_link);
+
+            if($value->is_video == 'ya'){
+                $value->foto = Storage::url('videos/produk/' . $value->media_link);
+            }
         }
 
         foreach ($promo as $k => $p) {
