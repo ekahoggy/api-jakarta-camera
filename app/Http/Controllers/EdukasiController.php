@@ -145,8 +145,9 @@ class EdukasiController extends Controller
         }
     }
 
-    public function edukasi() {
-        $categories = $this->edukasi->getEdukasi();
+    public function edukasi(Request $request) {
+        $params = $request->only('filter');
+        $categories = $this->edukasi->getEdukasi($params);
 
         if($categories){
             return response()->json(['status_code' => 200, 'data' => $categories], 200);
