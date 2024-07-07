@@ -165,13 +165,37 @@ class Edukasi extends Model
         return DB::table($this->table)->where('id', $id)->update($params);
     }
 
-    public function getEdukasi(){
-        $data = DB::table($this->table)->orderBy('is_publish', 'ASC')->get();
+    public function getEdukasi($params){
+        $query = DB::table($this->table)
+            ->leftJoin('m_edukasi_kategori', 'm_edukasi_kategori.id', '=', 'm_edukasi.kategori_id');
+
+        $totalItems = $query->count();
+        
+        $filter = json_decode($params['filter']);
+        
+        foreach($filter as $key => $val) {
+            if ($key == "kategori" && !empty($val)) {
+                $query->where("m_edukasi_kategori.kategori", "=", $val);
+            }
+        }
+
+        if (isset($params['offset']) && !empty($params['offset'])) {
+            $query->offset($params['offset']);
+        }
+
+        if (isset($params['limit']) && !empty($params['limit'])) {
+            $query->limit($params['limit']);
+        }
+
+        $data = $query->orderBy('is_publish', 'ASC')->get();
 
         foreach ($data as $key => $value) {
             $data[$key]->gambar = Storage::url('images/edukasi/' . $value->gambar);
         }
 
-        return $data;
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
     }
 }
