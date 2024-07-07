@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BiteShip;
 use App\Models\Order;
+use App\Models\Subscription;
 use App\Models\Xendit;
 use Illuminate\Http\Request;
 class OrderController extends Controller
@@ -11,6 +12,7 @@ class OrderController extends Controller
     protected $order;
     protected $xendit;
     protected $biteship;
+    protected $subscribe;
 
     public function __construct()
     {
@@ -18,6 +20,7 @@ class OrderController extends Controller
         $this->order = new Order();
         $this->xendit = new Xendit();
         $this->biteship = new BiteShip();
+        $this->subscribe = new Subscription();
     }
 
     function statusOrder($status) {
@@ -105,6 +108,25 @@ class OrderController extends Controller
 
     public function createOrder(Request $request) {
         $params = $request->only('data', "detail", "kurir", "voucher");
+        if($params['data']['subscribe']){
+            $dataSub = [
+                'email' => $params['data']['email'],
+                'created_by' => $params['data']['user_id'],
+                'name' => $params['data']['recipient']
+            ];
+            $sub = $this->subscribe->getByEmail($params['data']['email']);
+            if($sub){
+                if($sub->is_subscribed === "0"){
+                    $dataSub['is_subscribed'] = 1;
+                    $dataSub['id'] = $sub->id;
+                    $this->subscribe->edit($dataSub);
+                }
+            }
+            else{
+                $this->subscribe->post($dataSub);
+                $this->subscribe->sendEmail($dataSub);
+            }
+        }
         dd($params);
         $model = $this->order->createOrder($params);
 

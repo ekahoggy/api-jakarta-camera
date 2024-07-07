@@ -73,7 +73,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Jakarta Camera</h1>
+            <img src="https://jakartacamera-admin.moodstudio.id/assets/img/logo.png" alt="logo-jakcam">
         </div>
         <div class="content">
             @yield('content')

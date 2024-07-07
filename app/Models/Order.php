@@ -92,7 +92,7 @@ class Order extends Model
 
         $payload['created_by'] = $params['data']["user_id"];
         $payload['created_at'] = date('Y-m-d H:i:s');
-
+        dd($payload);
         DB::table($this->table)->insert($payload);
 
         return $payload;
