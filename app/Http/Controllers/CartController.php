@@ -21,14 +21,30 @@ class CartController extends Controller
         $params = $request->all();
         $promo = $this->promoDet->getDetailPromoAktif();
         $data = $this->cart->getCart($params);
+        $terhapus = [];
 
         foreach ($data as $key => $value) {
             $value->harga = $value->harga_varian !== null ? $value->harga_varian : $value->harga;
             $value->is_promo = false;
+            $value->disabled = false;
+            $value->sisa_stok = $value->stok;
+            $value->use_foto = $value->foto;
             $value->is_flashsale = false;
             $value->promo = [];
             $value->harga_asli = $value->harga;
             $value->harga_promo = $value->harga;
+
+            if($value->product_varian_id !== null){
+                $value->sisa_stok = $value->stok_varian;
+                $value->use_foto = $value->foto_varian;
+            }
+            if($value->sisa_stok <= $value->quantity){
+                $value->disabled = true;
+            }
+            else{
+                $value->disabled = false;
+            }
+
             foreach ($promo as $k => $p) {
                 if($p->m_produk_id === $value->product_id){
                     $value->is_promo = true;
@@ -50,9 +66,15 @@ class CartController extends Controller
                     ];
                 }
             }
+
+            if($value->sisa_stok == 0){
+                array_push($terhapus, $value);
+            }
         }
+
         return response()->json([
             'data' => $data,
+            'stok_habis' => $terhapus,
             'status_code' => 200,
             'message' => 'Successfully added to cart'
         ], 200);

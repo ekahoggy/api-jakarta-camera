@@ -60,7 +60,7 @@ class Order extends Model
         $payload['id'] = Generator::uuid4()->toString();
         $payload['invoice_number'] = $this->generateCodeInvoice();
         $payload["user_id"] = $params['data']["user_id"];
-        $payload["voucher_id"] = $params['voucher']["id"];
+        $payload["voucher_id"] = isset($params['voucher']) ? '' : $params['voucher']["id"];
         $payload["payment_id"] = "pay001";
         $payload["recipient"] = $params['data']["recipient"];
         $payload["phone_code"] = $params['data']["phone_code"];
