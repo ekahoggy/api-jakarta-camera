@@ -340,7 +340,8 @@ class Order extends Model
                 't_order.*',
                 't_order_detail.*',
                 'm_produk.nama',
-                'm_produk.harga'
+                'm_produk.harga',
+                'm_produk.sku'
             )
             ->leftJoin('t_order', 't_order.id', '=', 't_order_detail.order_id')
             ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
