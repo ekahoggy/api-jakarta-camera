@@ -230,10 +230,36 @@ class SiteController extends Controller
         }
     }
 
+    private function validasiSubscribe($request) {
+        $validator = Validator::make($request->all(), [
+            "name" => "required",
+            "email" => "required",
+        ]);
+
+        return $validator;
+    }
     public function subscribe(Request $request) {
-        $params = (array) $request->all();
-        $data = $this->subscribe->post($params);
-        return response()->json(['success' => true, "data" => $data]);
+        try {
+            $params = (array) $request->only('name', 'email', 'is_subscribed');
+            $validator = $this->validasiSubscribe($request);
+
+            // Periksa jika validasi gagal
+            if ($validator->fails()) {
+                return response()->json(['status_code' => 422, 'message' => $validator->errors()], 422);
+            }
+
+            $data = $this->subscribe->post($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
     }
 
     public function getProdukSlug(Request $request) {

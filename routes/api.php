@@ -318,10 +318,10 @@ Route::group(['middleware' => 'api'], function (){
             Route::prefix('voucher')->group(function (){
                 Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
             });
-        });
 
-        // Subscribe
-        Route::post('/subscribe', [SiteController::class, 'subscribe'])->name('subscribe');
+            // Subscribe
+            Route::post('/subscribe', [SiteController::class, 'subscribe'])->name('subscribe');
+        });
 
         // Cart
         Route::prefix('cart')->group(function (){

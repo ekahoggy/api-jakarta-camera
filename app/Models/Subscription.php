@@ -94,10 +94,11 @@ class Subscription extends Model
 
     public function post($params) {
         $params['id'] = Generator::uuid4()->toString();
-
         $params['created_at'] = date('Y-m-d H:i:s');
+
         DB::table($this->table)->insert($params);
         $this->sendEmail($params);
+        
         return $params;
     }
 
