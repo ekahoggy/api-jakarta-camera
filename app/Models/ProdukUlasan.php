@@ -20,77 +20,26 @@ class ProdukUlasan extends Model
         'id' => 'integer'
     ];
 
-    public function getAll($params){
+    public function getUlasanByProdukId($id){
         $query = DB::table($this->table)
-            ->orderBy('created_at', 'ASC');
-
-        $data = $query->get();
-        $totalItems = $query->count();
-
-        return [
-            'list' => $data,
-            'totalItems' => $totalItems
-        ];
-    }
-
-    public function getProdukUlasan(){
-        $query = DB::table($this->table)
-            ->select('m_produk_ulasan.*','m_news.judul')
-            ->leftJoin('m_news','m_news.id', '=', 'm_produk_ulasan.news_id');
-
-        $data = $query->orderBy('is_publish', 'ASC')
-            ->orderBy('tanggal', 'DESC')
-            ->get();
-
-        $totalItems = $query->count();
-        return [
-            'list' => $data,
-            'totalItems' => $totalItems
-        ];
-    }
-
-    public function getProdukUlasanByName($kategori){
-        return DB::table($this->table)->where('kategori', $kategori)->first();
-    }
-
-    public function getProdukUlasanByNameMulti($data){
-        return  DB::table($this->table)
-            ->whereIn('kategori', $data)
-            ->orderBy('kategori', 'ASC')->get();
-    }
-
-    public function getByNewsId($id){
-        $query = DB::table($this->table)
-            ->where('news_id', '=', $id)
+            ->select(
+                'm_produk_ulasan.rating', 'm_produk_ulasan.ulasan', 'm_produk_ulasan.created_at',
+                'users.username', 'users.name' 
+            )
+            ->leftJoin('users', 'users.id', '=', 'm_produk_ulasan.created_by')
+            ->where('m_produk_id', '=', $id)
             ->where('is_publish', 1)
             ->orderBy('created_at', 'ASC');
 
         $data = $query->get();
         $totalItems = $query->count();
+        $rataRating = $query->avg('rating');
 
         return [
             'list' => $data,
-            'totalItems' => $totalItems
+            'totalItems' => $totalItems,
+            'rataRating' => round($rataRating, 3)
         ];
-    }
-
-    public function postBalasan($data) {
-        $payload = [
-            'balasan' => $data['balasan'],
-            'tanggal_balasan' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return DB::table($this->table)->update($payload, ['id' => $data['id']]);
-    }
-
-    public function changeStatus($data) {
-        $payload = [
-            'is_publish' => $data['is_publish'],
-            'updated_at' => date('Y-m-d H:i:s')
-        ];
-
-        return DB::table($this->table)->update($payload, ['id' => $data['id']]);
     }
 
     public function postUlasan($data) {
@@ -105,5 +54,14 @@ class ProdukUlasan extends Model
         ];
 
         return DB::table($this->table)->insert($payload);
+    }
+
+    public function changeStatus($data) {
+        $payload = [
+            'is_publish' => $data['is_publish'],
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        return DB::table($this->table)->update($payload, ['id' => $data['id']]);
     }
 }

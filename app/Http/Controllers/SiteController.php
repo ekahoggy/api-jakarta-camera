@@ -74,6 +74,7 @@ class SiteController extends Controller
             $value->variant = $this->product->getVariant($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
+            $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
             $value->is_promo = false;
             $value->is_flashsale = false;
@@ -117,6 +118,8 @@ class SiteController extends Controller
                     $p->foto = $this->product->getMainPhotoProduk($value->id);
                     $p->photo_product = $this->product->getPhoto($value->id);
                     $p->harga_promo = $value->harga;
+                    $p->kategori = $value->kategori;
+                    $p->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
                     $p->is_promo = true;
                     $hitungPromo = ($p->persen / 100) * $value->harga;
@@ -190,6 +193,7 @@ class SiteController extends Controller
                 $value->variant = $this->product->getVariant($value->id);
                 $value->foto = $this->product->getMainPhotoProduk($value->id);
                 $value->photo_product = $this->product->getPhoto($value->id);
+                $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
                 $value->is_promo = false;
                 $value->is_flashsale = false;
@@ -285,6 +289,7 @@ class SiteController extends Controller
             $value->is_flashsale = false;
             $value->promo = [];
             $value->harga_promo = $value->harga;
+            $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
             foreach ($promo as $k => $p) {
                 if($p->m_produk_id === $value->id){
@@ -560,6 +565,22 @@ class SiteController extends Controller
             return 'Selesai';
         } else{
             return 'Batal';
+        }
+    }
+
+    public function getUlasan($id){
+        try {
+            $data = $this->produkUlasan->getUlasanByProdukId($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
         }
     }
 
