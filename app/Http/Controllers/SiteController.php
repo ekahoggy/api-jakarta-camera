@@ -18,6 +18,7 @@ use App\Models\Promo;
 use App\Models\PromoDet;
 use App\Models\NewsKategori;
 use App\Models\NewsKomentar;
+use App\Models\Subscription;
 
 class SiteController extends Controller
 {
@@ -33,6 +34,7 @@ class SiteController extends Controller
     protected $newsCategory;
     protected $newsKomentar;
     protected $biteship;
+    protected $subscribe;
 
     public function __construct()
     {
@@ -48,6 +50,7 @@ class SiteController extends Controller
         $this->newsCategory = new NewsKategori();
         $this->newsKomentar = new NewsKomentar();
         $this->biteship = new BiteShip();
+        $this->subscribe = new Subscription();
     }
 
     public function slider() {
@@ -218,6 +221,12 @@ class SiteController extends Controller
         else{
             return response()->json(['success' => true, "data" => []]);
         }
+    }
+
+    public function subscribe(Request $request) {
+        $params = (array) $request->all();
+        $data = $this->subscribe->post($params);
+        return response()->json(['success' => true, "data" => $data]);
     }
 
     public function getProdukSlug(Request $request) {
