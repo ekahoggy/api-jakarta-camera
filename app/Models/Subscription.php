@@ -97,6 +97,7 @@ class Subscription extends Model
 
         $params['created_at'] = date('Y-m-d H:i:s');
         DB::table($this->table)->insert($params);
+        $this->sendEmail($params);
         return $params;
     }
 

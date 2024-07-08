@@ -132,7 +132,6 @@ class OrderController extends Controller
             }
             else{
                 $this->subscribe->post($dataSub);
-                $this->subscribe->sendEmail($dataSub);
             }
         }
         $model = $this->order->createOrder($params);

@@ -320,6 +320,8 @@ Route::group(['middleware' => 'api'], function (){
             });
         });
 
+        // Subscribe
+        Route::post('/subscribe', [SiteController::class, 'subscribe'])->name('subscribe');
 
         // Cart
         Route::prefix('cart')->group(function (){
