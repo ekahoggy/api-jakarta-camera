@@ -18,6 +18,7 @@ use App\Models\Promo;
 use App\Models\PromoDet;
 use App\Models\NewsKategori;
 use App\Models\NewsKomentar;
+use App\Models\ProdukUlasan;
 
 class SiteController extends Controller
 {
@@ -32,6 +33,7 @@ class SiteController extends Controller
     protected $promoDet;
     protected $newsCategory;
     protected $newsKomentar;
+    protected $produkUlasan;
     protected $biteship;
 
     public function __construct()
@@ -45,6 +47,7 @@ class SiteController extends Controller
         $this->promo = new Promo();
         $this->promoDet = new PromoDet();
         $this->news = new News();
+        $this->produkUlasan = new ProdukUlasan();
         $this->newsCategory = new NewsKategori();
         $this->newsKomentar = new NewsKomentar();
         $this->biteship = new BiteShip();
@@ -508,7 +511,7 @@ class SiteController extends Controller
         }
     }
 
-    public function validasiKomentar($request) {
+    private function validasiKomentar($request) {
         $validator = Validator::make($request->all(), [
             "nama" => "required",
             "email" => "required",
@@ -517,7 +520,6 @@ class SiteController extends Controller
 
         return $validator;
     }
-
     public function postComment(Request $request) {
         try {
             $params = (array) $request->only('news_id', 'nama', 'email', 'komentar', 'user_id');
@@ -553,6 +555,38 @@ class SiteController extends Controller
             return 'Selesai';
         } else{
             return 'Batal';
+        }
+    }
+
+    private function validasiUlasan($request) {
+        $validator = Validator::make($request->all(), [
+            "rating" => "required",
+            "ulasan" => "required:min:10",
+        ]);
+
+        return $validator;
+    }
+    public function postUlasan(Request $request) {
+        try {
+            $params = (array) $request->only('m_produk_id', 't_order_id', 'rating', 'ulasan', 'user_id');
+            $validator = $this->validasiUlasan($request);
+
+            // Periksa jika validasi gagal
+            if ($validator->fails()) {
+                return response()->json(['status_code' => 422, 'message' => $validator->errors()], 422);
+            }
+
+            $data = $this->produkUlasan->postUlasan($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
         }
     }
 }

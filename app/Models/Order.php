@@ -269,10 +269,12 @@ class Order extends Model
             ->select(
                 'order.id', 'order.invoice_number', 'order.total_voucher', 'order.total_pengiriman', 'order.grand_total', 'order.status_order', 'order.date',
                 'detail.promo_id', 'detail.product_id', 'detail.varian_id', 'detail.qty', 'detail.price', 'detail.promo_amount', 'detail.promo_percent', 'detail.subtotal',
-                'produk.nama'
+                'produk.nama',
+                'ulasan.id as ulasan_id', 'ulasan.rating', 'ulasan.ulasan'
             )
             ->leftJoin('t_order_detail AS detail', 'detail.order_id', '=', 'order.id')
-            ->leftJoin('m_produk AS produk', 'produk.id', '=', 'detail.product_id');
+            ->leftJoin('m_produk AS produk', 'produk.id', '=', 'detail.product_id')
+            ->leftJoin('m_produk_ulasan AS ulasan', 'ulasan.m_produk_id', '=', 'produk.id');
 
         $totalItems = $query->count();
 
@@ -317,6 +319,9 @@ class Order extends Model
             $data[$i]['detail'][$order->id]['promo_amount'] = $order->promo_amount;
             $data[$i]['detail'][$order->id]['promo_percent'] = $order->promo_percent;
             $data[$i]['detail'][$order->id]['subtotal'] = $order->subtotal;
+            $data[$i]['detail'][$order->id]['ulasan_id'] = $order->ulasan_id;
+            $data[$i]['detail'][$order->id]['ulasan'] = $order->ulasan;
+            $data[$i]['detail'][$order->id]['rating'] = $order->rating;
         }
 
         foreach ($data as $i => $order) {

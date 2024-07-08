@@ -271,6 +271,7 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/user', [SiteController::class, 'getUser']);
             Route::post('/user-save', [SiteController::class, 'saveUser']);
             Route::get('/orders', [SiteController::class, 'getOrder']);
+            Route::post('/post-ulasan', [SiteController::class, 'postUlasan']);
 
             // public
             Route::get('/setting', [SettingController::class, 'getSetting']);
