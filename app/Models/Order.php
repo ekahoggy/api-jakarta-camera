@@ -333,4 +333,19 @@ class Order extends Model
             'totalItems' => $totalItems
         ];
     }
+
+    public function generateLaporan($params) {
+        $orders = DB::table('t_order_detail')
+            ->select(
+                't_order.*',
+                't_order_detail.*',
+                'm_produk.nama',
+                'm_produk.harga'
+            )
+            ->leftJoin('t_order', 't_order.id', '=', 't_order_detail.order_id')
+            ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
+            ->get();
+
+        return $orders;
+    }
 }
