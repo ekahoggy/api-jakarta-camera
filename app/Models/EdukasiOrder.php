@@ -37,6 +37,77 @@ class EdukasiOrder extends Model
         'id' => 'string'
     ];
 
+    public function getAll($params){
+        $query = DB::table($this->table)
+            ->select(
+                't_order_edukasi.*',
+                'm_edukasi.kategori_id',
+                'm_edukasi.judul',
+                'm_edukasi.slug',
+                'm_edukasi.gambar',
+                'm_edukasi.harga',
+                'm_edukasi.tingkatan',
+                'm_edukasi.is_publish',
+                'm_edukasi_kategori.kategori',
+                'users.name',
+                'users.username',
+                'users.email'
+            )
+            ->leftJoin('users', 'users.id', '=', 't_order_edukasi.user_id')
+            ->leftJoin('m_edukasi', 'm_edukasi.id', '=', 't_order_edukasi.edukasi_id')
+            ->leftJoin('m_edukasi_kategori', 'm_edukasi_kategori.id', '=', 'm_edukasi.kategori_id');
+
+        if (isset($params['notEqual']) && !empty($params['notEqual'])) {
+            $query->where("id", "!=", $params['notEqual']);
+        }
+
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $query->where("user_id", "=", $params['user_id']);
+        }
+
+        if (isset($params['bulan']) && !empty($params['bulan'])) {
+            $query->whereMonth('date', '=', $params['bulan']);
+        }
+
+        if (isset($params['hari']) && !empty($params['hari'])) {
+            $query->whereDate('date', '=', $params['hari']);
+        }
+
+        if (isset($params['offset']) && !empty($params['offset'])) {
+            $query->offset($params['offset']);
+        }
+
+        if (isset($params['limit']) && !empty($params['limit'])) {
+            $query->limit($params['limit']);
+        }
+
+        $data = $query->orderBy('created_at', 'DESC')->get();
+        $totalItems = $query->count();
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
+    }
+
+    public function getById($id){
+        $data = DB::table($this->table)
+            ->select('t_order.*', 'users.name', 'users.username', 'users.email')
+            ->leftJoin('users', 'users.id', '=', 't_order.user_id')
+            ->where('t_order.id', $id)
+            ->first();
+
+        $detail = DB::table('t_order_detail')
+            ->select('t_order_detail.*', 'm_produk.*')
+            ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
+            ->where('order_id', $id)
+            ->get();
+
+        return [
+            'data' => $data,
+            'detail' => $detail
+        ];
+    }
+
     public function createOrder($params){
         $id = Generator::uuid4()->toString();
         $xendit = new Xendit();
