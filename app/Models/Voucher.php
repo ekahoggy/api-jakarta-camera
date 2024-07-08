@@ -97,15 +97,18 @@ class Voucher extends Model
     }
 
     public function getVoucher($params){
+        $today = date('Y-m-d');
         $data = DB::table('m_voucher')
-            ->where('is_status', 1);
+            ->where('is_status', 1)
+            ->whereDate('tanggal_mulai','<=', $today)
+            ->whereDate('tanggal_selesai','>=', $today);
 
         if (isset($params['jenis']) && !empty($params['jenis'])) {
             $data->where('jenis', $params['jenis']);
         }
         if (isset($params['user_id']) && !empty($params['user_id'])) {
-            $data->where('untuk', 'user');
-            $data->where('user_id', $params['user_id']);
+            $data->orWhere('untuk', 'user');
+            $data->orWhere('user_id', $params['user_id']);
         }
 
         return $data->get();
