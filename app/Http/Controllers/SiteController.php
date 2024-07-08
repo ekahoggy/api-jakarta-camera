@@ -18,6 +18,7 @@ use App\Models\Promo;
 use App\Models\PromoDet;
 use App\Models\NewsKategori;
 use App\Models\NewsKomentar;
+use App\Models\ProdukUlasan;
 use App\Models\Subscription;
 
 class SiteController extends Controller
@@ -33,6 +34,7 @@ class SiteController extends Controller
     protected $promoDet;
     protected $newsCategory;
     protected $newsKomentar;
+    protected $produkUlasan;
     protected $biteship;
     protected $subscribe;
 
@@ -47,6 +49,7 @@ class SiteController extends Controller
         $this->promo = new Promo();
         $this->promoDet = new PromoDet();
         $this->news = new News();
+        $this->produkUlasan = new ProdukUlasan();
         $this->newsCategory = new NewsKategori();
         $this->newsKomentar = new NewsKomentar();
         $this->biteship = new BiteShip();
@@ -74,6 +77,7 @@ class SiteController extends Controller
             $value->variant = $this->product->getVariant($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
+            $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
             $value->is_promo = false;
             $value->is_flashsale = false;
@@ -117,6 +121,8 @@ class SiteController extends Controller
                     $p->foto = $this->product->getMainPhotoProduk($value->id);
                     $p->photo_product = $this->product->getPhoto($value->id);
                     $p->harga_promo = $value->harga;
+                    $p->kategori = $value->kategori;
+                    $p->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
                     $p->is_promo = true;
                     $hitungPromo = ($p->persen / 100) * $value->harga;
@@ -190,6 +196,7 @@ class SiteController extends Controller
                 $value->variant = $this->product->getVariant($value->id);
                 $value->foto = $this->product->getMainPhotoProduk($value->id);
                 $value->photo_product = $this->product->getPhoto($value->id);
+                $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
                 $value->is_promo = false;
                 $value->is_flashsale = false;
@@ -291,6 +298,7 @@ class SiteController extends Controller
             $value->is_flashsale = false;
             $value->promo = [];
             $value->harga_promo = $value->harga;
+            $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
 
             foreach ($promo as $k => $p) {
                 if($p->m_produk_id === $value->id){
@@ -522,7 +530,7 @@ class SiteController extends Controller
         }
     }
 
-    public function validasiKomentar($request) {
+    private function validasiKomentar($request) {
         $validator = Validator::make($request->all(), [
             "nama" => "required",
             "email" => "required",
@@ -531,7 +539,6 @@ class SiteController extends Controller
 
         return $validator;
     }
-
     public function postComment(Request $request) {
         try {
             $params = (array) $request->only('news_id', 'nama', 'email', 'komentar', 'user_id');
@@ -567,6 +574,54 @@ class SiteController extends Controller
             return 'Selesai';
         } else{
             return 'Batal';
+        }
+    }
+
+    public function getUlasan($id){
+        try {
+            $data = $this->produkUlasan->getUlasanByProdukId($id);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    private function validasiUlasan($request) {
+        $validator = Validator::make($request->all(), [
+            "rating" => "required",
+            "ulasan" => "required:min:10",
+        ]);
+
+        return $validator;
+    }
+    public function postUlasan(Request $request) {
+        try {
+            $params = (array) $request->only('m_produk_id', 't_order_id', 'rating', 'ulasan', 'user_id');
+            $validator = $this->validasiUlasan($request);
+
+            // Periksa jika validasi gagal
+            if ($validator->fails()) {
+                return response()->json(['status_code' => 422, 'message' => $validator->errors()], 422);
+            }
+
+            $data = $this->produkUlasan->postUlasan($params);
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
         }
     }
 }

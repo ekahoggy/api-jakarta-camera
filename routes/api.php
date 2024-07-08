@@ -276,6 +276,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/user', [SiteController::class, 'getUser']);
             Route::post('/user-save', [SiteController::class, 'saveUser']);
             Route::get('/orders', [SiteController::class, 'getOrder']);
+            Route::get('/get-ulasan/{id}', [SiteController::class, 'getUlasan']);
+            Route::post('/post-ulasan', [SiteController::class, 'postUlasan']);
 
             // public
             Route::get('/setting', [SettingController::class, 'getSetting']);
@@ -320,6 +322,7 @@ Route::group(['middleware' => 'api'], function (){
 
         // Subscribe
         Route::post('/subscribe', [SiteController::class, 'subscribe'])->name('subscribe');
+
         // Cart
         Route::prefix('cart')->group(function (){
             Route::get('/get', [CartController::class, 'getCart'])->name('getCart');
