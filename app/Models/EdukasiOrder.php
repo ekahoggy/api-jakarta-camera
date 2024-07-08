@@ -91,15 +91,33 @@ class EdukasiOrder extends Model
 
     public function getById($id){
         $data = DB::table($this->table)
-            ->select('t_order.*', 'users.name', 'users.username', 'users.email')
-            ->leftJoin('users', 'users.id', '=', 't_order.user_id')
-            ->where('t_order.id', $id)
+            ->select(
+                't_order_edukasi.*',
+                'm_edukasi.kategori_id',
+                'm_edukasi.judul',
+                'm_edukasi.slug',
+                'm_edukasi.gambar',
+                'm_edukasi.harga',
+                'm_edukasi.tingkatan',
+                'm_edukasi.is_publish',
+                'm_edukasi_kategori.kategori',
+                't_payment.channel',
+                't_payment.method',
+                'users.name',
+                'users.username',
+                'users.email'
+            )
+            ->leftJoin('users', 'users.id', '=', 't_order_edukasi.user_id')
+            ->leftJoin('m_edukasi', 'm_edukasi.id', '=', 't_order_edukasi.edukasi_id')
+            ->leftJoin('m_edukasi_kategori', 'm_edukasi_kategori.id', '=', 'm_edukasi.kategori_id')
+            ->leftJoin('t_payment', 't_payment.payment_id', '=', 't_order_edukasi.payment_id')
+            ->where('t_order_edukasi.id', $id)
             ->first();
 
-        $detail = DB::table('t_order_detail')
-            ->select('t_order_detail.*', 'm_produk.*')
-            ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
-            ->where('order_id', $id)
+        $detail = DB::table('m_edukasi_video')
+            ->select('m_edukasi_video.*', 'm_edukasi.*')
+            ->leftJoin('m_edukasi', 'm_edukasi.id', '=', 'm_edukasi_video.edukasi_id')
+            ->where('m_edukasi.id', $data->edukasi_id)
             ->get();
 
         return [

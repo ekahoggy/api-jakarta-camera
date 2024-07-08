@@ -20,7 +20,7 @@ class EdukasiController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['edukasi', 'pay', 'getDataBySlug']]);
+        $this->middleware('auth:api', ['except' => ['edukasi', 'pay', 'getDataBySlug', 'generatePDF']]);
         $this->edukasi = new Edukasi();
         $this->order = new EdukasiOrder();
         $this->xendit = new Xendit();
@@ -43,10 +43,12 @@ class EdukasiController extends Controller
         }
     }
 
-    public function generatePDF(Request $request){
+    public function generatePDF($id){
         try {
-            $params = (array) $request->all();
-            $pdf = PDF::loadView('pdf.edukasi', $params);
+            $data = $this->order->getById($id);
+            $data['data']->status_order_convert = $this->statusOrder($data['data']->status_order);
+
+            $pdf = PDF::loadView('pdf.edukasi', $data);
 
             return $pdf->download('edukasi.pdf');
         }

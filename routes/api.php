@@ -124,7 +124,7 @@ Route::group(['middleware' => 'api'], function (){
         Route::group(['prefix' => 'edukasi'], function (){
             Route::group(['prefix' => 'order'], function (){
                 Route::get('/', [EdukasiController::class, 'getOrder']);
-                Route::post('/pdf', [EdukasiController::class, 'generatePDF']);
+                Route::get('/pdf/{id}', [EdukasiController::class, 'generatePDF']);
             });
 
             Route::group(['prefix' => 'daftar'], function (){
@@ -313,12 +313,13 @@ Route::group(['middleware' => 'api'], function (){
                 Route::get('/{slug}', [EdukasiController::class, 'getDataBySlug']);
                 Route::post('/pay', [EdukasiController::class, 'pay']);
             });
+
+            // Voucher
+            Route::prefix('voucher')->group(function (){
+                Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
+            });
         });
 
-        // Voucher
-        Route::prefix('voucher')->group(function (){
-            Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
-        });
 
         // Cart
         Route::prefix('cart')->group(function (){
