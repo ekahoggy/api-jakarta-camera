@@ -23,8 +23,8 @@ class Xendit extends Model
         $appUrl = env("APP_CLIENT_URL", "http://localhost:3200");
         $create_invoice_request = new CreateInvoiceRequest([
             'external_id' => $data['invoice_number'],
-            'payer_email' => $data['email'],
-            'should_send_email' => true,
+            'payer_email' => isset($data['email']) ? $data['email'] : '',
+            'should_send_email' => isset($data['email']) ? true : false,
             'description' => isset($data['description']) ? $data['description'] : '-',
             'amount' => $data['grand_total'],
             'currency' => 'IDR',

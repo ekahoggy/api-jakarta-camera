@@ -122,6 +122,11 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::group(['prefix' => 'edukasi'], function (){
+            Route::group(['prefix' => 'order'], function (){
+                Route::get('/', [EdukasiController::class, 'getOrder']);
+                Route::post('/pdf', [EdukasiController::class, 'generatePDF']);
+            });
+
             Route::group(['prefix' => 'daftar'], function (){
                 Route::get('/', [EdukasiController::class, 'getData']);
                 Route::get('/{id}', [EdukasiController::class, 'getDataById']);
