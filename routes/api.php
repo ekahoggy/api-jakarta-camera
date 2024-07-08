@@ -14,6 +14,7 @@ use App\Http\Controllers\EdukasiKategoriController;
 use App\Http\Controllers\EdukasiSliderController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NewsKategoriController;
 use App\Http\Controllers\NewsKomentarController;
@@ -69,6 +70,10 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
             Route::get('/pendapatan', [DashboardController::class, 'pendapatan']);
             Route::get('/penjualanhariini', [DashboardController::class, 'penjualanhariini']);
+        });
+
+        Route::group(['prefix' => 'laporan'], function (){
+            Route::get('/penjualan', [LaporanController::class, 'laporanPenjualan']);
         });
 
         Route::group(['prefix' => 'user'], function (){

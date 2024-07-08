@@ -346,6 +346,25 @@ class Produk extends Model
         return $data;
     }
 
+    public function decreaseStok($params, $is_varian = false) {
+        if(isset($params['product_varian_id'])){
+            $stokSekarang = $params['sisa_stok'] - $params['quantity'];
+            $pVarian = [
+                'id' => $params['product_varian_id'],
+                'stok' => $stokSekarang
+            ];
+            $this->updateStok($pVarian);
+        }
+        else{
+            $stokSekarang = $params['sisa_stok'] - $params['quantity'];
+            $pProduct = [
+                'id' => $params['product_id'],
+                'stok' => $stokSekarang
+            ];
+            $this->updateStokProduk($pProduct);
+        }
+    }
+
     public function updateStok($params) {
         DB::table('m_produk_varian')->where('id', $params['id'])->update(['stok' => $params['stok']]);
 

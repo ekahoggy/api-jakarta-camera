@@ -6,6 +6,7 @@ use App\Models\BiteShip;
 use App\Models\Cart;
 use App\Models\LogUser;
 use App\Models\Order;
+use App\Models\Produk;
 use App\Models\Subscription;
 use App\Models\Xendit;
 use Barryvdh\DomPDF\PDF;
@@ -17,6 +18,7 @@ class OrderController extends Controller
     protected $biteship;
     protected $subscribe;
     protected $cart;
+    protected $produk;
     protected $logUser;
 
     public function __construct()
@@ -27,6 +29,7 @@ class OrderController extends Controller
         $this->biteship = new BiteShip();
         $this->subscribe = new Subscription();
         $this->cart = new Cart();
+        $this->produk = new Produk();
         $this->logUser = new LogUser();
     }
 
@@ -141,6 +144,9 @@ class OrderController extends Controller
             $this->order->createOrderDetail($item);
             //hapus keranjang setelah order
             $this->cart->deleteCart($item);
+
+            //kurangi stok setelah order
+            $this->produk->decreaseStok($item);
         }
 
         if (!empty($model)) {
