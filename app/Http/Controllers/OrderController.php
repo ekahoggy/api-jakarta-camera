@@ -6,6 +6,7 @@ use App\Models\BiteShip;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\Xendit;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 class OrderController extends Controller
 {
@@ -215,5 +216,26 @@ class OrderController extends Controller
             'data' => [],
             'status_code' => 200
         ], 200);
+    }
+
+    public function viewPDF()
+    {
+        $users = Order::all();
+
+        $pdf = PDF::loadView('pdf.usersdetails', array('users' =>  $users))
+        ->setPaper('a4', 'portrait');
+
+        return $pdf->stream();
+
+    }
+
+    public function downloadPDF()
+    {
+        $users = Order::all();
+
+        $pdf = PDF::loadView('pdf.usersdetails', array('users' =>  $users))
+        ->setPaper('a4', 'portrait');
+
+        return $pdf->download('users-details.pdf');
     }
 }
