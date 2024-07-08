@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Mail\Voucher as MailVoucher;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -9,6 +10,7 @@ use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use App\Models\Service;
+use Illuminate\Support\Facades\Mail;
 
 class Voucher extends Model
 {
@@ -134,6 +136,24 @@ class Voucher extends Model
         $params['created_at'] = date('Y-m-d H:i:s');
         $params['gambar'] = $service->saveImage("voucher/", $params['gambar']);
 
+        $user = User::find($params['user_id']);
+        $data = [
+            'subject' => 'Ada Voucher khusus untukmu - '.$params['voucher'],
+            'name' => $user->name,
+            'email' => $user->email,
+            'redeem_code' => $params['redeem_code'],
+            'tanggal_mulai' => $params['tanggal_mulai'],
+            'jam_mulai' => $params['jam_mulai'],
+            'tanggal_selesai' => $params['tanggal_selesai'],
+            'jam_selesai' => $params['jam_selesai'],
+            'voucher' => $params['type'] === 'P' ? $params['voucher_value'].'%' : 'Rp '.number_format($params['voucher_value']),
+        ];
+
+        Mail::to($data['email'])->send(new MailVoucher($data));
+        // $user_id = $params['data']['user_id'];
+        // $note = $params['data']['recipient'].' membuat order dengan invoice #'.$model['invoice_number'];
+
+        // $this->logUser->post('t_order', $model['id'], $note, $user_id);
         return DB::table('m_voucher')->insert($params);
     }
 }

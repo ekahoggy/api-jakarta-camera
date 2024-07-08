@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\BiteShip;
+use App\Models\Cart;
+use App\Models\LogUser;
 use App\Models\Order;
 use App\Models\Subscription;
 use App\Models\Xendit;
@@ -14,6 +16,8 @@ class OrderController extends Controller
     protected $xendit;
     protected $biteship;
     protected $subscribe;
+    protected $cart;
+    protected $logUser;
 
     public function __construct()
     {
@@ -22,6 +26,8 @@ class OrderController extends Controller
         $this->xendit = new Xendit();
         $this->biteship = new BiteShip();
         $this->subscribe = new Subscription();
+        $this->cart = new Cart();
+        $this->logUser = new LogUser();
     }
 
     function statusOrder($status) {
@@ -121,6 +127,7 @@ class OrderController extends Controller
                     $dataSub['is_subscribed'] = 1;
                     $dataSub['id'] = $sub->id;
                     $this->subscribe->edit($dataSub);
+                    $this->subscribe->sendEmail($dataSub);
                 }
             }
             else{
@@ -133,6 +140,8 @@ class OrderController extends Controller
         foreach($params["detail"] as $item) {
             $item["order_id"] = $model["id"];
             $this->order->createOrderDetail($item);
+            //hapus keranjang setelah order
+            $this->cart->deleteCart($item);
         }
 
         if (!empty($model)) {
@@ -151,6 +160,11 @@ class OrderController extends Controller
                 'payment_id' => $payment['payment_id']
             ];
             $this->order->updateOrderPaymentId($updateOrder);
+
+            $user_id = $params['data']['user_id'];
+            $note = $params['data']['recipient'].' membuat order dengan invoice #'.$model['invoice_number'];
+
+            $this->logUser->post('t_order', $model['id'], $note, $user_id);
 
             return response()->json(['status_code' => 200, 'message' => 'Successfully create order', 'link' => $generateInvoice['invoice_url']], 200);
         }

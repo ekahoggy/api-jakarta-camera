@@ -311,12 +311,13 @@ Route::group(['middleware' => 'api'], function (){
                 Route::get('/{slug}', [EdukasiController::class, 'getDataBySlug']);
                 Route::post('/pay', [EdukasiController::class, 'pay']);
             });
+
+            // Voucher
+            Route::prefix('voucher')->group(function (){
+                Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
+            });
         });
 
-        // Voucher
-        Route::prefix('voucher')->group(function (){
-            Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
-        });
 
         // Cart
         Route::prefix('cart')->group(function (){
