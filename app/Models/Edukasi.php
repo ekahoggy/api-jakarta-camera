@@ -167,12 +167,12 @@ class Edukasi extends Model
 
     public function getEdukasi($params){
         $query = DB::table($this->table)
+            ->select('m_edukasi.*', 'm_edukasi_kategori.kategori')
             ->leftJoin('m_edukasi_kategori', 'm_edukasi_kategori.id', '=', 'm_edukasi.kategori_id');
 
         $totalItems = $query->count();
-        
         $filter = json_decode($params['filter']);
-        
+
         foreach($filter as $key => $val) {
             if ($key == "kategori" && !empty($val)) {
                 $query->where("m_edukasi_kategori.kategori", "=", $val);
