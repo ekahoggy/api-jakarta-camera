@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Edukasi;
 use App\Models\EdukasiOrder;
+use App\Models\PromoDet;
 use App\Models\Xendit;
 // use Barryvdh\DomPDF\Facade as PDF;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Validator;
 class EdukasiController extends Controller
 {
     protected $edukasi;
+    protected $promoDet;
     protected $order;
     protected $xendit;
 
@@ -24,6 +26,7 @@ class EdukasiController extends Controller
         $this->edukasi = new Edukasi();
         $this->order = new EdukasiOrder();
         $this->xendit = new Xendit();
+        $this->promoDet = new PromoDet();
     }
 
     public function getData(Request $request){
@@ -103,6 +106,25 @@ class EdukasiController extends Controller
 
             return response()->json([
                 'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    public function getEdukasiByKategori(Request $request){
+        try {
+            $params = (array) $request->all();
+            $promo = $this->promoDet->getDetailPromoAktif('edukasi');
+            $data = $this->edukasi->getEdukasiKategori($params);
+
+            return response()->json([
+                'data' => $data,
+                'promo' => $promo,
                 'status_code' => 200
             ], 200);
         } catch (\Throwable $th) {

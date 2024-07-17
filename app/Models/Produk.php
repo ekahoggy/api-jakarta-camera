@@ -405,4 +405,55 @@ class Produk extends Model
         return $data;
     }
 
+    public function getProdukKategori($params){
+        $query = DB::table($this->table)
+                ->selectRaw('
+                    m_produk.id,
+                    m_produk.sku,
+                    m_produk.nama,
+                    m_produk.type,
+                    m_produk.stok,
+                    m_produk.min_beli,
+                    m_produk.harga,
+                    m_produk.m_kategori_id,
+                    m_produk.m_brand_id,
+                    m_kategori.slug as slug_kategori,
+                    m_kategori.kategori as kategori_produk,
+                    m_brand.brand as brand_produk,
+                    m_brand.slug as slug_brand
+                ')
+                ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+                ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
+                ->where('is_active', 1)
+                ->whereIn('m_kategori_id', $params)
+                ->get();
+
+        return $query;
+    }
+
+    public function getProdukBrand($params){
+        $query = DB::table($this->table)
+                ->selectRaw('
+                    m_produk.id,
+                    m_produk.sku,
+                    m_produk.nama,
+                    m_produk.type,
+                    m_produk.stok,
+                    m_produk.min_beli,
+                    m_produk.harga,
+                    m_produk.m_kategori_id,
+                    m_produk.m_brand_id,
+                    m_kategori.slug as slug_kategori,
+                    m_kategori.kategori as kategori_produk,
+                    m_brand.brand as brand_produk,
+                    m_brand.slug as slug_brand
+                ')
+                ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+                ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
+                ->where('is_active', 1)
+                ->whereIn('m_brand_id', $params)
+                ->get();
+
+        return $query;
+    }
 }

@@ -650,4 +650,30 @@ class SiteController extends Controller
             ], 500);
         }
     }
+
+    public function cronjob(Request $request) {
+        try {
+
+            //untuk promo
+            $promo = $this->promo->getPromoChanged();
+            foreach ($promo as $key => $value) {
+                $pPromo = [
+                    'id' => $value->id,
+                    'is_status' => 0
+                ];
+
+                $this->promo->updatePromo($pPromo);
+            }
+
+            return response()->json([
+                'data' => [],
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
 }

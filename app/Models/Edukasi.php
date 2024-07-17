@@ -160,6 +160,25 @@ class Edukasi extends Model
         return $data;
     }
 
+    public function getEdukasiKategori($params){
+        $query = DB::table($this->table)
+                ->selectRaw('
+                    m_edukasi.id,
+                    m_edukasi.judul,
+                    m_edukasi.tingkatan,
+                    m_edukasi.harga,
+                    m_edukasi.kategori_id,
+                    m_edukasi_kategori.slug as slug_kategori,
+                    m_edukasi_kategori.kategori as kategori_edukasi
+                ')
+                ->leftJoin('m_edukasi_kategori', 'm_edukasi_kategori.id', '=', 'm_edukasi.kategori_id')
+                ->where('is_publish', 1)
+                ->whereIn('kategori_id', $params)
+                ->get();
+
+        return $query;
+    }
+
     public function changeStatus($params) {
         $id = $params['id'];
         return DB::table($this->table)->where('id', $id)->update($params);

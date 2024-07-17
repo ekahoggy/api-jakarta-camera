@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
+use App\Mail\Voucher as MailVoucher;
+use App\Mail\Promo as MailPromo;
 
 class Subscription extends Model
 {
@@ -98,12 +100,12 @@ class Subscription extends Model
 
         DB::table($this->table)->insert($params);
         $this->sendEmail($params);
-        
+
         return $params;
     }
 
     public function sendEmail($data){
-        $appUrl = env("APP_CLIENT_URL", "http://localhost:3200");
+        $appUrl = env("APP_CLIENT_URL");
         $data = [
             'name' => $data['name'],
             'email' => $data['email'],
@@ -111,5 +113,26 @@ class Subscription extends Model
         ];
 
         Mail::to($data['email'])->send(new Subscribe($data));
+    }
+
+    public function sendPromo($params) {
+        $appUrl = env("APP_CLIENT_URL");
+        $user = DB::table($this->table)
+                ->where('is_subscribed', 1)
+                ->get();
+
+        foreach ($user as $key => $value) {
+            $data = [
+                'subject' => '🔥 Ada promo baru Dari Jakarta Camera nihh!! 🔥',
+                'name' => $value->name,
+                'email' => $value->email,
+                'promo' => $params['promo'],
+                'detail' => $params['detail'],
+                'link_cta' => $appUrl,
+                'link_unsub' => "$appUrl/unsubscribe?email=" .$value->email,
+            ];
+
+            Mail::to($value->email)->send(new MailPromo($data));
+        }
     }
 }

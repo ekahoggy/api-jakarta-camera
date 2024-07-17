@@ -20,8 +20,8 @@ class Promo extends Model
         'id',
         'kode',
         'type',
+        'jenis',
         'promo',
-        'kategori_id',
         'tanggal_mulai',
         'tanggal_selesai',
         'jam_mulai',
@@ -110,5 +110,37 @@ class Promo extends Model
 
         DB::table($this->table)->insert($params);
         return $params;
+    }
+
+    public function getPromoChanged(){
+        $date = date('Y-m-d');
+        $time = date('H:i:s');
+
+        $query = DB::table($this->table)
+        ->select(
+            'm_promo.id',
+            'm_promo.kode',
+            'm_promo.type',
+            'm_promo.jenis',
+            'm_promo.promo',
+            'm_promo.tanggal_mulai',
+            'm_promo.jam_mulai',
+            'm_promo.tanggal_selesai',
+            'm_promo.jam_selesai',
+            'm_promo.promo_min_beli',
+            'm_promo.is_status'
+        )
+        ->where('m_promo.is_status', 1)
+        ->where(function ($query) use ($date, $time) {
+            $query->where(function ($query) use ($date, $time) {
+                $query->whereDate('m_promo.tanggal_selesai', '<', $date)
+                    ->orWhere(function ($query) use ($date, $time) {
+                        $query->whereDate('m_promo.tanggal_selesai', '=', $date)
+                            ->whereTime('m_promo.jam_selesai', '<', $time);
+                    });
+            });
+        });
+
+        return $query->get();
     }
 }

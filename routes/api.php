@@ -127,6 +127,8 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::group(['prefix' => 'edukasi'], function (){
+            Route::post('/byKategori', [EdukasiController::class, 'getEdukasiByKategori']);
+
             Route::group(['prefix' => 'order'], function (){
                 Route::get('/', [EdukasiController::class, 'getOrder']);
                 Route::get('/pdf/{id}', [EdukasiController::class, 'generatePDF']);
@@ -190,7 +192,8 @@ Route::group(['middleware' => 'api'], function (){
         Route::group(['prefix' => 'produk'], function (){
             Route::get('/', [ProdukController::class, 'getData']);
             Route::get('/{id}', [ProdukController::class, 'getDataById']);
-            Route::get('/byKategori/{id}', [ProdukController::class, 'getProdukByKategori']);
+            Route::post('/byKategori', [ProdukController::class, 'getProdukByKategori']);
+            Route::post('/byBrand', [ProdukController::class, 'getProdukByBrand']);
             Route::get('/detail/{id}', [ProdukController::class, 'getDetail']);
             Route::get('/photo/{id}', [ProdukController::class, 'getPhoto']);
             Route::get('/variant/{id}', [ProdukController::class, 'getVariant']);
@@ -326,6 +329,9 @@ Route::group(['middleware' => 'api'], function (){
 
             // Subscribe
             Route::post('/subscribe', [SiteController::class, 'subscribe'])->name('subscribe');
+
+            //cronjob
+            Route::get('/cronjob', [SiteController::class, 'cronjob'])->name('cronjob');
         });
 
         // Cart

@@ -141,7 +141,7 @@ class Voucher extends Model
 
         $user = User::find($params['user_id']);
         $data = [
-            'subject' => 'Ada Voucher khusus untukmu - '.$params['voucher'],
+            'subject' => '🔥 Selamat Kamu Mendapatkan Kode Voucher Dari Jakarta Camera !! 🔥',
             'name' => $user->name,
             'email' => $user->email,
             'redeem_code' => $params['redeem_code'],

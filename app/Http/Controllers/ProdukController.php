@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produk;
+use App\Models\PromoDet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -10,11 +11,13 @@ use Illuminate\Support\Facades\Validator;
 class ProdukController extends Controller
 {
     protected $produk;
+    protected $promoDet;
 
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['produk']]);
         $this->produk = new Produk();
+        $this->promoDet = new PromoDet();
     }
 
     public function getData(Request $request){
@@ -38,10 +41,24 @@ class ProdukController extends Controller
         return response()->json(['success' => true, "data" => $data]);
     }
 
-    public function getProdukByKategori(Request $request, $id){
-        $data = Produk::where('is_active', 1)->where('m_kategori_id', $id)->get();
+    public function getProdukByKategori(Request $request){
+        $params = (array) $request->all();
+        $produkModel = new Produk();
+        $promo = $this->promoDet->getDetailPromoAktif();
 
-        return response()->json(['success' => true, "data" => $data]);
+        $data = $produkModel->getProdukKategori($params);
+
+        return response()->json(['success' => true, "data" => $data, "promo" => $promo]);
+    }
+
+    public function getProdukByBrand(Request $request){
+        $params = (array) $request->all();
+        $produkModel = new Produk();
+        $promo = $this->promoDet->getDetailPromoAktif();
+
+        $data = $produkModel->getProdukBrand($params);
+
+        return response()->json(['success' => true, "data" => $data, "promo" => $promo]);
     }
 
     public function produk() {
