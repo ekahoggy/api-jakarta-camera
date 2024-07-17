@@ -45,7 +45,7 @@ class VoucherDetail extends Model
             'm_brand.brand as brand',
             'm_brand.slug as slug_brand'
         )
-        ->leftJoin('m_produk', 'm_produk.id', '=', 'm_voucher_det.m_produk_id')
+        ->leftJoin('m_produk', 'm_produk.id', '=', 'm_voucher_det.produk_id')
         ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
         ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id');
 
@@ -84,7 +84,7 @@ class VoucherDetail extends Model
         ->leftJoin('m_edukasi_kategori as edu', 'edu.id', '=', 'm_voucher_kategori.kategori_id')
         ->leftJoin('m_brand', 'm_brand.id', '=', 'm_voucher_kategori.brand_id');
 
-        $query->where("m_voucher_kategori.promo_id", "=", $id_voucher);
+        $query->where("m_voucher_kategori.voucher_id", "=", $id_voucher);
 
         $data = $query->get();
 

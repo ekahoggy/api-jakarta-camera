@@ -46,6 +46,13 @@ class VoucherController extends Controller
     public function getDataById($id){
         try {
             $data = $this->voucher->getById($id);
+            $data->detail = $this->voucherDet->getDetailByVoucher($id);
+            $data->voucher_kategori = $this->voucherDet->getKategoriByVoucher($id);
+            $data->user_id = $this->voucherUser->getUserByVoucher($id);
+
+            foreach ($data->detail as $key => $value) {
+                $value->used = $value->qty - $value->used;
+            }
 
             return response()->json([
                 'data' => $data,

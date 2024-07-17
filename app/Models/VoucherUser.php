@@ -30,4 +30,17 @@ class VoucherUser extends Model
         DB::table($this->table)->insert($params);
         return $params;
     }
+
+    public function getUserByVoucher($id) {
+        $data = DB::table($this->table)->select(
+            'm_voucher_user.*',
+            'users.name',
+            'users.email',
+        )
+        ->leftJoin('users', 'users.id', '=', 'm_voucher_user.user_id')
+        ->leftJoin('m_voucher', 'm_voucher.id', '=', 'm_voucher_user.voucher_id')
+        ->where('m_voucher_user.voucher_id', $id)->get();
+
+        return $data;
+    }
 }
