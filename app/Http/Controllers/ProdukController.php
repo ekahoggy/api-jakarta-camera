@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Produk;
 use App\Models\PromoDet;
+use App\Models\VoucherDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -12,12 +13,14 @@ class ProdukController extends Controller
 {
     protected $produk;
     protected $promoDet;
+    protected $voucherDet;
 
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['produk']]);
         $this->produk = new Produk();
         $this->promoDet = new PromoDet();
+        $this->voucherDet = new VoucherDetail();
     }
 
     public function getData(Request $request){
@@ -45,20 +48,20 @@ class ProdukController extends Controller
         $params = (array) $request->all();
         $produkModel = new Produk();
         $promo = $this->promoDet->getDetailPromoAktif();
-
+        $voucher = $this->voucherDet->getDetailVoucherAktif();
         $data = $produkModel->getProdukKategori($params);
 
-        return response()->json(['success' => true, "data" => $data, "promo" => $promo]);
+        return response()->json(['success' => true, "data" => $data, "promo" => $promo, "voucher" => $voucher]);
     }
 
     public function getProdukByBrand(Request $request){
         $params = (array) $request->all();
         $produkModel = new Produk();
         $promo = $this->promoDet->getDetailPromoAktif();
-
+        $voucher = $this->voucherDet->getDetailVoucherAktif();
         $data = $produkModel->getProdukBrand($params);
 
-        return response()->json(['success' => true, "data" => $data, "promo" => $promo]);
+        return response()->json(['success' => true, "data" => $data, "promo" => $promo, "voucher" => $voucher]);
     }
 
     public function produk() {

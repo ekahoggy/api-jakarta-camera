@@ -20,6 +20,7 @@ use App\Models\NewsKategori;
 use App\Models\NewsKomentar;
 use App\Models\ProdukUlasan;
 use App\Models\Subscription;
+use App\Models\Voucher;
 
 class SiteController extends Controller
 {
@@ -37,6 +38,7 @@ class SiteController extends Controller
     protected $produkUlasan;
     protected $biteship;
     protected $subscribe;
+    protected $voucher;
 
     public function __construct()
     {
@@ -47,6 +49,7 @@ class SiteController extends Controller
         $this->brand = new Brand();
         $this->order = new Order();
         $this->promo = new Promo();
+        $this->voucher = new Voucher();
         $this->promoDet = new PromoDet();
         $this->news = new News();
         $this->produkUlasan = new ProdukUlasan();
@@ -663,6 +666,17 @@ class SiteController extends Controller
                 ];
 
                 $this->promo->updatePromo($pPromo);
+            }
+
+            //untuk voucher
+            $voucher = $this->voucher->getVoucherChanged();
+            foreach ($voucher as $key => $value) {
+                $pVoucher = [
+                    'id' => $value->id,
+                    'is_status' => 0
+                ];
+
+                $this->voucher->changeStatusVoucher($pVoucher);
             }
 
             return response()->json([

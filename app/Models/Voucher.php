@@ -20,7 +20,6 @@ class Voucher extends Model
 
     protected $fillable = [
         'id',
-        'user_id',
         'redeem_code',
         'voucher',
         'tanggal_mulai',
@@ -38,6 +37,9 @@ class Voucher extends Model
         'voucher_max',
         'voucher_min_beli',
         'untuk',
+        'for_co',
+        'used_to',
+        'is_hidden',
         'is_status',
     ];
 
@@ -132,6 +134,15 @@ class Voucher extends Model
         return DB::table('m_voucher')->where('id', $id)->update($params);
     }
 
+    public function changeStatusVoucher($params) {
+        $service = new Service();
+
+        $id = $params['id']; unset($params['id']);
+        $params['updated_at'] = date('Y-m-d H:i:s');
+
+        return DB::table('m_voucher')->where('id', $id)->update($params);
+    }
+
     public function insertVoucher($params) {
         $service = new Service();
 
@@ -139,24 +150,56 @@ class Voucher extends Model
         $params['created_at'] = date('Y-m-d H:i:s');
         $params['gambar'] = $service->saveImage("voucher/", $params['gambar']);
 
-        $user = User::find($params['user_id']);
-        $data = [
-            'subject' => '🔥 Selamat Kamu Mendapatkan Kode Voucher Dari Jakarta Camera !! 🔥',
-            'name' => $user->name,
-            'email' => $user->email,
-            'redeem_code' => $params['redeem_code'],
-            'tanggal_mulai' => $params['tanggal_mulai'],
-            'jam_mulai' => $params['jam_mulai'],
-            'tanggal_selesai' => $params['tanggal_selesai'],
-            'jam_selesai' => $params['jam_selesai'],
-            'voucher' => $params['type'] === 'P' ? $params['voucher_value'].'%' : 'Rp '.number_format($params['voucher_value']),
-        ];
+        // $user = User::find($params['user_id']);
+        // $data = [
+        //     'subject' => '🔥 Selamat Kamu Mendapatkan Kode Voucher Dari Jakarta Camera !! 🔥',
+        //     'name' => $user->name,
+        //     'email' => $user->email,
+        //     'redeem_code' => $params['redeem_code'],
+        //     'tanggal_mulai' => $params['tanggal_mulai'],
+        //     'jam_mulai' => $params['jam_mulai'],
+        //     'tanggal_selesai' => $params['tanggal_selesai'],
+        //     'jam_selesai' => $params['jam_selesai'],
+        //     'voucher' => $params['type'] === 'P' ? $params['voucher_value'].'%' : 'Rp '.number_format($params['voucher_value']),
+        // ];
 
-        Mail::to($data['email'])->send(new MailVoucher($data));
+        // Mail::to($data['email'])->send(new MailVoucher($data));
         // $user_id = $params['data']['user_id'];
         // $note = $params['data']['recipient'].' membuat order dengan invoice #'.$model['invoice_number'];
 
         // $this->logUser->post('t_order', $model['id'], $note, $user_id);
-        return DB::table('m_voucher')->insert($params);
+        DB::table('m_voucher')->insert($params);
+        return $params;
+    }
+
+    public function getVoucherChanged(){
+        $date = date('Y-m-d');
+        $time = date('H:i:s');
+
+        $query = DB::table($this->table)
+        ->select(
+            'm_voucher.id',
+            'm_voucher.redeem_code',
+            'm_voucher.type',
+            'm_voucher.jenis',
+            'm_voucher.voucher',
+            'm_voucher.tanggal_mulai',
+            'm_voucher.jam_mulai',
+            'm_voucher.tanggal_selesai',
+            'm_voucher.jam_selesai',
+            'm_voucher.is_status'
+        )
+        ->where('m_voucher.is_status', 1)
+        ->where(function ($query) use ($date, $time) {
+            $query->where(function ($query) use ($date, $time) {
+                $query->whereDate('m_voucher.tanggal_selesai', '<', $date)
+                    ->orWhere(function ($query) use ($date, $time) {
+                        $query->whereDate('m_voucher.tanggal_selesai', '=', $date)
+                            ->whereTime('m_voucher.jam_selesai', '<', $time);
+                    });
+            });
+        });
+
+        return $query->get();
     }
 }
