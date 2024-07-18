@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\DB;
 
-
 class PromoKategori extends Model
 {
     use HasFactory;
