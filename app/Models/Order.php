@@ -218,6 +218,23 @@ class Order extends Model
         ];
     }
 
+    public function getMultipleById($id){
+        $data = DB::table('t_order')
+            ->select('t_order.*', 'users.name', 'users.username', 'users.email')
+            ->leftJoin('users', 'users.id', '=', 't_order.user_id')
+            ->whereIn('t_order.id', $id)
+            ->get();
+
+        foreach ($data as $key => $value) {
+            $data[$key]->detail = DB::table('t_order_detail')
+            ->select('t_order_detail.*', 'm_produk.*')
+            ->leftJoin('m_produk', 'm_produk.id', '=', 't_order_detail.product_id')
+            ->where('order_id', $value->id)
+            ->get();
+        }
+        return $data;
+    }
+
     public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updateOrder($params);
@@ -281,7 +298,7 @@ class Order extends Model
     function getOrderUer($params) {
         $query = DB::table('t_order AS order')
             ->select(
-                'order.id', 'order.invoice_number', 'order.total_voucher', 'order.total_pengiriman', 'order.total_price', 'order.grand_total', 
+                'order.id', 'order.invoice_number', 'order.total_voucher', 'order.total_pengiriman', 'order.total_price', 'order.grand_total',
                 'order.status_order', 'order.date', 'order.shipping_sender', 'order.shipping_group', 'order.awb_shipping', 'order.recipient', 'order.phone_code', 'order.phone_number',
                 'order.province_name', 'order.city_name', 'order.subdistrict_name', 'order.village_name', 'order.address', 'order.postal_code',
                 'payment.channel', 'payment.method',
@@ -402,15 +419,15 @@ class Order extends Model
         if ($number < 1000) {
             return $number;
         }
-        
+
         // Jika nominal lebih dari atau sama dengan 1000 dan kurang dari 1 juta
         if ($number < 1000000) {
             $formatted = $number / 1000;
-            
+
             // Pilih format yang diinginkan, bisa 'rb' atau 'k'
             return round($formatted, 2) . 'rb'; // atau 'k' untuk format internasional
         }
-        
+
         // Jika nominal lebih dari atau sama dengan 1 juta
         if ($number >= 1000000) {
             $formatted = $number / 1000000;

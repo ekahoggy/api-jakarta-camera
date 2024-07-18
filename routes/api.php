@@ -211,6 +211,7 @@ Route::group(['middleware' => 'api'], function (){
         Route::group(['prefix' => 'order'], function (){
             Route::get('/', [OrderController::class, 'getData']);
             Route::get('/{id}', [OrderController::class, 'getDataById']);
+            Route::post('/multipleGetId', [OrderController::class, 'multipleGetId']);
             Route::post('/save', [OrderController::class, 'simpan']);
             Route::post('/status', [OrderController::class, 'changeStatus']);
             Route::post('/pay', [OrderController::class, 'createOrder'])->name('createOrder');
