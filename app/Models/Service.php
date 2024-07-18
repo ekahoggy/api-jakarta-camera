@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
-use WebPConvert\WebPConvert;
 use Spatie\Image\Manipulations;
+use WebPConvert\WebPConvert;
+use Illuminate\Support\Str;
 
 class Service extends Model
 {
