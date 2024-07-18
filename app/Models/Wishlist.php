@@ -82,7 +82,7 @@ class Wishlist extends Model
             $query->limit($params['limit']);
         }
 
-        $data = $query->orderBy('index_position', 'ASC')->get();
+        $data = $query->get();
 
         foreach ($data as $key => $value) {
             $data[$key]->picture = Storage::url('images/promo-slider/' . $value->picture);
