@@ -72,15 +72,15 @@ class SiteController extends Controller
 
     public function getProduct(Request $request){
         $params = (array) $request->all();
-
-        $promo = $this->promoDet->getDetailPromoAktif();
         $produk = $this->product->getAll($params);
+        $promo = $this->promoDet->getDetailPromoAktif();
 
         foreach ($produk['list'] as $key => $value) {
             $value->variant = $this->product->getVariant($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
             $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
+            $value->total_terjual = $this->order->getTotalTerjual($value->id)['total_terjual'];
 
             $value->is_promo = false;
             $value->is_flashsale = false;
@@ -119,14 +119,15 @@ class SiteController extends Controller
         foreach ($promo as $k => $p) {
             foreach ($produk['list'] as $key => $value) {
                 if($p->m_produk_id === $value->id){
-                    $p->slug = $value->slug;
                     $p->variant = $this->product->getVariant($value->id);
                     $p->foto = $this->product->getMainPhotoProduk($value->id);
                     $p->photo_product = $this->product->getPhoto($value->id);
+                    $p->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
+                    $p->total_terjual = $this->order->getTotalTerjual($value->id)['total_terjual'];
+                    
+                    $p->slug = $value->slug;
                     $p->harga_promo = $value->harga;
                     $p->kategori = $value->kategori;
-                    $p->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
-
                     $p->is_promo = true;
                     $hitungPromo = ($p->persen / 100) * $value->harga;
                     $p->harga_promo = $value->harga - $hitungPromo;

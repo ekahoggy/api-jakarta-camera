@@ -267,12 +267,15 @@ class Order extends Model
     function getOrderUer($params) {
         $query = DB::table('t_order AS order')
             ->select(
-                'order.id', 'order.invoice_number', 'order.total_voucher', 'order.total_pengiriman', 'order.grand_total', 'order.status_order', 'order.date',
+                'order.id', 'order.invoice_number', 'order.total_voucher', 'order.total_pengiriman', 'order.total_price', 'order.grand_total', 
+                'order.status_order', 'order.date', 'order.shipping_sender', 'order.shipping_group', 'order.awb_shipping', 'order.recipient', 'order.phone_code', 'order.phone_number',
+                'order.province_name', 'order.city_name', 'order.subdistrict_name', 'order.village_name', 'order.address', 'order.postal_code',
+                'payment.channel', 'payment.method',
                 'detail.promo_id', 'detail.product_id', 'detail.varian_id', 'detail.qty', 'detail.price', 'detail.promo_amount', 'detail.promo_percent', 'detail.subtotal',
-                'produk.nama',
-                'ulasan.id as ulasan_id', 'ulasan.rating', 'ulasan.ulasan'
+                'produk.nama', 'ulasan.id as ulasan_id', 'ulasan.rating', 'ulasan.ulasan'
             )
             ->leftJoin('t_order_detail AS detail', 'detail.order_id', '=', 'order.id')
+            ->leftJoin('t_payment AS payment', 'order.payment_id', '=', 'payment.payment_id')
             ->leftJoin('m_produk AS produk', 'produk.id', '=', 'detail.product_id')
             ->leftJoin('m_produk_ulasan AS ulasan', 'ulasan.m_produk_id', '=', 'produk.id');
 
@@ -307,8 +310,23 @@ class Order extends Model
             $data[$i]['total_voucher'] = $order->total_voucher;
             $data[$i]['total_pengiriman'] = $order->total_pengiriman;
             $data[$i]['grand_total'] = $order->grand_total;
+            $data[$i]['total_price'] = $order->total_price;
+            $data[$i]['pay_channel'] = str_replace('_', ' ', $order->channel);
+            $data[$i]['pay_method'] = str_replace('_', ' ', $order->method);
             $data[$i]['status_order'] = $order->status_order;
             $data[$i]['date'] = date('d M Y', strtotime($order->date));
+            $data[$i]['shipping_sender'] = $order->shipping_sender;
+            $data[$i]['shipping_group'] = $order->shipping_group;
+            $data[$i]['awb_shipping'] = $order->awb_shipping;
+            $data[$i]['recipient'] = $order->recipient;
+            $data[$i]['phone_code'] = $order->phone_code;
+            $data[$i]['phone_number'] = $order->phone_number;
+            $data[$i]['province_name'] = $order->province_name;
+            $data[$i]['city_name'] = $order->city_name;
+            $data[$i]['subdistrict_name'] = $order->subdistrict_name;
+            $data[$i]['village_name'] = $order->village_name;
+            $data[$i]['address'] = $order->address;
+            $data[$i]['postal_code'] = $order->postal_code;
 
             $data[$i]['detail'][$order->id]['nama'] = $order->nama;
             $data[$i]['detail'][$order->id]['promo_id'] = $order->promo_id;
@@ -348,5 +366,41 @@ class Order extends Model
             ->get();
 
         return $orders;
+    }
+
+    public function getTotalTerjual($id){
+        $query = DB::table($this->table)
+            ->select('t_order.status_order')
+            ->leftJoin('t_order_detail', 't_order.id', '=', 't_order_detail.order_id')
+            ->where('t_order.status_order', '=', 'received')
+            ->where('t_order_detail.product_id', '=',$id);
+
+        $totalTerjual = $query->count();
+
+        return [
+            'total_terjual' => $this->formatNominal($totalTerjual),
+        ];
+    }
+
+    private function formatNominal($number) {
+
+        // Jika nominal kurang dari 1000, tidak perlu mengubahnya
+        if ($number < 1000) {
+            return $number;
+        }
+        
+        // Jika nominal lebih dari atau sama dengan 1000 dan kurang dari 1 juta
+        if ($number < 1000000) {
+            $formatted = $number / 1000;
+            
+            // Pilih format yang diinginkan, bisa 'rb' atau 'k'
+            return round($formatted, 2) . 'rb'; // atau 'k' untuk format internasional
+        }
+        
+        // Jika nominal lebih dari atau sama dengan 1 juta
+        if ($number >= 1000000) {
+            $formatted = $number / 1000000;
+            return round($formatted, 2) . 'jt';
+        }
     }
 }

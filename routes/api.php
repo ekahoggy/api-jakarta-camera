@@ -217,7 +217,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/statusPengiriman', [OrderController::class, 'updatePengiriman']);
         });
 
-
         Route::group(['prefix' => 'xendit'], function (){
             Route::post('/callback', [OrderController::class, 'xenditCallback']);
         });
