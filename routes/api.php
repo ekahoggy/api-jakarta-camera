@@ -33,6 +33,7 @@ use App\Http\Controllers\StokKeluarController;
 use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\StokUpdateController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WishlistController;
 
 // Email
 use App\Mail\VerifikasiEmail;
@@ -335,6 +336,12 @@ Route::group(['middleware' => 'api'], function (){
             // Servis
             Route::prefix('servis')->group(function (){
                 Route::post('/', [JasaServisController::class, 'simpan'])->name('pengajuanServis');
+            });
+
+            // Wishlist
+            Route::prefix('wishlist')->group(function (){
+                Route::get('/', [WishlistController::class, 'getData'])->name('getWishlist');
+                Route::post('/', [WishlistController::class, 'simpan'])->name('addWishlist');
             });
 
             // Subscribe

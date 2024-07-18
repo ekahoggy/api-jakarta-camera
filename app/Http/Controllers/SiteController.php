@@ -325,13 +325,14 @@ class SiteController extends Controller
             $value->variant = $this->product->getVariant($value->id);
             $value->photo_product = $this->product->getPhoto($value->id);
             $value->foto = $this->product->getMainPhotoProduk($value->id);
+            $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
+            $value->total_terjual = $this->order->getTotalTerjual($value->id)['total_terjual'];
+
             $value->rowspan = count($value->variant);
             $value->is_promo = false;
             $value->is_flashsale = false;
             $value->promo = [];
             $value->harga_promo = $value->harga;
-            $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
-
             foreach ($promo as $k => $p) {
                 if($p->m_produk_id === $value->id){
                     $value->is_promo = true;
