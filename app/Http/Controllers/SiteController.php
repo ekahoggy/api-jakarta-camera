@@ -162,12 +162,12 @@ class SiteController extends Controller
         foreach ($promo as $k => $p) {
             foreach ($produk['list'] as $key => $value) {
                 if($p->m_produk_id === $value->id){
-                    $p->slug = $value->slug;
                     $p->variant = $this->product->getVariant($value->id);
                     $p->foto = $this->product->getMainPhotoProduk($value->id);
                     $p->photo_product = $this->product->getPhoto($value->id);
+                    
+                    $p->slug = $value->slug;
                     $p->harga_promo = $value->harga;
-
                     $p->is_promo = true;
                     $hitungPromo = ($p->persen / 100) * $value->harga;
                     $p->harga_promo = $value->harga - $hitungPromo;
@@ -203,6 +203,7 @@ class SiteController extends Controller
                 $value->foto = $this->product->getMainPhotoProduk($value->id);
                 $value->photo_product = $this->product->getPhoto($value->id);
                 $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
+                $value->total_terjual = $this->order->getTotalTerjual($value->id)['total_terjual'];
 
                 $value->is_promo = false;
                 $value->is_flashsale = false;
@@ -227,7 +228,7 @@ class SiteController extends Controller
                             'promo_min_beli' => $p->promo_min_beli
                         ];
                     }
-                }
+                }   
             }
             return response()->json(['success' => true, "data" => $produk]);
         }
