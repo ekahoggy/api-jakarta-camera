@@ -135,8 +135,20 @@ class Order extends Model
             )
             ->leftJoin('users', 'users.id', '=', 't_order.user_id');
 
-        $totalItems = $query->count();
-
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if($key === 'invoice_number' && !empty($value)){
+                    $query->where('t_order.invoice_number', 'like', '%' . $value . '%');
+                }
+                if($key === 'status_order' && !empty($value)){
+                    $query->where('t_order.status_order', '=', $value);
+                }
+                if($key === 'date' && !empty($value)){
+                    $query->where('t_order.date', '=', $value);
+                }
+            }
+        }
         if (isset($params['notEqual']) && !empty($params['notEqual'])) {
             $query->where("id", "!=", $params['notEqual']);
         }
@@ -161,8 +173,10 @@ class Order extends Model
             $query->limit($params['limit']);
         }
 
-        $data = $query->orderBy('created_at', 'DESC')->get();
+        $query->orderBy('t_order.date', 'DESC');
+        $data = $query->orderBy('t_order.created_at', 'DESC')->get();
 
+        $totalItems = $query->count();
         return [
             'list' => $data,
             'totalItems' => $totalItems

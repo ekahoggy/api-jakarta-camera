@@ -39,6 +39,7 @@ class SiteController extends Controller
     protected $biteship;
     protected $subscribe;
     protected $voucher;
+    protected $ulasan;
 
     public function __construct()
     {
@@ -57,6 +58,7 @@ class SiteController extends Controller
         $this->newsKomentar = new NewsKomentar();
         $this->biteship = new BiteShip();
         $this->subscribe = new Subscription();
+        $this->ulasan = new ProdukUlasan();
     }
 
     public function slider() {

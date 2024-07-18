@@ -46,11 +46,26 @@ class PromoController extends Controller
         try {
             $data = $this->promo->getById($id);
             $data->detail = $this->promoDet->getDetailByPromo($id);
-            $data->promo_kategori = $this->promoDet->getKategoriByPromo($id);
+            $kat = $this->promoDet->getKategoriByPromo($id);
 
+            $brand = [];
+            $kategori = [];
+
+            foreach ($kat as $key => $value) {
+                if(isset($value->brand_id)){
+                    array_push($brand, $value->brand_id);
+                }
+
+                if(isset($value->kategori_id)){
+                    array_push($kategori, $value->kategori_id);
+                }
+            }
             foreach ($data->detail as $key => $value) {
                 $value->promo_used = $value->qty - $value->promo_used;
             }
+
+            $data->brand_id = $brand;
+            $data->kategori_id = $kategori;
 
             return response()->json([
                 'data' => $data,

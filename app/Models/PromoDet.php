@@ -92,6 +92,28 @@ class PromoDet extends Model
         return $data;
     }
 
+    public function getBrandByPromo($id_promo = null){
+        $query = DB::table('m_promo_kategori')
+        ->select(
+            'm_promo_kategori.*',
+            'prd.slug as slug_kategori',
+            'prd.kategori as kategori',
+            'edu.slug as slug_kategori',
+            'edu.kategori as kategori',
+            'm_brand.brand as brand',
+            'm_brand.slug as slug_brand'
+        )
+        ->leftJoin('m_kategori as prd', 'prd.id', '=', 'm_promo_kategori.kategori_id')
+        ->leftJoin('m_edukasi_kategori as edu', 'edu.id', '=', 'm_promo_kategori.kategori_id')
+        ->leftJoin('m_brand', 'm_brand.id', '=', 'm_promo_kategori.brand_id');
+
+        $query->where("m_promo_kategori.promo_id", "=", $id_promo);
+
+        $data = $query->get();
+
+        return $data;
+    }
+
     public function simpan($params) {
         if (isset($params['id']) && !empty($params['id'])) {
             return $this->updatePromoDet($params);
@@ -139,6 +161,7 @@ class PromoDet extends Model
         ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
         ->where('m_promo.type', $type)
         ->where('m_promo.is_status', 1)
+        ->where('m_promo_det.status', 1)
         ->where('m_promo.is_flashsale', 0);
 
         $query->where(function ($query) use ($date, $time) {
