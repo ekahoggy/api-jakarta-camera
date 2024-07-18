@@ -88,6 +88,26 @@ class OrderController extends Controller
         }
     }
 
+    public function multipleGetId(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->order->getMultipleById($params);
+            foreach ($data as $key => $value) {
+                $value->status_order_convert = $this->statusOrder($value->status_order);
+            }
+
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
     public function simpan(Request $request){
         try {
             $params = (array) $request->only('id', 'type', 'username', 'name', 'email', 'password', 'phone_code', 'phone_number', 'remember_token', 'address', 'photo', 'roles_id', 'kode', 'email_expired', 'is_active',);
