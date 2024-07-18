@@ -100,17 +100,23 @@ class Voucher extends Model
 
     public function getVoucher($params){
         $today = date('Y-m-d');
-        $data = DB::table('m_voucher')
-            ->where('is_status', 1)
-            ->whereDate('tanggal_mulai','<=', $today)
-            ->whereDate('tanggal_selesai','>=', $today);
+        $data = DB::table('m_voucher as v')
+            ->selectRaw('v.*')
+            ->whereDate('v.tanggal_mulai','<=', $today)
+            ->whereDate('v.tanggal_selesai','>=', $today)
+            ->where('v.is_hidden', 0)
+            ->where('v.is_status', 1);
 
         if (isset($params['jenis']) && !empty($params['jenis'])) {
             $data->where('jenis', $params['jenis']);
         }
-        if (isset($params['user_id']) && !empty($params['user_id'])) {
-            $data->orWhere('untuk', 'user');
-            $data->orWhere('user_id', $params['user_id']);
+        if (isset($params['redeem_code']) && !empty($params['redeem_code'])) {
+            $data->where('v.redeem_code', 'like', '%' . $params['redeem_code'] . '%');
+            // $data->where('v.is_hidden', 1);
+            // if (isset($params['user_id']) && !empty($params['user_id'])) {
+            //     $data->orWhere('v.untuk', 'user');
+            //     $data->orWhere('vu.user_id', $params['user_id']);
+            // }
         }
 
         return $data->get();

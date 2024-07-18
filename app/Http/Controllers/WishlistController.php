@@ -20,7 +20,7 @@ class WishlistController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['simpan']]);
+        $this->middleware('auth:api', ['except' => ['simpan','getData']]);
         $this->wishlist = new Wishlist();
         $this->promoDet = new PromoDet();
         $this->product = new Produk();
@@ -33,14 +33,14 @@ class WishlistController extends Controller
             $params = (array) $request->all();
             $promo = $this->promoDet->getDetailPromoAktif();
             $produk = $this->wishlist->getAll($params);
-    
+
             foreach ($produk['list'] as $value) {
                 $value->variant = $this->product->getVariant($value->id);
                 $value->photo_product = $this->product->getPhoto($value->id);
                 $value->foto = $this->product->getMainPhotoProduk($value->id);
                 $value->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
                 $value->total_terjual = $this->order->getTotalTerjual($value->id)['total_terjual'];
-    
+
                 $value->rowspan = count($value->variant);
                 $value->is_promo = false;
                 $value->is_flashsale = false;
@@ -117,7 +117,7 @@ class WishlistController extends Controller
         try {
             $service = new Service();
             $params = (array) $request->all('name', 'email', 'phone_code', 'phone_number', 'keterangan', 'file');
-            
+
             $params['file'] = $service->saveImage("promo-slider/", $params['file']);
             $data = Wishlist::create($params);
 
