@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EdukasiController;
 use App\Http\Controllers\EdukasiKategoriController;
 use App\Http\Controllers\EdukasiSliderController;
+use App\Http\Controllers\JasaServisController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LaporanController;
@@ -217,7 +218,6 @@ Route::group(['middleware' => 'api'], function (){
             Route::post('/statusPengiriman', [OrderController::class, 'updatePengiriman']);
         });
 
-
         Route::group(['prefix' => 'xendit'], function (){
             Route::post('/callback', [OrderController::class, 'xenditCallback']);
         });
@@ -275,7 +275,7 @@ Route::group(['middleware' => 'api'], function (){
         });
 
         Route::prefix('public')->group(function (){
-            // user post
+            // User post
             Route::get('/checkEmail', [UserController::class, 'checkEmail']);
             Route::post('/register', [UserController::class, 'register']);
             Route::post('/login', [UserController::class, 'login']);
@@ -287,23 +287,27 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/get-ulasan/{id}', [SiteController::class, 'getUlasan']);
             Route::post('/post-ulasan', [SiteController::class, 'postUlasan']);
 
-            // public
+            // Public home
             Route::get('/setting', [SettingController::class, 'getSetting']);
             Route::get('/popup', [PromoSliderController::class, 'slider']);
+            Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
+            Route::get('/brand', [SiteController::class, 'getBrand']);
+            Route::post('/getLastSeenProduk', [SiteController::class, 'getLastSeenProduk']);
+
+            // Public Produk
             Route::get('/kategori', [KategoriController::class, 'kategori'])->name('kategori');
             Route::get('/produk', [SiteController::class, 'getProduct'])->name('produk');
             Route::get('/produkPromo', [SiteController::class, 'getProductPromo']);
             Route::get('/flashsale', [SiteController::class, 'getFlashsale']);
             Route::get('/getProdukSlug', [SiteController::class, 'getProdukSlug'])->name('getProdukSlug');
-            Route::post('/getLastSeenProduk', [SiteController::class, 'getLastSeenProduk']);
             Route::get('/katalog', [SiteController::class, 'katalog'])->name('katalog');
-            Route::get('/slider', [SiteController::class, 'slider'])->name('slider');
-            Route::get('/brand', [SiteController::class, 'getBrand']);
-            Route::get('/category-news', [SiteController::class, 'getCategoryNews']);
-
             Route::get('/stok', [SiteController::class, 'getStok']);
+
+            //  Public shipping
             Route::post('/getRates', [SiteController::class, 'getRates']);
 
+            // Public news
+            Route::get('/category-news', [SiteController::class, 'getCategoryNews']);
             Route::prefix('news')->group(function (){
                 Route::get('/', [SiteController::class, 'getNews']);
                 Route::post('/view/{id}', [SiteController::class, 'clickToViewNews']);
@@ -325,6 +329,11 @@ Route::group(['middleware' => 'api'], function (){
             // Voucher
             Route::prefix('voucher')->group(function (){
                 Route::get('/', [VoucherController::class, 'voucher'])->name('getVoucher');
+            });
+
+            // Servis
+            Route::prefix('servis')->group(function (){
+                Route::post('/', [JasaServisController::class, 'simpan'])->name('pengajuanServis');
             });
 
             // Subscribe
