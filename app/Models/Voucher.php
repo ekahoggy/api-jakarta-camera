@@ -104,20 +104,23 @@ class Voucher extends Model
             ->selectRaw('v.*')
             ->whereDate('v.tanggal_mulai','<=', $today)
             ->whereDate('v.tanggal_selesai','>=', $today)
-            ->where('v.is_hidden', 0)
             ->where('v.is_status', 1);
 
-        if (isset($params['jenis']) && !empty($params['jenis'])) {
-            $data->where('jenis', $params['jenis']);
-        }
-        if (isset($params['redeem_code']) && !empty($params['redeem_code'])) {
-            $data->where('v.redeem_code', 'like', '%' . $params['redeem_code'] . '%');
-            // $data->where('v.is_hidden', 1);
-            // if (isset($params['user_id']) && !empty($params['user_id'])) {
-            //     $data->orWhere('v.untuk', 'user');
-            //     $data->orWhere('vu.user_id', $params['user_id']);
-            // }
-        }
+            if (isset($params['jenis']) && !empty($params['jenis'])) {
+                $data->where('jenis', $params['jenis']);
+            }
+            if (isset($params['redeem_code']) && !empty($params['redeem_code'])) {
+                $data->where('v.redeem_code', 'like', '%' . $params['redeem_code'] . '%');
+                $data->where('v.is_hidden', 1);
+                $data->orWhere('v.is_hidden', 1);
+                // if (isset($params['user_id']) && !empty($params['user_id'])) {
+                    //     $data->orWhere('v.untuk', 'user');
+                    //     $data->orWhere('vu.user_id', $params['user_id']);
+                    // }
+                }
+            else{
+                $data->where('v.is_hidden', 0);
+            }
 
         return $data->get();
     }
