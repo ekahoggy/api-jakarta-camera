@@ -122,7 +122,13 @@ class Voucher extends Model
                 $data->where('v.is_hidden', 0);
             }
 
-        return $data->get();
+        $model = $data->get();
+
+        foreach ($model as $i => $value) {
+            $model[$i]->gambar = Storage::url('images/voucher/' . $value->gambar);
+        }
+
+        return $model;
     }
 
     public function simpan($params) {
