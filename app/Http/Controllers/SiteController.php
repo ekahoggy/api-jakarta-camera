@@ -466,6 +466,21 @@ class SiteController extends Controller
         }
     }
 
+    public function getOrderEdukasi(Request $request){
+        try {
+            $params = (array) $request->all();
+            $data = $this->order->getOrderEdukasi($params);
+
+            foreach ($data['list'] as $i => $item) {
+                $data['list'][$i]->gambar =  Storage::url('images/edukasi/' . $item->gambar);
+            }
+
+            return response()->json([ 'data' => $data, 'status_code' => 200 ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([ 'message' => $th, 'status_code' => 500], 500);
+        }
+    }
+
     public function getNews(Request $request){
         try {
             $params = (array) $request->all();

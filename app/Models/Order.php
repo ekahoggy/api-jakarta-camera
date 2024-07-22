@@ -383,6 +383,46 @@ class Order extends Model
         ];
     }
 
+    function getOrderEdukasi($params) {
+        $query = DB::table('t_order_edukasi AS order')
+            ->select(
+                'order.id', 'order.invoice_number', 'order.total_promo', 'order.total_voucher', 'order.total_pembayaran', 'order.grand_total', 'order.status_order', 'order.date', 
+                'payment.channel', 'payment.method',
+                'edukasi.judul', 'edukasi.gambar', 'edukasi.harga'
+            )
+            ->leftJoin('m_edukasi AS edukasi', 'order.edukasi_id', '=', 'edukasi.id')
+            ->leftJoin('t_payment AS payment', 'order.payment_id', '=', 'payment.payment_id');
+
+        $totalItems = $query->count();
+
+        if (isset($params['user_id']) && !empty($params['user_id'])) {
+            $query->where("user_id", "=", $params['user_id']);
+        }
+
+        if (isset($params['judul']) && !empty($params['judul'])) {
+            $query->where("judul", "like", "%".$params['judul']."%");
+        }
+
+        if (isset($params['status']) && !empty($params['status'])) {
+            $query->where("status_order", "=", $params['status']);
+        }
+
+        if (isset($params['offset']) && !empty($params['offset'])) {
+            $query->offset($params['offset']);
+        }
+
+        if (isset($params['limit']) && !empty($params['limit'])) {
+            $query->limit($params['limit']);
+        }
+
+        $orders = $query->orderBy('date', 'ASC')->get();
+
+        return [
+            'list' => $orders,
+            'totalItems' => $totalItems
+        ];
+    }
+
     public function generateLaporan($params) {
         $orders = DB::table('t_order_detail')
             ->select(
