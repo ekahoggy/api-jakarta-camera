@@ -339,6 +339,10 @@ Route::group(['middleware' => 'api'], function (){
                 Route::post('/', [JasaServisController::class, 'simpan'])->name('pengajuanServis');
             });
 
+            Route::prefix('pasang-cctv')->group(function (){
+                Route::post('/', [JasaServisController::class, 'simpan'])->name('pengajuanServis');
+            });
+            
             // Wishlist
             Route::prefix('wishlist')->group(function (){
                 Route::get('/', [WishlistController::class, 'getData'])->name('getWishlist');
