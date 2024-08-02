@@ -66,7 +66,6 @@ class JasaPasangCctvController extends Controller
             'postal_code' => 'required', 
             'address' => 'required', 
             'latitude' => 'required', 
-            'longitude' => 'required',
         ]);
 
         try {

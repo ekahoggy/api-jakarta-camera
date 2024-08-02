@@ -12,6 +12,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EdukasiController;
 use App\Http\Controllers\EdukasiKategoriController;
 use App\Http\Controllers\EdukasiSliderController;
+use App\Http\Controllers\JasaPasangCctvController;
 use App\Http\Controllers\JasaServisController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\KategoriController;
@@ -340,7 +341,7 @@ Route::group(['middleware' => 'api'], function (){
             });
 
             Route::prefix('pasang-cctv')->group(function (){
-                Route::post('/', [JasaServisController::class, 'simpan'])->name('pengajuanServis');
+                Route::post('/', [JasaPasangCctvController::class, 'simpan'])->name('pengajuanServis');
             });
             
             // Wishlist

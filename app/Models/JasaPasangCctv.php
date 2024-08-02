@@ -56,6 +56,14 @@ class JasaPasangCctv extends Model
         return $data;
     }
 
+    public function simpan($params) {
+        if (isset($params['id']) && !empty($params['id'])) {
+            return $this->updateJasa($params);
+        } else {
+            return $this->insertJasa($params);
+        }
+    }
+
     public function getDetail($id) {
         return DB::table($this->table)->where('id', $id)->get();
     }
