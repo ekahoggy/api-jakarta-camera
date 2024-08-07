@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class ServisKamera extends Mailable
+class PasangCctv extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,12 +19,12 @@ class ServisKamera extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
-        $this->subject = 'Jakarta Camera Service Kamera';
+        $this->subject = 'Jakarta Camera Jasa Pasang CCTV';
     }
 
     public function build()
     {
-        return $this->view('emails.servis-kamera')
+        return $this->view('emails.pasang-cctv')
             ->with('data', $this->data)
             ->subject($this->subject);
     }
