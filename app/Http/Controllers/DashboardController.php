@@ -84,4 +84,58 @@ class DashboardController extends Controller
             ], 500);
         }
     }
+
+    function penjualanpertahun(Request $request) {
+        try {
+            $params = (array) $request->all();
+            $params['tahun'] = date('Y');
+            $data = $this->order->getAll($params);
+            $totalPendapatan = 0;
+
+            $months = [];
+            $salesByMonth = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $months[] = substr(date('F', strtotime($params['tahun'] . '-' . $i . '-01')), 0, 3);
+                $salesByMonth[$i] = 0;
+            }
+
+            foreach ($data['list'] as $key => $value) {
+                if ($value->status_order === 'received') {
+                    $month = date('n', strtotime($value->date));
+                    $salesByMonth[$month] += $value->grand_total;
+                    $totalPendapatan += $value->grand_total;
+                }
+            }
+            ksort($salesByMonth);
+
+            return response()->json([
+                'data' => [
+                    'months' => $months,
+                    'sales' => array_values($salesByMonth)
+                ],
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    function logUser(Request $request) {
+        try {
+            $params = (array) $request->all();
+            $data = $this->order->getAll($params);
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
 }

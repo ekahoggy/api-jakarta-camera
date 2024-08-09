@@ -165,6 +165,10 @@ class Order extends Model
             $query->whereDate('date', '=', $params['hari']);
         }
 
+        if (isset($params['tahun']) && !empty($params['tahun'])) {
+            $query->whereYear('date', '=', $params['tahun']);
+        }
+
         if (isset($params['offset']) && !empty($params['offset'])) {
             $query->offset($params['offset']);
         }
@@ -386,7 +390,7 @@ class Order extends Model
     function getOrderEdukasi($params) {
         $query = DB::table('t_order_edukasi AS order')
             ->select(
-                'order.id', 'order.invoice_number', 'order.total_promo', 'order.total_voucher', 'order.total_pembayaran', 'order.grand_total', 'order.status_order', 'order.date', 
+                'order.id', 'order.invoice_number', 'order.total_promo', 'order.total_voucher', 'order.total_pembayaran', 'order.grand_total', 'order.status_order', 'order.date',
                 'payment.channel', 'payment.method',
                 'edukasi.judul', 'edukasi.gambar', 'edukasi.harga'
             )

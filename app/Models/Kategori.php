@@ -105,12 +105,14 @@ class Kategori extends Model
 
     public function insertCategory($params) {
         $service = new Service();
+        $logUser = new LogUser();
 
         $params['id'] = Generator::uuid4()->toString();
         $params['slug'] = Str::slug($params['kategori'], '-');
         $params['created_at'] = date('Y-m-d H:i:s');
         $params['icon'] = $service->saveImage("kategori/", $params['icon']);
 
+        // $logUser->post($params['id'], 'insert', 'm_kategori', json_encode($params));
         return DB::table('m_kategori')->insert($params);
     }
 
