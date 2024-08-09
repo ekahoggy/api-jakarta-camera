@@ -456,4 +456,14 @@ class Produk extends Model
 
         return $query;
     }
+
+    function reminderStok() {
+        $query = DB::table($this->table)
+        ->where('stok', '<=', 'min_beli')
+        ->orderBy('stok', 'asc')
+        ->limit(5)
+        ->get();
+
+        return $query;
+    }
 }

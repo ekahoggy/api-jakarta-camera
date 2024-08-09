@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogUser;
 use App\Models\Order;
+use App\Models\Produk;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -126,7 +128,25 @@ class DashboardController extends Controller
     function logUser(Request $request) {
         try {
             $params = (array) $request->all();
-            $data = $this->order->getAll($params);
+            $logUser = new LogUser();
+            $data = $logUser->getAll($params);
+            return response()->json([
+                'data' => $data,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
+
+    function reminderStok(Request $request) {
+        try {
+            $params = (array) $request->all();
+            $produk = new Produk();
+            $data = $produk->reminderStok();
             return response()->json([
                 'data' => $data,
                 'status_code' => 200

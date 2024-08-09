@@ -31,6 +31,17 @@ class LogUser extends Model
         'id' => 'string'
     ];
 
+    function getAll($params) {
+        $query = DB::table($this->table)
+        ->orderBy('created_at', 'desc')
+        ->get();
+        $data = [
+            'list' => $query,
+            'totalItems' => $query->count()
+        ];
+        return $data;
+    }
+
     public function post($ref_name, $ref_id, $notes, $user_id)
     {
         $params['id'] = Generator::uuid4()->toString();
