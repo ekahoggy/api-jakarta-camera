@@ -57,7 +57,7 @@ class JasaPasangCctvController extends Controller
             'nama' => 'required|string',
             'email' => 'required|email',
             'phone_code' => 'required',
-            'phone_number' => 'required|numeric',
+            'phone_number' => 'required',
             'pesan' => 'required|string|min:50',
             'province_id' => 'required', 
             'subdistrict_id' => 'required', 
