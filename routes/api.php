@@ -341,9 +341,9 @@ Route::group(['middleware' => 'api'], function (){
             });
 
             Route::prefix('pasang-cctv')->group(function (){
-                Route::post('/', [JasaPasangCctvController::class, 'simpan'])->name('pengajuanServis');
+                Route::post('/', [JasaPasangCctvController::class, 'simpan'])->name('pasangcctv');
             });
-            
+
             // Wishlist
             Route::prefix('wishlist')->group(function (){
                 Route::get('/', [WishlistController::class, 'getData'])->name('getWishlist');
