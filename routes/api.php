@@ -73,6 +73,8 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/counterPesanan', [DashboardController::class, 'counterPesanan']);
             Route::get('/pendapatan', [DashboardController::class, 'pendapatan']);
             Route::get('/penjualanhariini', [DashboardController::class, 'penjualanhariini']);
+            Route::get('/penjualanpertahun', [DashboardController::class, 'penjualanpertahun']);
+            Route::get('/logUser', [DashboardController::class, 'logUser']);
         });
 
         Route::group(['prefix' => 'laporan'], function (){
