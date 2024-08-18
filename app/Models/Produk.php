@@ -458,12 +458,87 @@ class Produk extends Model
     }
 
     function reminderStok() {
-        $query = DB::table($this->table)
-        ->where('stok', '<=', 'min_beli')
-        ->orderBy('stok', 'asc')
-        ->limit(5)
+        // $produk = DB::table($this->table)
+        // ->selectRaw('
+        //     m_produk.id,
+        //     m_produk.nama,
+        //     m_produk.stok,
+        //     m_produk.min_beli,
+        //     m_produk.harga,
+        //     m_kategori.kategori
+        // ')
+        // ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+        // ->where('stok', '<=', 'min_beli')
+        // ->where('is_active', 1)
+        // ->orderBy('stok', 'asc')
+        // ->limit(5)
+        // ->get();
+
+        $products = DB::table('m_produk')
+        ->selectRaw('
+            m_produk.id,
+            m_produk.nama,
+            m_produk.stok,
+            m_produk.min_beli,
+            m_produk.harga,
+            m_kategori.kategori,
+            NULL as varian_id,
+            m_produk.sku,
+            NULL as varian1,
+            NULL as varian1_type,
+            NULL as varian2,
+            NULL as varian2_type,
+            NULL as stok_varian,
+            NULL as harga_varian,
+            CASE WHEN EXISTS (
+                SELECT 1 FROM m_produk_varian
+                WHERE m_produk_varian.m_produk_id = m_produk.id
+            ) THEN true ELSE false END as is_variant
+        ')
+        ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+        ->where('m_produk.is_active', 1)
+        ->where('m_produk.stok', '<=', DB::raw('m_produk.min_beli'))
+        ->unionAll(
+            DB::table('m_produk_varian')
+            ->selectRaw('
+                m_produk.id,
+                m_produk.nama,
+                m_produk.stok,
+                m_produk.min_beli,
+                m_produk.harga,
+                m_kategori.kategori,
+                m_produk_varian.id as varian_id,
+                m_produk_varian.sku,
+                m_produk_varian.varian1,
+                m_produk_varian.varian1_type,
+                m_produk_varian.varian2,
+                m_produk_varian.varian2_type,
+                m_produk_varian.stok as stok_varian,
+                m_produk_varian.harga as harga_varian,
+                true as is_variant
+            ')
+            ->leftJoin('m_produk', 'm_produk.id', '=', 'm_produk_varian.m_produk_id')
+            ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+            ->where('m_produk.is_active', 1)
+            ->where('m_produk_varian.stok', '<=', DB::raw('m_produk.min_beli'))
+        )
+        ->orderByRaw('COALESCE(stok_varian, stok) ASC')
         ->get();
 
-        return $query;
+        return $products;
+
+        // foreach($produk as $p){
+        //     $p->is_varian = false;
+        //     foreach($varian as $v){
+        //         if($p->id === $v->m_produk_id){
+        //             $p->is_varian = true;
+        //             $p->nama = $p->nama . ' - ' . $v->varian1 . ' ' . $v->varian2;
+        //             $p->stok = $v->stok;
+        //             $p->harga = $v->harga;
+        //         }
+        //     }
+        // }
+
+        // return $produk;
     }
 }

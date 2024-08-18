@@ -165,6 +165,14 @@ Route::group(['middleware' => 'api'], function (){
             });
         });
 
+        Route::group(['prefix' => 'layanan'], function (){
+            Route::group(['prefix' => 'service'], function (){
+                Route::get('/', [JasaServisController::class, 'getData']);
+                Route::post('/', [JasaServisController::class, 'simpan']);
+
+            });
+        });
+
         Route::group(['prefix' => 'voucher'], function (){
             Route::get('/', [VoucherController::class, 'getData']);
             Route::get('/{id}', [VoucherController::class, 'getDataById']);
