@@ -33,7 +33,7 @@ class WoocommerceController extends Controller
 
     public function getProduk(Request $request) {
         try {
-            $produk = $this->woocommerce->getProduk();
+            $produk = $this->woocommerce->getProduk($request->all());
 
             return response()->json([
                 'data' => $produk,

@@ -27,18 +27,6 @@ class WoocommerceModel extends Model
         $local_store = $data['local_store'];
         $remote_store = $data['remote_store'];
 
-        // $store = \App\Store::where(['local_store' => $local_store])->first();
-        // if(!$store){
-        // $store = new \App\Store();
-        // }
-
-        // $store->data = json_encode($data);
-        // $store->local_store = $local_store;
-        // $store->remote_store = $remote_store;
-        // $store->status = ‘100’;
-        // //$store->synced_at = now();
-        // $store->save();
-
         $store_url = 'https://jakartacamera.com';
         $endpoint = '/wc-auth/v1/authorize';
         $params = [
@@ -54,8 +42,10 @@ class WoocommerceModel extends Model
     }
 
     public function getProduk($params = []){
+        $paramsString = http_build_query($params);
+
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->WOOCOMMERCE_STORE_URL."/wp-json/wc/v3/products?per_page=100");
+        curl_setopt($ch, CURLOPT_URL, $this->WOOCOMMERCE_STORE_URL."/wp-json/wc/v3/products?". $paramsString);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_USERPWD, $this->WOOCOMMERCE_CONSUMER_KEY . ":" . $this->WOOCOMMERCE_CONSUMER_SECRET);
         $output = curl_exec($ch);
