@@ -35,6 +35,7 @@ use App\Http\Controllers\StokMasukController;
 use App\Http\Controllers\StokUpdateController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\WoocommerceController;
 
 // Email
 use App\Mail\VerifikasiEmail;
@@ -67,6 +68,11 @@ Route::group(['middleware' => 'api'], function (){
             Route::get('/verif-email', [AuthController::class, 'verif']);
             Route::post('/forgot-password', [AuthController::class, 'forgot']);
             Route::post('/reset-password', [AuthController::class, 'reset']);
+        });
+
+        Route::group(['prefix' => 'woocommerce'], function (){
+            Route::get('/authorize', [WoocommerceController::class, 'authorWoo']);
+            Route::get('/produk', [WoocommerceController::class, 'getProduk']);
         });
 
         Route::group(['prefix' => 'dashboard'], function (){
@@ -286,6 +292,7 @@ Route::group(['middleware' => 'api'], function (){
                 Route::post('/save', [StokUpdateController::class, 'simpan']);
                 Route::post('/status', [StokUpdateController::class, 'changeStatus']);
             });
+
         });
 
         Route::prefix('public')->group(function (){
