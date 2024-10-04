@@ -173,12 +173,21 @@ class Produk extends Model
 
     public function insertProduct($params) {
         $params['id'] = Generator::uuid4()->toString();
-        $params['sku'] = isset($params['sku']) ? $params['sku'] : 'JC-'.date('ymdhms');
+        $params['sku'] = isset($params['sku']) ? $params['sku'] : '';
+
+        if($params['sku'] == ''){
+            $params['sku'] = 'JC-'.date('ymdhms').$params['woo_produk_id'];
+        }
         $params['slug'] = Str::slug($params['nama'], '-');
         $params['updated_at'] = date('Y-m-d H:i:s');
 
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
-            $this->savePhoto($params['id'], $params['photo']);
+            if($params['sinkron']){
+                $this->savePhotoSinkron($params['id'], $params['photo'], $params['sinkron']);
+            }
+            else{
+                $this->savePhoto($params['id'], $params['photo'], $params['sinkron']);
+            }
             unset($params['photo']);
         }
 
@@ -192,10 +201,30 @@ class Produk extends Model
             unset($params['variant']);
         }
 
+        unset($params['sinkron']);
+
         return DB::table('m_produk')->insert($params);
     }
 
-    public function savePhoto($produkId, $photo) {
+    public function savePhotoSinkron($produkId, $photo, $sinkron = false) {
+        $service = new Service();
+
+        foreach($photo as $i => $image) {
+            $data = [];
+            $data['id'] = Generator::uuid4()->toString();
+            $data['m_produk_id'] = $produkId;
+            $data['woo_media_id'] = $image->id;
+            $data['name'] = $image->name ?? '';
+            $data['alt'] = $image->alt ?? '';
+            $data['is_main'] = $i == 0 ? 1 : 0;
+            $data['urutan'] = $i + 1;
+            $data['media_link'] = $sinkron ? $image->src : $service->saveImage("produk/", $image['foto']);
+
+            DB::table('m_produk_media')->insert($data);
+        }
+    }
+
+    public function savePhoto($produkId, $photo, $sinkron = false) {
         $service = new Service();
 
         DB::table('m_produk_media')->where('m_produk_id', '=', $produkId)->delete();
@@ -204,9 +233,11 @@ class Produk extends Model
             if($image['isFoto']){
                 $data['id'] = Generator::uuid4()->toString();
                 $data['m_produk_id'] = $produkId;
+                $data['name'] = $image['name'] ?? '';
+                $data['alt'] = $image['alt'] ?? '';
                 $data['is_main'] = $i == 0 ? 1 : 0;
                 $data['urutan'] = $i + 1;
-                $data['media_link'] = $service->saveImage("produk/", $image['foto']);
+                $data['media_link'] = $sinkron ? $image->src : $service->saveImage("produk/", $image['foto']);
 
                 DB::table('m_produk_media')->insert($data);
             }
@@ -269,7 +300,7 @@ class Produk extends Model
         if (!empty($photo)) {
             foreach($photo as $i => $image) {
                 if($image->media_link !== ''){
-                    $photo[$i]->foto = Storage::url('images/produk/' . $image->media_link);
+                    $photo[$i]->foto = $image->media_link;
                     $photo[$i]->isFoto = true;
                 }
             }
@@ -385,7 +416,7 @@ class Produk extends Model
 
     public function getMainPhotoProduk($id) {
         $data = DB::table('m_produk_media')->where('m_produk_id', $id)->where('is_main', 1)->first();
-        $url = Storage::url('images/produk/' . $data->media_link);
+        $url = $data->media_link ?? '';
 
         return $url;
     }

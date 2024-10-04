@@ -74,6 +74,7 @@ class SiteController extends Controller
 
     public function getProduct(Request $request){
         $params = (array) $request->all();
+        $params['limit'] = 50;
         $produk = $this->product->getAll($params);
         $promo = $this->promoDet->getDetailPromoAktif();
 
@@ -126,7 +127,7 @@ class SiteController extends Controller
                     $p->photo_product = $this->product->getPhoto($value->id);
                     $p->rating = $this->produkUlasan->getUlasanByProdukId($value->id)['rataRating'];
                     $p->total_terjual = $this->order->getTotalTerjual($value->id)['total_terjual'];
-                    
+
                     $p->slug = $value->slug;
                     $p->harga_promo = $value->harga;
                     $p->kategori = $value->kategori;
@@ -165,7 +166,7 @@ class SiteController extends Controller
                     $p->variant = $this->product->getVariant($value->id);
                     $p->foto = $this->product->getMainPhotoProduk($value->id);
                     $p->photo_product = $this->product->getPhoto($value->id);
-                    
+
                     $p->slug = $value->slug;
                     $p->harga_promo = $value->harga;
                     $p->is_promo = true;
@@ -228,7 +229,7 @@ class SiteController extends Controller
                             'promo_min_beli' => $p->promo_min_beli
                         ];
                     }
-                }   
+                }
             }
             return response()->json(['success' => true, "data" => $produk]);
         }
@@ -281,7 +282,7 @@ class SiteController extends Controller
         $produk->harga_promo = $produk->harga;
 
         foreach ($produk->detail_foto as $value) {
-            $value->foto = Storage::url('images/produk/' . $value->media_link);
+            $value->foto = $value->media_link;
 
             if($value->is_video == 'ya'){
                 $value->foto = Storage::url('videos/produk/' . $value->media_link);
@@ -319,6 +320,7 @@ class SiteController extends Controller
 
     public function katalog(Request $request) {
         $params = (array) $request->all();
+        $params['limit'] = 50;
         $promo = $this->promoDet->getDetailPromoAktif();
         $produk = $this->product->getAll($params);
 

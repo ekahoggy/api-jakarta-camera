@@ -72,7 +72,10 @@ Route::group(['middleware' => 'api'], function (){
 
         Route::group(['prefix' => 'woocommerce'], function (){
             Route::get('/authorize', [WoocommerceController::class, 'authorWoo']);
+            Route::get('/kategori', [WoocommerceController::class, 'getKategori']);
+            Route::get('/sinkron-kategori', [WoocommerceController::class, 'sinkronKategori']);
             Route::get('/produk', [WoocommerceController::class, 'getProduk']);
+            Route::get('/sinkron-produk', [WoocommerceController::class, 'sinkronProduk']);
         });
 
         Route::group(['prefix' => 'dashboard'], function (){

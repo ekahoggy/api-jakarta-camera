@@ -61,7 +61,7 @@ class Kategori extends Model
         $data = $query->orderBy('created_at', 'DESC')->get();
 
         foreach ($data as $key => $value) {
-            $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
+            // $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
             $data[$key]->children = DB::table($this->table)->where('induk_id', $value->id)->get();
         }
 
@@ -110,9 +110,13 @@ class Kategori extends Model
         $params['id'] = Generator::uuid4()->toString();
         $params['slug'] = Str::slug($params['kategori'], '-');
         $params['created_at'] = date('Y-m-d H:i:s');
-        $params['icon'] = $service->saveImage("kategori/", $params['icon']);
+        if(!isset($params['sinkron'])){
+            $params['icon'] = $service->saveImage("kategori/", $params['icon']);
+        }
+        else{
+            unset($params['sinkron']);
+        }
 
-        // $logUser->post($params['id'], 'insert', 'm_kategori', json_encode($params));
         return DB::table('m_kategori')->insert($params);
     }
 

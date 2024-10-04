@@ -41,6 +41,19 @@ class WoocommerceModel extends Model
         return $store_url . $endpoint . '?' . $query_string;
     }
 
+    public function getCategories($params = []){
+        $paramsString = http_build_query($params);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->WOOCOMMERCE_STORE_URL."/wp-json/wc/v3/products/categories?". $paramsString);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_USERPWD, $this->WOOCOMMERCE_CONSUMER_KEY . ":" . $this->WOOCOMMERCE_CONSUMER_SECRET);
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($output);
+    }
+
     public function getProduk($params = []){
         $paramsString = http_build_query($params);
 
