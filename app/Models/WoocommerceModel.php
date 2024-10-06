@@ -67,6 +67,30 @@ class WoocommerceModel extends Model
         return json_decode($output);
     }
 
+    public function updateProduk($payload = []){
+        $payload['stock_quantity'] = $payload['stok'];
+        $payload['stock_status'] = $payload['stok'] > 0 ? 'instock' : 'outofstock';
+
+        $url = $this->WOOCOMMERCE_STORE_URL."/wp-json/wc/v3/products/".$payload['woo_produk_id'];
+        $headers = [
+            'Content-Type: application/json',
+            'Authorization: Basic ' . base64_encode($this->WOOCOMMERCE_CONSUMER_KEY . ":" . $this->WOOCOMMERCE_CONSUMER_SECRET)
+        ];
+        $data = json_encode($payload);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_PUT, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($output);
+    }
+
     public function webhookCreate() {
         $data = [
             'name' => 'Order updated',

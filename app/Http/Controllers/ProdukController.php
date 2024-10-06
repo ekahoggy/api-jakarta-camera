@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Produk;
 use App\Models\PromoDet;
 use App\Models\VoucherDetail;
+use App\Models\WoocommerceModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -190,9 +191,11 @@ class ProdukController extends Controller
 
     public function updateStokProduk(Request $request){
         $params = (array) $request->all();
+        dd($params);
         $produkModel = new Produk();
+        $wooModel = new WoocommerceModel();
         $data = $produkModel->updateStokProduk($params);
-
+        $wooModel->updateProduk($params);
         if($data){
             return response()->json(['status_code' => 200, 'data' => $data], 200);
         }

@@ -147,4 +147,20 @@ class WoocommerceController extends Controller
             ], 500);
         }
     }
+
+    public function updateProduk(Request $request) {
+        try {
+            $produk = $this->woocommerce->updateProduk($request->all());
+
+            return response()->json([
+                'data' => $produk,
+                'status_code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th,
+                'status_code' => 500
+            ], 500);
+        }
+    }
 }

@@ -74,7 +74,7 @@ class SiteController extends Controller
 
     public function getProduct(Request $request){
         $params = (array) $request->all();
-        $params['limit'] = 50;
+
         $produk = $this->product->getAll($params);
         $promo = $this->promoDet->getDetailPromoAktif();
 
