@@ -113,8 +113,11 @@ class Produk extends Model
             $query->limit($params['limit']);
         }
 
-        $data = $query->orderBy('m_produk.created_at', 'DESC')->get();
+        $perPage = isset($params['per_page']) ? $params['per_page'] : 12;
+
+        $data = $query->orderBy('m_produk.created_at', 'DESC')->paginate($perPage);
         $totalItems = $query->count();
+
         return [
             'list' => $data,
             'totalItems' => $totalItems

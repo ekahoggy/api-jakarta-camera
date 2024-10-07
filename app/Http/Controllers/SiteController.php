@@ -110,6 +110,7 @@ class SiteController extends Controller
                 }
             }
         }
+        
         return response()->json(['success' => true, "data" => $produk]);
     }
 
