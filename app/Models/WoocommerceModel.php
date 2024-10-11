@@ -67,6 +67,19 @@ class WoocommerceModel extends Model
         return json_decode($output);
     }
 
+    public function getTags($params = []){
+        $paramsString = http_build_query($params);
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->WOOCOMMERCE_STORE_URL."/wp-json/wc/v3/products/tags?". $paramsString);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_USERPWD, $this->WOOCOMMERCE_CONSUMER_KEY . ":" . $this->WOOCOMMERCE_CONSUMER_SECRET);
+        $output = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($output);
+    }
+
     public function updateProduk($payload = []){
         $payload['stock_quantity'] = $payload['stok'];
         $payload['stock_status'] = $payload['stok'] > 0 ? 'instock' : 'outofstock';
