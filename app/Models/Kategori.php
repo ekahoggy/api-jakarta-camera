@@ -18,6 +18,7 @@ class Kategori extends Model
 
     protected $fillable = [
         'id',
+        'woo_kategori_id',
         'induk_id',
         'kategori',
         'slug',
@@ -30,7 +31,7 @@ class Kategori extends Model
     ];
 
     public function childs() {
-        return $this->hasMany('App\Models\Kategori','induk_id','id') ;
+        return $this->hasMany('App\Models\Kategori','induk_id','woo_kategori_id') ;
     }
 
     public function getAll($params){
@@ -73,7 +74,7 @@ class Kategori extends Model
 
     public function getById($id){
         $data = DB::table('m_kategori')
-            ->select('id', 'induk_id', 'kategori', 'slug', 'icon', 'keterangan')
+            ->select('id', 'induk_id', 'woo_kategori_id', 'kategori', 'slug', 'icon', 'keterangan')
             ->where('id', $id)
             ->first();
 
