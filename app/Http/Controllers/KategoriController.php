@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kategori;
+use App\Models\WoocommerceModel;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
@@ -10,11 +11,13 @@ use Illuminate\Support\Facades\Validator;
 class KategoriController extends Controller
 {
     protected $kategori;
+    protected $wooModel;
 
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => ['kategori']]);
         $this->kategori = new Kategori();
+        $this->wooModel = new WoocommerceModel();
     }
 
     public function getData(Request $request){
@@ -58,10 +61,10 @@ class KategoriController extends Controller
             "icon"  => "required"
         ]);
         if ($validator->valid()) {
-            $data = $this->kategori->simpan($params);
+            $this->kategori->simpan($params);
 
             return response()->json([
-                'data' => $data,
+                'data' => [],
                 'status_code' => 200
             ], 200);
         }
