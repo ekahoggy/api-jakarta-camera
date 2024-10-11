@@ -321,9 +321,8 @@ class SiteController extends Controller
 
     public function katalog(Request $request) {
         $params = (array) $request->all();
-        $params['limit'] = 50;
         $promo = $this->promoDet->getDetailPromoAktif();
-        $produk = $this->product->getAll($params);
+        $produk = $this->product->getAllPaginate($params);
 
         foreach ($produk['list'] as $value) {
             $value->variant = $this->product->getVariant($value->id);

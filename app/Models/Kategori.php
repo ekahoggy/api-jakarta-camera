@@ -73,7 +73,7 @@ class Kategori extends Model
         foreach ($data as $key => $value) {
             $iconPath = 'images/kategori/' . $value->icon;
             $data[$key]->icon = $value->icon->endsWith('.webp') ? Storage::url($iconPath) : null;
-            $data[$key]->children = DB::table($this->table)->where('induk_id', $value->woo_kategori_id)->get();
+            $data[$key]->child = DB::table($this->table)->where('induk_id', $value->woo_kategori_id)->get();
         }
 
         return [
@@ -147,11 +147,11 @@ class Kategori extends Model
     }
 
     public function getKategori(){
-        $data = DB::table('m_kategori')->whereNull('induk_id')->orderBy('created_at', 'DESC')->get();
+        $data = DB::table('m_kategori')->where('induk_id', '=', 0)->orderBy('created_at', 'DESC')->get();
 
         foreach ($data as $key => $value) {
             $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
-            $data[$key]->child = DB::table('m_kategori')->where('induk_id', $value->id)->get();
+            $data[$key]->child = DB::table('m_kategori')->where('induk_id', $value->woo_kategori_id)->get();
         }
 
         return $data;
