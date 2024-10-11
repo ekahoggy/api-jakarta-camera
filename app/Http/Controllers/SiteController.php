@@ -75,7 +75,7 @@ class SiteController extends Controller
     public function getProduct(Request $request){
         $params = (array) $request->all();
 
-        $produk = $this->product->getAll($params);
+        $produk = $this->product->getAllPaginate($params);
         $promo = $this->promoDet->getDetailPromoAktif();
 
         foreach ($produk['list'] as $key => $value) {

@@ -113,9 +113,89 @@ class Produk extends Model
             $query->limit($params['limit']);
         }
 
+        $data = $query->orderBy('m_produk.created_at', 'DESC')->get();
+        $totalItems = $query->count();
+
+        return [
+            'list' => $data,
+            'totalItems' => $totalItems
+        ];
+    }
+
+    public function getAllPaginate($params = []){
+        $query = DB::table('m_produk')
+            ->selectRaw('
+                m_produk.*,
+                m_kategori.kategori,
+                m_kategori.slug as slug_kategori,
+                m_brand.brand,
+                m_brand.slug as slug_brand
+            ')
+            ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
+            ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id');
+
+        if (isset($params['filter']) && !empty($params['filter'])) {
+            $filter = json_decode($params['filter']);
+            foreach ($filter as $key => $value) {
+                if ($key === 'nama'){
+                    if(!empty($value)){
+                        $query->where('nama', 'like', '%' . $value . '%');
+                    }
+                    // $query->orWhere('sku', 'like', '%' . $value . '%');
+                }
+                if ($key === 'm_kategori_id'){
+                    if($value !== null){
+                        $query->where('m_kategori_id', $value);
+                    }
+                }
+                if ($key === 'm_brand_id'){
+                    if($value !== null){
+                        $query->where('m_brand_id', $value);
+                    }
+                }
+                if($key === 'is_active'){
+                    if($value !== null){
+                        $query->where('is_active', $value);
+                    }
+                }
+                if($key == 'category'){
+                    if(!empty($value) && isset($value)){
+                        $query->whereIn('m_kategori.slug', $value);
+                    }
+                }
+                if($key == 'brand'){
+                    if(!empty($value) && isset($value)){
+                        $query->whereIn('m_brand.slug', $value);
+                    }
+                }
+            }
+        }
+
+        if (isset($params['lastseen']) && !empty($params['lastseen'])) {
+            $query->whereIn('m_produk.id', $params['lastseen']);
+        }
+
+        if (isset($params['kategori']) && !empty($params['kategori'])) {
+            $query->where('m_kategori.slug', $params['kategori']);
+        }
+
+        if (isset($params['brand']) && !empty($params['brand'])) {
+            $query->where('m_brand.slug', $params['brand']);
+        }
+
+        if (isset($params['offset']) && !empty($params['offset'])) {
+            $query->offset($params['offset']);
+        }
+
+        if (isset($params['limit']) && !empty($params['limit'])) {
+            $query->limit($params['limit']);
+        }
+
         $perPage = isset($params['per_page']) ? $params['per_page'] : 12;
 
-        $data = $query->orderBy('m_produk.created_at', 'DESC')->paginate($perPage);
+        $data = $query->orderBy('m_produk.created_at', 'DESC')
+            ->paginate($perPage);
+            
         $totalItems = $query->count();
 
         return [
