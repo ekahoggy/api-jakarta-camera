@@ -71,9 +71,13 @@ class Kategori extends Model
         $data = $query->orderBy('created_at', 'DESC')->get();
 
         foreach ($data as $key => $value) {
-            $iconPath = 'images/kategori/' . $value->icon;
-            $data[$key]->icon = $value->icon->endsWith('.webp') ? Storage::url($iconPath) : null;
-            $data[$key]->child = DB::table($this->table)->where('induk_id', $value->woo_kategori_id)->get();
+            if($value->icon !== null && $value->icon !== 'null'){
+                $iconPath = 'images/kategori/' . $value->icon;
+                $pieces = explode('.', $iconPath);
+                $last_word = array_pop($pieces);
+                $value->icon = $last_word === 'webp' ? Storage::url($iconPath) : $value->icon;
+            }
+            $value->child = DB::table($this->table)->where('induk_id', $value->woo_kategori_id)->get();
         }
 
         return [
@@ -88,6 +92,12 @@ class Kategori extends Model
             ->where('id', $id)
             ->first();
 
+        if($data->icon !== null && $data->icon !== 'null'){
+            $iconPath = 'images/kategori/' . $data->icon;
+            $pieces = explode('.', $iconPath);
+            $last_word = array_pop($pieces);
+            $data->icon = $last_word === 'webp' ? Storage::url($iconPath) : $data->icon;
+        }
         return $data;
     }
 
@@ -150,7 +160,9 @@ class Kategori extends Model
         $data = DB::table('m_kategori')->where('induk_id', '=', 0)->orderBy('created_at', 'DESC')->get();
 
         foreach ($data as $key => $value) {
-            $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
+            // if($value->icon !== null || $value->icon !== 'null'){
+            //     $data[$key]->icon = Storage::url('images/kategori/' . $value->icon);
+            // }
             $data[$key]->child = DB::table('m_kategori')->where('induk_id', $value->woo_kategori_id)->get();
         }
 

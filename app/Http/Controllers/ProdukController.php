@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\Produk\ProdukResource;
 use App\Models\Produk;
 use App\Models\PromoDet;
 use App\Models\VoucherDetail;
@@ -30,12 +31,16 @@ class ProdukController extends Controller
 
         $produk = $produkModel->getAll($params);
         foreach ($produk['list'] as $key => $value) {
-            $value->variant = $produkModel->getVariant($value->id);
+            // $value->variant = $produkModel->getVariant($value->id);
+            // $value->rowspan = count($value->variant);
             $value->photo_product = $produkModel->getPhoto($value->id);
             $value->foto = $produkModel->getMainPhotoProduk($value->id);
             $value->video = $produkModel->getVideo($value->id);
-            $value->rowspan = count($value->variant);
+            $value->categories = $produkModel->getCategories($value->id);
+            $value->tags = $produkModel->getTags($value->id);
         }
+        // dd($produk['list']);
+        // return response()->json(['success' => true, "data" => new ProdukResource($produk['list'])]);
         return response()->json(['success' => true, "data" => $produk]);
     }
 
@@ -96,7 +101,7 @@ class ProdukController extends Controller
 
         if ($validator->valid()) {
             $params = (array) $request->only(
-                "id", "nama", "sku", "photo", "slug", "deskripsi", "detail_produk", "harga", "in_box", "is_active",
+                "id", "woo_produk_id", "nama", "sku", "photo", "slug", "deskripsi", "detail_produk", "harga", "in_box", "is_active",
                 "m_brand_id", "m_kategori_id", "min_beli", "lebar", "berat", "panjang", "tinggi", "stok", "tags", "type", "variant",
                 "link_blibli", "link_bukalapak", "link_lazada", "link_shopee", "link_tokped", "video", "link_video",
                 "created_at", "created_by", "updated_at", "updated_by"
@@ -191,11 +196,9 @@ class ProdukController extends Controller
 
     public function updateStokProduk(Request $request){
         $params = (array) $request->all();
-        dd($params);
         $produkModel = new Produk();
-        $wooModel = new WoocommerceModel();
+
         $data = $produkModel->updateStokProduk($params);
-        $wooModel->updateProduk($params);
         if($data){
             return response()->json(['status_code' => 200, 'data' => $data], 200);
         }

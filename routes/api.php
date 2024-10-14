@@ -53,7 +53,7 @@ use Illuminate\Support\Facades\Crypt;
 |
 */
 
-Route::middleware('throttle:10,1')->group(['middleware' => 'api'], function (){
+Route::group(['middleware' => 'api'], function (){
     Route::group(['prefix' => 'v1'], function (){
         Route::group(['prefix' => 'auth'], function () {
             Route::post('/login', [AuthController::class, 'login']);

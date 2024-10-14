@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 use Ramsey\Uuid\Uuid as Generator;
 use Illuminate\Support\Facades\DB;
@@ -12,12 +13,22 @@ use Illuminate\Support\Str;
 class Produk extends Model
 {
     use HasFactory;
+    private $WOOCOMMERCE_STORE_URL;
+    private $WOOCOMMERCE_CONSUMER_KEY;
+    private $WOOCOMMERCE_CONSUMER_SECRET;
+
+    public function __construct() {
+        $this->WOOCOMMERCE_STORE_URL = 'https://jakartacamera.com';
+        $this->WOOCOMMERCE_CONSUMER_KEY = 'ck_c46c613c61a7afda407d20f59593c4cc1523d22e';
+        $this->WOOCOMMERCE_CONSUMER_SECRET = 'cs_6aa1f62f6dd3539d47ac1cb528d954f276b60352';
+    }
 
     protected $table = 'm_produk';
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'id',
+        'woo_produk_id',
         'sku',
         'm_kategori_id',
         'nama',
@@ -32,8 +43,13 @@ class Produk extends Model
         'detail_produk',
         'deskripsi',
         'in_box',
-        'tags',
         'min_beli',
+        'berat',
+        'tinggi',
+        'panjang',
+        'lebar',
+        'stok',
+        'stok_status',
         'link_video',
         'is_active',
         'created_by',
@@ -45,7 +61,7 @@ class Produk extends Model
     ];
 
     public function getAll($params = []){
-        $query = DB::table('m_produk')
+        $query = $this->query()
             ->selectRaw('
                 m_produk.*,
                 m_kategori.kategori,
@@ -63,7 +79,6 @@ class Produk extends Model
                     if(!empty($value)){
                         $query->where('nama', 'like', '%' . $value . '%');
                     }
-                    // $query->orWhere('sku', 'like', '%' . $value . '%');
                 }
                 if ($key === 'm_kategori_id'){
                     if($value !== null){
@@ -195,7 +210,7 @@ class Produk extends Model
 
         $data = $query->orderBy('m_produk.created_at', 'DESC')
             ->paginate($perPage);
-            
+
         $totalItems = $query->count();
 
         return [
@@ -236,6 +251,31 @@ class Produk extends Model
         $params['slug'] = Str::slug($params['nama'], '-');
         $params['updated_at'] = date('Y-m-d H:i:s');
 
+        $image = [];
+        foreach ($params['photo'] as $key => $value) {
+            $image[$key]['id'] = $value['woo_media_id'];
+        }
+
+        $dataWoo = [
+            'name' => $params['nama'],
+            'sku' => $params['sku'],
+            'slug' => $params['slug'],
+            // 'description' => $params['deskripsi'],
+            // 'short_description' => $params['detail_produk'],
+            // 'uagb_excerpt' => $params['in_box'],
+            'stock_quantity' => $params['stok'],
+            'price' => $params['harga'],
+            'weight' => $params['berat'] / 1000,
+            'dimensions' => [
+                'length' => $params['lebar'],
+                'width' => $params['panjang'],
+                'height' => $params['tinggi'],
+            ],
+            // 'image' => $image
+        ];
+
+        $woo = $this->updateWooProduk($params['woo_produk_id'], $dataWoo);
+
         if (isset($params['photo']) && !empty(isset($params['photo']))) {
             $this->savePhoto($id, $params['photo']);
             unset($params['photo']);
@@ -251,7 +291,24 @@ class Produk extends Model
             unset($params['variant']);
         }
 
-        return DB::table('m_produk')->where('id', $id)->update($params);
+        $dataUpdate = [
+            'nama' => $woo->name,
+            'sku' => $woo->sku,
+            'slug' => $woo->slug,
+            'deskripsi' => $params['deskripsi'],
+            'detail_produk' => $params['detail_produk'],
+            'in_box' => $params['in_box'],
+            'stok' => $woo->stock_quantity,
+            'stok_status' => $woo->stock_status,
+            'harga' => $woo->price,
+            'berat' => $woo->weight * 1000,
+            'harga' => (double)$woo->price ?? 0,
+            'berat' => (double)$woo->weight * 1000 ?? 0,
+            'lebar' => $woo->dimensions ? (int)$woo->dimensions->length : 0,
+            'panjang' => $woo->dimensions ? (int)$woo->dimensions->width : 0,
+            'tinggi' => $woo->dimensions ? (int)$woo->dimensions->height : 0,
+        ];
+        return DB::table('m_produk')->where('id', $id)->update($dataUpdate);
     }
 
     public function insertProduct($params) {
@@ -283,8 +340,32 @@ class Produk extends Model
             $this->saveVariant($params['id'], $params['variant']);
             unset($params['variant']);
         }
+        if($params['sinkron']){
+            if(isset($params['tags'])){
+                foreach ($params['tags'] as $key => $value) {
+                    $tags = [
+                        'produk_id' => $params['id'],
+                        'woo_tags_id' => $value->id
+                    ];
+
+                    DB::table('m_produk_tags')->insert($tags);
+                }
+            }
+            if(isset($params['categories'])){
+                foreach ($params['categories'] as $key => $value) {
+                    $categories = [
+                        'produk_id' => $params['id'],
+                        'woo_kategori_id' => $value->id
+                    ];
+
+                    DB::table('m_produk_kategori')->insert($categories);
+                }
+            }
+        }
 
         unset($params['sinkron']);
+        unset($params['tags']);
+        unset($params['categories']);
 
         return DB::table('m_produk')->insert($params);
     }
@@ -314,13 +395,14 @@ class Produk extends Model
         foreach($photo as $i => $image) {
             $data = [];
             if($image['isFoto']){
+                $abbreviation = explode('.', trim($image['foto']))[0];
                 $data['id'] = Generator::uuid4()->toString();
                 $data['m_produk_id'] = $produkId;
                 $data['name'] = $image['name'] ?? '';
                 $data['alt'] = $image['alt'] ?? '';
                 $data['is_main'] = $i == 0 ? 1 : 0;
                 $data['urutan'] = $i + 1;
-                $data['media_link'] = $sinkron ? $image->src : $service->saveImage("produk/", $image['foto']);
+                $data['media_link'] = $abbreviation == 'https://jakartacamera' ? $image['foto'] : $service->saveImage("produk/", $image['foto']);
 
                 DB::table('m_produk_media')->insert($data);
             }
@@ -371,6 +453,44 @@ class Produk extends Model
             return $url;
         }
         return null;
+    }
+
+    public function getCategories($produkId) {
+        $data = DB::table('m_produk_kategori')
+        ->selectRaw('
+            m_produk_kategori.*,
+            m_kategori.induk_id,
+            m_kategori.kategori,
+            m_kategori.slug,
+            m_kategori.icon
+        ')
+        ->leftJoin('m_kategori', 'm_kategori.woo_kategori_id', '=', 'm_produk_kategori.woo_kategori_id')
+        ->where('produk_id', $produkId)
+        ->get();
+
+        return $data;
+    }
+
+    public function getTags($produkId) {
+        $data = DB::table('m_produk_tags')
+        ->selectRaw('
+            m_produk_tags.*,
+            m_tags.name,
+            m_tags.slug,
+            m_tags.count
+        ')
+        ->leftJoin('m_tags', 'm_tags.woo_tags_id', '=', 'm_produk_tags.woo_tags_id')
+        ->where('produk_id', $produkId)
+        ->get();
+
+        return $data;
+    }
+
+    public function media(): HasMany
+    {
+        $media = $this->hasMany(Media::class, 'm_produk_id', 'id');
+
+        return $media;
     }
 
     public function getPhoto($produkId) {
@@ -486,8 +606,16 @@ class Produk extends Model
     }
 
     public function updateStokProduk($params) {
-        DB::table('m_produk')->where('id', $params['id'])->update(['stok' => $params['stok']]);
+        $dataWoo = [
+            'stock_quantity' => $params['stok']
+        ];
+        $woo = $this->updateWooProduk($params['woo_produk_id'], $dataWoo);
 
+        $dataUpdate = [
+            'stok' => $woo->stock_quantity,
+            'stok_status' => $woo->stock_status
+        ];
+        DB::table('m_produk')->where('id', $params['id'])->update($dataUpdate);
         return true;
     }
 
@@ -502,6 +630,32 @@ class Produk extends Model
         $url = $data->media_link ?? '';
 
         return $url;
+    }
+
+    public function updateWooProduk($id, $payload = []){
+        $params = http_build_query($payload);
+        $url = $this->WOOCOMMERCE_STORE_URL.'/wp-json/wc/v3/products/'.$id.'?'.$params;
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'PUT',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+                'Authorization: Basic '. base64_encode($this->WOOCOMMERCE_CONSUMER_KEY . ":" . $this->WOOCOMMERCE_CONSUMER_SECRET)
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return json_decode($response);
+        // echo $response;
     }
 
     public function stok($param) {
@@ -520,7 +674,7 @@ class Produk extends Model
     }
 
     public function getProdukKategori($params){
-        $query = DB::table($this->table)
+        $query = DB::table('m_produk_kategori')
                 ->selectRaw('
                     m_produk.id,
                     m_produk.sku,
@@ -533,13 +687,13 @@ class Produk extends Model
                     m_produk.m_brand_id,
                     m_kategori.slug as slug_kategori,
                     m_kategori.kategori as kategori_produk,
-                    m_brand.brand as brand_produk,
-                    m_brand.slug as slug_brand
+                    m_kategori.woo_kategori_id as kategori_produk
                 ')
-                ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
-                ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
+                ->leftJoin('m_produk', 'm_produk.id', '=', 'm_produk_kategori.produk_id')
+                ->leftJoin('m_kategori', 'm_kategori.woo_kategori_id', '=', 'm_produk_kategori.woo_kategori_id')
+                // ->leftJoin('m_brand', 'm_brand.id', '=', 'm_produk.m_brand_id')
                 ->where('is_active', 1)
-                ->whereIn('m_kategori_id', $params)
+                ->whereIn('m_kategori.id', $params)
                 ->get();
 
         return $query;
@@ -572,22 +726,6 @@ class Produk extends Model
     }
 
     function reminderStok() {
-        // $produk = DB::table($this->table)
-        // ->selectRaw('
-        //     m_produk.id,
-        //     m_produk.nama,
-        //     m_produk.stok,
-        //     m_produk.min_beli,
-        //     m_produk.harga,
-        //     m_kategori.kategori
-        // ')
-        // ->leftJoin('m_kategori', 'm_kategori.id', '=', 'm_produk.m_kategori_id')
-        // ->where('stok', '<=', 'min_beli')
-        // ->where('is_active', 1)
-        // ->orderBy('stok', 'asc')
-        // ->limit(5)
-        // ->get();
-
         $products = DB::table('m_produk')
         ->selectRaw('
             m_produk.id,
@@ -640,19 +778,5 @@ class Produk extends Model
         ->get();
 
         return $products;
-
-        // foreach($produk as $p){
-        //     $p->is_varian = false;
-        //     foreach($varian as $v){
-        //         if($p->id === $v->m_produk_id){
-        //             $p->is_varian = true;
-        //             $p->nama = $p->nama . ' - ' . $v->varian1 . ' ' . $v->varian2;
-        //             $p->stok = $v->stok;
-        //             $p->harga = $v->harga;
-        //         }
-        //     }
-        // }
-
-        // return $produk;
     }
 }

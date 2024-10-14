@@ -104,31 +104,6 @@ class WoocommerceModel extends Model
         return json_decode($output);
     }
 
-    public function saveKategori($payload = []){
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->WOOCOMMERCE_STORE_URL.'/wc/v3/products/categories',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => array('name' => '<string>','slug' => '<string>','parent' => '<string>','description' => '<string>','display' => '["default","default"]','image' => '<string>','menu_order' => '<string>'),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: multipart/form-data',
-                'Authorization: '. base64_encode($this->WOOCOMMERCE_CONSUMER_KEY . ":" . $this->WOOCOMMERCE_CONSUMER_SECRET)
-            ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-        echo $response;
-    }
-
     public function webhookCreate() {
         $data = [
             'name' => 'Order updated',

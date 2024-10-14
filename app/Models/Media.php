@@ -11,27 +11,21 @@ class Media extends Model
 {
     use HasFactory;
 
-    protected $table = 'm_medias';
+    protected $table = 'm_produk_media';
 
     protected $fillable = [
-        'file',
-        'is_status'
+        'woo_media_id',
+        'm_produk_id',
+        'media_link',
+        'name',
+        'alt',
+        'is_video',
+        'is_main',
+        'urutan',
+        'is_active'
     ];
 
     protected $casts = [
         'id' => 'string'
     ];
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($model) {
-            try {
-                $model->id = Generator::uuid4()->toString();
-            } catch (UnsatisfiedDependencyException $e) {
-                abort(500, $e->getMessage());
-            }
-        });
-    }
 }
